@@ -1,11 +1,11 @@
 import Template from "../components/Template";
 import Table from "../components/Table";
 
-export default function Index() {
+export default function Meetings() {
   return (
     <Template
-      title="Users"
-      description="A list of all the users in your account including their name, title, email and role."
+      title="Meetings"
+      description="A list of all the meetings in your account."
     >
       <Table />
     </Template>
