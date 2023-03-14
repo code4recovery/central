@@ -1,11 +1,12 @@
-import Template from "../components/Template";
-import Table from "../components/Table";
+import { strings } from "~/i18n";
+import { Button, Table, Template } from "~/components";
 
 export default function Index() {
   return (
     <Template
-      title="Users"
-      description="A list of all the users in your account including their name, title, email and role."
+      title={strings.meetings_title}
+      description={strings.meetings_description}
+      cta={<Button url="/create" label={strings.meetings_add} />}
     >
       <Table />
     </Template>

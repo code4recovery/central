@@ -1,0 +1,17 @@
+export const strings = {
+  admin_description: "A list of all the admin functions in your account",
+  admin_title: "Admin",
+  app_name: "OIAA CMS",
+  help_show: "Show help",
+  meetings_add: "Add meeting",
+  meetings_description: "A list of all the meetings in your account",
+  meetings_title: "Meetings",
+  profile_title: "Your profile",
+  profile_description: "Edit your user profile",
+  reports_description: "A list of all the reports in your account",
+  reports_title: "Reports",
+  search: "Search for meetings",
+  settings_title: "Settings",
+  sign_out: "Sign out",
+  user_menu_open: "Open user menu",
+};

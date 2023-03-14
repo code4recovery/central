@@ -8,37 +8,31 @@ const people = [
   {
     name: "Lindsay Walton",
     title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
+    email: "lindsay.walton1@example.com",
     role: "Member",
   },
   {
     name: "Lindsay Walton",
     title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
+    email: "lindsay.walton2@example.com",
     role: "Member",
   },
   {
     name: "Lindsay Walton",
     title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
+    email: "lindsay.walton3@example.com",
     role: "Member",
   },
   {
     name: "Lindsay Walton",
     title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
-    role: "Member",
-  },
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
+    email: "lindsay.walton4@example.com",
     role: "Member",
   },
   // More people...
 ];
 
-export default function Table() {
+export function Table() {
   return (
     <table className="min-w-full divide-y divide-gray-300">
       <thead>
