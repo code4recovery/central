@@ -1,97 +1,72 @@
-const people = [
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
-    role: "Member",
-  },
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton1@example.com",
-    role: "Member",
-  },
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton2@example.com",
-    role: "Member",
-  },
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton3@example.com",
-    role: "Member",
-  },
-  {
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton4@example.com",
-    role: "Member",
-  },
-  // More people...
-];
+import { Link } from "@remix-run/react";
 
-export function Table() {
+import { formatClasses as cx } from "~/helpers";
+
+export function Table({
+  columns,
+  rows,
+}: {
+  columns: {
+    [index: string]: {
+      label: string;
+      align?: "left" | "center" | "right";
+    };
+  };
+  rows: {
+    id: string;
+    [index: string]: string | number | string[] | undefined;
+  }[];
+}) {
+  const headers = Object.keys(columns).slice(0, 4);
   return (
-    <table className="min-w-full divide-y divide-gray-300">
+    <table className="min-w-full divide-y divide-gray-400 text-left text-sm">
       <thead>
         <tr>
-          <th
-            scope="col"
-            className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-          >
-            Name
-          </th>
-          <th
-            scope="col"
-            className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell"
-          >
-            Title
-          </th>
-          <th
-            scope="col"
-            className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell"
-          >
-            Email
-          </th>
-          <th
-            scope="col"
-            className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-          >
-            Role
-          </th>
-          <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
-            <span className="sr-only">Edit</span>
-          </th>
+          {headers.map((column, index) => (
+            <th
+              key={column}
+              scope="col"
+              className={cx("p-3 font-semibold text-gray-900", {
+                "hidden lg:table-cell": index === 1,
+                "hidden sm:table-cell": index === 2,
+              })}
+            >
+              {columns[column].label}
+            </th>
+          ))}
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-200">
-        {people.map((person) => (
-          <tr key={person.email}>
-            <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:w-auto sm:max-w-none sm:pl-0">
-              {person.name}
+      <tbody className="divide-y divide-gray-300 text-gray-700">
+        {rows.map((row) => (
+          <tr key={row.id}>
+            <td className="w-full max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
+              <Link to={row.id} className="text-indigo-500 underline">
+                {row[headers[0]]}
+              </Link>
               <dl className="font-normal lg:hidden">
-                <dt className="sr-only">Title</dt>
-                <dd className="mt-1 truncate text-gray-700">{person.title}</dd>
-                <dt className="sr-only sm:hidden">Email</dt>
-                <dd className="mt-1 truncate text-gray-500 sm:hidden">
-                  {person.email}
-                </dd>
+                {!!row[headers[1]] && (
+                  <>
+                    <dt className="sr-only">{columns[headers[1]].label}</dt>
+                    <dd className="mt-1 truncate">{row[headers[1]]}</dd>
+                  </>
+                )}
+                {!!row[headers[2]] && (
+                  <>
+                    <dt className="sr-only">{columns[headers[2]].label}</dt>
+                    <dd className="mt-1 truncate sm:hidden">
+                      {row[headers[2]]}
+                    </dd>
+                  </>
+                )}
               </dl>
             </td>
-            <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">
-              {person.title}
-            </td>
-            <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">
-              {person.email}
-            </td>
-            <td className="px-3 py-4 text-sm text-gray-500">{person.role}</td>
-            <td className="py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-              <a href="/edit" className="text-indigo-600 hover:text-indigo-900">
-                Edit<span className="sr-only">, {person.name}</span>
-              </a>
-            </td>
+            {!!row[headers[1]] && (
+              <td className="hidden p-3 lg:table-cell">{row[headers[1]]}</td>
+            )}
+            {!!row[headers[2]] && (
+              <td className="hidden p-3 sm:table-cell">{row[headers[2]]}</td>
+            )}
+            {!!row[headers[3]] && <td className="p-3">{row[headers[3]]}</td>}
           </tr>
         ))}
       </tbody>

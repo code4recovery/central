@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, NavLink } from "@remix-run/react";
 
-import { classNames } from "~/helpers";
+import { formatClasses as cx } from "~/helpers";
 import { Logo } from "~/components";
 import { strings } from "~/i18n";
 
@@ -67,10 +67,11 @@ export function MainNav() {
                       key={index}
                       to={url}
                       className={({ isActive }) =>
-                        classNames(
-                          isActive
-                            ? "border-indigo-500 text-gray-900"
-                            : "border-transparent",
+                        cx(
+                          {
+                            "border-indigo-500 text-gray-900": isActive,
+                            "border-transparent": !isActive,
+                          },
                           "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
                         )
                       }
@@ -150,8 +151,10 @@ export function MainNav() {
                           {({ active }) => (
                             <NavLink
                               to={url}
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
+                              className={cx(
+                                {
+                                  "bg-gray-100": active,
+                                },
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
@@ -174,10 +177,13 @@ export function MainNav() {
                   key={url}
                   to={url}
                   className={({ isActive }) =>
-                    classNames(
-                      isActive
-                        ? "bg-indigo-50 border-indigo-500 text-indigo-700"
-                        : "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800",
+                    cx(
+                      {
+                        "bg-indigo-50 border-indigo-500 text-indigo-700":
+                          isActive,
+                        "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800":
+                          !isActive,
+                      },
                       "block border-l-4 py-2 pl-3 pr-4 text-base font-medium "
                     )
                   }
