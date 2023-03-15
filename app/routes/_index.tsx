@@ -23,6 +23,7 @@ export default function Index() {
           name: { label: "Name" },
           day: { label: "Day" },
           time: { label: "Time" },
+          region: { label: "Region", align: "right" },
         }}
         rows={meetings}
       />

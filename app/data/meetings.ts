@@ -1266,6 +1266,7 @@ export function getMeetings() {
 
   return meetings.slice(0, 25).map((meeting) => ({
     ...meeting,
+    region: meeting.regions.pop(),
     day: days[meeting.day],
     id: meeting.slug,
   }));

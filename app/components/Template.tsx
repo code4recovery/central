@@ -18,7 +18,7 @@ export function Template({
         {title && (
           <div className="sm:flex sm:items-center">
             <div className="sm:flex-auto">
-              <h1 className="font-semibold leading-6 text-gray-900 text-xl">
+              <h1 className="font-semibold leading-6 text-gray-900 text-2xl">
                 {title}
               </h1>
               {description && (
@@ -30,7 +30,7 @@ export function Template({
             )}
           </div>
         )}
-        <div className="-mx-4 mt-8 sm:-mx-0">{children}</div>
+        <div className="-mx-4 mt-8 mb-16 sm:-mx-0">{children}</div>
       </div>
     </>
   );
