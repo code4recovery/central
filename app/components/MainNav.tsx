@@ -25,27 +25,31 @@ export function MainNav() {
         url: "/",
       },
       {
+        label: strings.activity_title,
+        url: "/activity",
+      },
+      {
         label: strings.reports_title,
         url: "/reports",
       },
-      {
-        label: strings.admin_title,
-        url: "/admin",
-      },
     ],
     secondary: [
-      {
-        label: strings.profile_title,
-        url: "/profile",
-      },
-      {
-        label: strings.settings_title,
-        url: "/settings",
-      },
-      {
-        label: strings.sign_out,
-        url: "/sign-out",
-      },
+      [
+        {
+          label: strings.profile_title,
+          url: "/profile",
+        },
+        {
+          label: strings.settings_title,
+          url: "/settings",
+        },
+      ],
+      [
+        {
+          label: strings.sign_out,
+          url: "/sign-out",
+        },
+      ],
     ],
   };
 
@@ -58,7 +62,7 @@ export function MainNav() {
               <div className="flex px-2 lg:px-0">
                 <div className="flex flex-shrink-0 items-center">
                   <Link to="/">
-                    <Logo className="h-8 w-auto text-indigo-600" />
+                    <Logo className="h-8 w-auto text-blue-600" />
                   </Link>
                 </div>
                 <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
@@ -69,7 +73,7 @@ export function MainNav() {
                       className={({ isActive }) =>
                         cx(
                           {
-                            "border-indigo-500 text-gray-900": isActive,
+                            "border-blue-500 text-gray-900": isActive,
                             "border-transparent": !isActive,
                           },
                           "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
@@ -96,7 +100,7 @@ export function MainNav() {
                     <input
                       id="search"
                       name="search"
-                      className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                       placeholder={strings.search}
                       type="search"
                     />
@@ -104,7 +108,7 @@ export function MainNav() {
                 </div>
               </div>
               <div className="flex items-center lg:hidden">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -116,7 +120,7 @@ export function MainNav() {
               <div className="hidden lg:ml-4 lg:flex lg:items-center">
                 <button
                   type="button"
-                  className="flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   <span className="sr-only">{strings.help_show}</span>
                   <QuestionMarkCircleIcon
@@ -127,7 +131,7 @@ export function MainNav() {
 
                 <Menu as="div" className="relative ml-4 flex-shrink-0">
                   <div>
-                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                       <span className="sr-only">{strings.user_menu_open}</span>
                       <img
                         className="h-8 w-8 rounded-full"
@@ -145,23 +149,27 @@ export function MainNav() {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      {navItems.secondary.map(({ url, label }) => (
-                        <Menu.Item key={url}>
-                          {({ active }) => (
-                            <NavLink
-                              to={url}
-                              className={cx(
-                                {
-                                  "bg-gray-100": active,
-                                },
-                                "block px-4 py-2 text-sm text-gray-700"
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-gray-200 divide-y">
+                      {navItems.secondary.map((group, index) => (
+                        <div key={index} className="py-1">
+                          {group.map(({ url, label }) => (
+                            <Menu.Item key={url}>
+                              {({ active }) => (
+                                <NavLink
+                                  to={url}
+                                  className={cx(
+                                    {
+                                      "bg-gray-100": active,
+                                    },
+                                    "block px-4 py-2 text-sm text-gray-700"
+                                  )}
+                                >
+                                  {label}
+                                </NavLink>
                               )}
-                            >
-                              {label}
-                            </NavLink>
-                          )}
-                        </Menu.Item>
+                            </Menu.Item>
+                          ))}
+                        </div>
                       ))}
                     </Menu.Items>
                   </Transition>
@@ -179,8 +187,7 @@ export function MainNav() {
                   className={({ isActive }) =>
                     cx(
                       {
-                        "bg-indigo-50 border-indigo-500 text-indigo-700":
-                          isActive,
+                        "bg-blue-50 border-blue-500 text-blue-700": isActive,
                         "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800":
                           !isActive,
                       },
@@ -211,7 +218,7 @@ export function MainNav() {
                 </div>
                 <button
                   type="button"
-                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   <span className="sr-only">{strings.help_show}</span>
                   <QuestionMarkCircleIcon
@@ -220,15 +227,19 @@ export function MainNav() {
                   />
                 </button>
               </div>
-              <div className="mt-3 space-y-1">
-                {navItems.secondary.map(({ url, label }) => (
-                  <NavLink
-                    key={url}
-                    to={url}
-                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  >
-                    {label}
-                  </NavLink>
+              <div className="mt-3 space-y-1 divide-gray-200 divide-y">
+                {navItems.secondary.map((group, index) => (
+                  <div key={index} className="py-1">
+                    {group.map(({ url, label }) => (
+                      <NavLink
+                        key={url}
+                        to={url}
+                        className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                      >
+                        {label}
+                      </NavLink>
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>

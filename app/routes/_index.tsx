@@ -3,19 +3,25 @@ import { json } from "@remix-run/node";
 
 import { Button, Table, Template } from "~/components";
 import { getMeetings } from "~/data";
+import { formatString } from "~/helpers";
 import { strings } from "~/i18n";
 
 export async function loader() {
-  return json({ meetings: getMeetings() });
+  return json({
+    meetings: getMeetings(),
+    meetings_count: (1234).toLocaleString(),
+  });
 }
 
 export default function Index() {
-  const { meetings } = useLoaderData();
+  const { meetings, meetings_count } = useLoaderData();
 
   return (
     <Template
       title={strings.meetings_title}
-      description={strings.meetings_description}
+      description={formatString(strings.meetings_description, {
+        meetings_count,
+      })}
       cta={<Button url="/create" label={strings.meetings_add} />}
     >
       <Table

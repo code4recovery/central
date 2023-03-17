@@ -43,7 +43,7 @@ export function Table({
         {rows.map((row) => (
           <tr key={row.id}>
             <td className="w-full max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
-              <Link to={row.id} className="text-indigo-500 underline">
+              <Link to={row.id} className="text-blue-500 underline">
                 {row[keys[0]]}
               </Link>
               <dl className="font-normal lg:hidden">
