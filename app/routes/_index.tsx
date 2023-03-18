@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 
 import { Button, Table, Template } from "~/components";
 import { getMeetings } from "~/data";
-import { formatString } from "~/helpers";
+import { config, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 
 export async function loader() {
@@ -33,6 +33,12 @@ export default function Index() {
         }}
         rows={meetings}
       />
+      <div className="pt-10 flex justify-center">
+        <Button
+          label={formatString(strings.load_more, { count: config.batchSize })}
+          onClick={() => {}}
+        />
+      </div>
     </Template>
   );
 }

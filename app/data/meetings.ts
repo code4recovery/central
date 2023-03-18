@@ -1,3 +1,5 @@
+import { config } from "~/helpers";
+
 type Meeting = {
   day: number;
   time: string;
@@ -22,7 +24,7 @@ type Meeting = {
   website?: string;
 };
 
-export function getMeetings() {
+export function getMeetings(start = 0) {
   const meetings: Meeting[] = [
     {
       day: 5,
@@ -1264,7 +1266,7 @@ export function getMeetings() {
     "Saturday",
   ];
 
-  return meetings.slice(0, 25).map((meeting) => ({
+  return meetings.slice(start, config.batchSize).map((meeting) => ({
     ...meeting,
     region: meeting.regions.pop(),
     day: days[meeting.day],

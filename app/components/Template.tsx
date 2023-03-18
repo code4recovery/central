@@ -1,4 +1,4 @@
-import { MainNav } from "./MainNav";
+import { Footer, Header } from "~/components";
 
 export function Template({
   title,
@@ -13,9 +13,9 @@ export function Template({
 }) {
   return (
     <>
-      <MainNav />
+      <Header />
       {(title || children) && (
-        <div className="mt-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <main className="mt-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-grow w-full">
           {title && (
             <div className="sm:flex sm:items-center">
               <div className="sm:flex-auto">
@@ -32,10 +32,11 @@ export function Template({
             </div>
           )}
           {children && (
-            <div className="-mx-4 mt-8 mb-16 sm:-mx-0">{children}</div>
+            <div className="-mx-4 my-8 mb-16 sm:-mx-0">{children}</div>
           )}
-        </div>
+        </main>
       )}
+      <Footer />
     </>
   );
 }
