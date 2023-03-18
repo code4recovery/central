@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Link } from "@remix-run/react";
 
-import { formatClasses as cx } from "~/helpers";
+import { config, formatClasses as cx } from "~/helpers";
 
 export function Table({
   columns,
@@ -19,6 +19,7 @@ export function Table({
   }[];
 }) {
   const keys = Object.keys(columns);
+  const { text } = config.colors[config.color as keyof typeof config.colors];
   return (
     <table className="min-w-full divide-y divide-gray-400 text-left text-sm">
       <thead>
@@ -43,7 +44,7 @@ export function Table({
         {rows.map((row) => (
           <tr key={row.id}>
             <td className="w-full max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
-              <Link to={row.id} className="text-blue-500 underline">
+              <Link to={row.id} className={cx(text, "underline")}>
                 {row[keys[0]]}
               </Link>
               <dl className="font-normal lg:hidden">

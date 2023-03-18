@@ -1,4 +1,5 @@
 import { Link } from "@remix-run/react";
+import { config, formatClasses as cx } from "~/helpers";
 
 export function Button({
   label,
@@ -9,18 +10,24 @@ export function Button({
   onClick?: () => void;
   url?: string;
 }) {
-  const props = {
-    className:
-      "block rounded-md bg-blue-600 py-2 px-3 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600",
-  };
+  const className = cx(
+    "block rounded-md py-2 px-3 text-center text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+    config.colors[config.color as keyof typeof config.colors].background,
+    config.colors[config.color as keyof typeof config.colors].focusOutline,
+    config.colors[config.color as keyof typeof config.colors].backgroundHover
+  );
 
-  return onClick && !url ? (
-    <button {...props} onClick={onClick}>
+  return onClick ? (
+    <button className={className} onClick={onClick}>
       {label}
     </button>
   ) : url ? (
-    <Link {...props} to={url}>
+    <Link className={className} to={url}>
       {label}
     </Link>
-  ) : null;
+  ) : (
+    <button className={className} type="submit">
+      {label}
+    </button>
+  );
 }

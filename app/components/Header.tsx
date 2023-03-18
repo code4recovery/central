@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, NavLink } from "@remix-run/react";
 
-import { formatClasses as cx } from "~/helpers";
+import { config, formatClasses as cx } from "~/helpers";
 import { Logo } from "~/components";
 import { strings } from "~/i18n";
 
@@ -36,10 +36,6 @@ export function Header() {
     secondary: [
       [
         {
-          label: strings.profile_title,
-          url: "/profile",
-        },
-        {
           label: strings.settings_title,
           url: "/settings",
         },
@@ -52,6 +48,8 @@ export function Header() {
       ],
     ],
   };
+  const { text, focusRing, border } =
+    config.colors[config.color as keyof typeof config.colors];
 
   return (
     <header>
@@ -63,7 +61,7 @@ export function Header() {
                 <div className="flex px-2 lg:px-0">
                   <div className="flex flex-shrink-0 items-center">
                     <Link to="/">
-                      <Logo className="h-8 w-auto text-blue-600" />
+                      <Logo className={cx("h-8 w-auto", text)} />
                     </Link>
                   </div>
                   <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
@@ -74,7 +72,8 @@ export function Header() {
                         className={({ isActive }) =>
                           cx(
                             {
-                              "border-blue-500 text-gray-900": isActive,
+                              "text-gray-900": isActive,
+                              [border]: isActive,
                               "border-transparent": !isActive,
                             },
                             "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
@@ -101,7 +100,10 @@ export function Header() {
                       <input
                         id="search"
                         name="search"
-                        className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                        className={cx(
+                          "block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
+                          focusRing
+                        )}
                         placeholder={strings.search}
                         type="search"
                       />
@@ -109,7 +111,12 @@ export function Header() {
                   </div>
                 </div>
                 <div className="flex items-center lg:hidden">
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                  <Disclosure.Button
+                    className={cx(
+                      "inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset",
+                      focusRing
+                    )}
+                  >
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -121,7 +128,10 @@ export function Header() {
                 <div className="hidden lg:ml-4 lg:flex lg:items-center">
                   <button
                     type="button"
-                    className="flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className={cx(
+                      "flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2",
+                      focusRing
+                    )}
                   >
                     <span className="sr-only">{strings.help_show}</span>
                     <QuestionMarkCircleIcon
@@ -132,7 +142,12 @@ export function Header() {
 
                   <Menu as="div" className="relative ml-4 flex-shrink-0">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      <Menu.Button
+                        className={cx(
+                          "flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
+                          focusRing
+                        )}
+                      >
                         <span className="sr-only">
                           {strings.user_menu_open}
                         </span>
@@ -190,11 +205,12 @@ export function Header() {
                     className={({ isActive }) =>
                       cx(
                         {
-                          "bg-blue-50 border-blue-500 text-blue-700": isActive,
+                          [border]: isActive,
                           "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800":
                             !isActive,
                         },
-                        "block border-l-4 py-2 pl-3 pr-4 text-base font-medium "
+                        "block border-l-4 py-2 pl-3 pr-4 text-base font-medium",
+                        text
                       )
                     }
                   >
@@ -221,7 +237,10 @@ export function Header() {
                   </div>
                   <button
                     type="button"
-                    className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className={cx(
+                      "ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2",
+                      focusRing
+                    )}
                   >
                     <span className="sr-only">{strings.help_show}</span>
                     <QuestionMarkCircleIcon

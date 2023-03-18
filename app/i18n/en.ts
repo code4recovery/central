@@ -8,12 +8,10 @@ export const strings = {
   meetings_add: "Add meeting",
   meetings_description: "You have %meetings_count% meetings in your account.",
   meetings_title: "Meetings",
-  profile_title: "Your profile",
-  profile_description: "Edit your user profile",
   reports_description: "A list of all the reports in your account",
   reports_title: "Reports",
   search: "Search for meetings",
-  settings_title: "Account settings",
+  settings_title: "Settings",
   sign_out: "Sign out",
   user_menu_open: "Open user menu",
 };
