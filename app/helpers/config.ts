@@ -1,6 +1,5 @@
 export const config = {
   batchSize: 25,
-  color: "indigo",
   colors: {
     slate: {
       label: "Slate",

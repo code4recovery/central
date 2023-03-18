@@ -1,5 +1,6 @@
 import { Link } from "@remix-run/react";
-import { config, formatClasses as cx } from "~/helpers";
+import { formatClasses as cx } from "~/helpers";
+import { getAccount } from "~/data";
 
 export function Button({
   label,
@@ -10,11 +11,14 @@ export function Button({
   onClick?: () => void;
   url?: string;
 }) {
+  const {
+    theme: { background, focusOutline, backgroundHover },
+  } = getAccount();
   const className = cx(
     "block rounded-md py-2 px-3 text-center text-sm font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
-    config.colors[config.color as keyof typeof config.colors].background,
-    config.colors[config.color as keyof typeof config.colors].focusOutline,
-    config.colors[config.color as keyof typeof config.colors].backgroundHover
+    background,
+    focusOutline,
+    backgroundHover
   );
 
   return onClick ? (

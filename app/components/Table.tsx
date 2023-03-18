@@ -1,7 +1,8 @@
 import { Fragment } from "react";
 import { Link } from "@remix-run/react";
 
-import { config, formatClasses as cx } from "~/helpers";
+import { getAccount } from "~/data";
+import { formatClasses as cx } from "~/helpers";
 
 export function Table({
   columns,
@@ -19,7 +20,9 @@ export function Table({
   }[];
 }) {
   const keys = Object.keys(columns);
-  const { text } = config.colors[config.color as keyof typeof config.colors];
+  const {
+    theme: { text },
+  } = getAccount();
   return (
     <table className="min-w-full divide-y divide-gray-400 text-left text-sm">
       <thead>

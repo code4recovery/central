@@ -8,16 +8,13 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, NavLink } from "@remix-run/react";
 
-import { config, formatClasses as cx } from "~/helpers";
-import { Logo } from "~/components";
+import { getAccount, getUser } from "~/data";
+import { formatClasses as cx } from "~/helpers";
 import { strings } from "~/i18n";
+import { DefaultAccountLogo as Logo } from "~/icons";
 
 export function Header() {
-  const user = {
-    name: "Josh R",
-    email: "josh@example.com",
-    emailHash: "20dec0f8cf0ff2f581f6e350133d6bcd",
-  };
+  const user = getUser();
   const navItems = {
     primary: [
       {
@@ -48,8 +45,9 @@ export function Header() {
       ],
     ],
   };
-  const { text, focusRing, border } =
-    config.colors[config.color as keyof typeof config.colors];
+  const {
+    theme: { text, focusRing, border },
+  } = getAccount();
 
   return (
     <header>
