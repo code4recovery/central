@@ -1,24 +1,7 @@
 import { Button } from "~/components";
 import { getAccount } from "~/data";
 import { config, formatClasses as cx } from "~/helpers";
-
-type Field = {
-  name: string;
-  label: string;
-  type:
-    | "text"
-    | "textarea"
-    | "email"
-    | "url"
-    | "checkboxes"
-    | "colors"
-    | "image";
-  span?: number;
-  helpText?: string;
-  placeholder?: string;
-  value?: string;
-  defaultImage?: React.ReactNode;
-};
+import type { Field } from "~/types";
 
 export function Form({
   title,
@@ -33,7 +16,7 @@ export function Form({
     theme: { name: theme, focusRing, text },
   } = getAccount();
 
-  const textInputCSS =
+  const fieldClassNames =
     "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6";
 
   return (
@@ -54,22 +37,32 @@ export function Form({
         <form action="#" method="POST">
           <div className="shadow sm:overflow-hidden sm:rounded-md">
             <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
-              <div className="grid grid-cols-12 gap-6">
+              <div className="grid grid-cols-12 gap-5">
                 {fields.map(
                   ({
+                    defaultImage: DefaultImage,
                     helpText,
                     label,
                     name,
+                    options,
                     placeholder,
                     span,
                     type,
                     value,
-                    defaultImage: DefaultImage,
                   }) => (
                     <div
                       className={cx("col-span-12", {
+                        "sm:col-span-1": span === 1,
+                        "sm:col-span-2": span === 2,
+                        "sm:col-span-3": span === 3,
+                        "sm:col-span-4": span === 4,
+                        "sm:col-span-5": span === 5,
                         "sm:col-span-6": span === 6,
+                        "sm:col-span-7": span === 7,
                         "sm:col-span-8": span === 8,
+                        "sm:col-span-9": span === 9,
+                        "sm:col-span-10": span === 10,
+                        "sm:col-span-11": span === 11,
                       })}
                       key={name}
                     >
@@ -79,14 +72,16 @@ export function Form({
                       >
                         {label}
                       </label>
-                      {["text", "email", "url"].includes(type) && (
+                      {["email", "number", "text", "time", "url"].includes(
+                        type
+                      ) && (
                         <input
                           type={type}
                           name={name}
                           id={name}
                           placeholder={placeholder}
-                          className={cx(focusRing, textInputCSS)}
-                          defaultValue={value}
+                          className={cx(focusRing, fieldClassNames)}
+                          defaultValue={value ? `${value}` : undefined}
                         />
                       )}
                       {type === "textarea" && (
@@ -94,9 +89,9 @@ export function Form({
                           id={name}
                           name={name}
                           rows={3}
-                          className={cx(focusRing, textInputCSS)}
+                          className={cx(focusRing, fieldClassNames)}
                           placeholder={placeholder}
-                          defaultValue={value}
+                          defaultValue={value ? `${value}` : undefined}
                         />
                       )}
                       {type === "colors" && (
@@ -135,29 +130,51 @@ export function Form({
                           })}
                         </div>
                       )}
+                      {type === "select" && (
+                        <select
+                          name={name}
+                          id={name}
+                          className={fieldClassNames}
+                          defaultValue={value ? `${value}` : undefined}
+                        >
+                          <option></option>
+
+                          {options?.map(({ value, option }) => (
+                            <option key={value} value={value}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                       {type === "checkboxes" && (
-                        <div className="flex items-start">
-                          <div className="flex h-6 items-center">
-                            <input
-                              id="aa"
-                              name="programs"
-                              type="checkbox"
-                              className={cx(
-                                "h-4 w-4 rounded border-gray-300",
-                                focusRing,
-                                text
-                              )}
-                              defaultChecked={true}
-                            />
-                          </div>
-                          <div className="ml-3 text-sm leading-6">
-                            <label
-                              htmlFor="aa"
-                              className="font-medium text-gray-900"
+                        <div className="items-start grid grid-cols-3 gap-x-5 gap-y-3">
+                          {options?.map(({ option, value: optionValue }) => (
+                            <div
+                              className="flex items-center gap-2 m-0"
+                              key={optionValue}
                             >
-                              AA
-                            </label>
-                          </div>
+                              <input
+                                id={`${optionValue}`}
+                                name={name}
+                                type="checkbox"
+                                className={cx(
+                                  "h-4 w-4 rounded border-gray-300 m-0",
+                                  focusRing,
+                                  text
+                                )}
+                                defaultChecked={
+                                  Array.isArray(value) &&
+                                  value?.includes(optionValue)
+                                }
+                              />
+                              <label
+                                htmlFor={`${optionValue}`}
+                                className="text-sm"
+                              >
+                                {option}
+                              </label>
+                            </div>
+                          ))}
                         </div>
                       )}
                       {type === "image" && (

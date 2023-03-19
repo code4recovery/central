@@ -24,7 +24,7 @@ type Meeting = {
   website?: string;
 };
 
-export function getMeetings(start = 0) {
+export function getMeetings(slug?: string) {
   const meetings: Meeting[] = [
     {
       day: 5,
@@ -1266,10 +1266,15 @@ export function getMeetings(start = 0) {
     "Saturday",
   ];
 
-  return meetings.slice(start, config.batchSize).map((meeting) => ({
+  if (slug) {
+    return meetings.filter((meeting) => meeting.slug === slug).pop();
+  }
+
+  return meetings.slice(0, config.batchSize).map((meeting) => ({
     ...meeting,
     region: meeting.regions.pop(),
     day: days[meeting.day],
     id: meeting.slug,
+    link: `/meetings/${meeting.slug}`,
   }));
 }

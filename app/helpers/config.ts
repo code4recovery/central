@@ -1,4 +1,82 @@
+import { strings } from "~/i18n";
+import type { Field } from "~/types";
+
+const meetingFields: Field[] = [
+  {
+    name: "name",
+    label: "Name",
+    type: "text",
+  },
+  {
+    name: "day",
+    label: "Day",
+    span: 4,
+    type: "select",
+    options: [
+      {
+        value: 0,
+        option: strings.days_sunday,
+      },
+      {
+        value: 1,
+        option: strings.days_monday,
+      },
+      {
+        value: 2,
+        option: strings.days_tuesday,
+      },
+      {
+        value: 3,
+        option: strings.days_wednesday,
+      },
+      {
+        value: 4,
+        option: strings.days_thursday,
+      },
+      {
+        value: 5,
+        option: strings.days_friday,
+      },
+      {
+        value: 6,
+        option: strings.days_saturday,
+      },
+    ],
+  },
+  {
+    name: "time",
+    label: "Time",
+    span: 4,
+    type: "time",
+  },
+  {
+    name: "duration",
+    label: "Duration",
+    span: 4,
+    type: "number",
+  },
+  {
+    name: "types",
+    label: "Types",
+    type: "checkboxes",
+    options: [
+      { value: "BA", option: "Babysitting Available" },
+      { value: "C", option: "Closed" },
+      { value: "DB", option: "Digital Basket" },
+      { value: "BE", option: "Newcomer" },
+      { value: "O", option: "Open" },
+      { value: "A", option: "Secular" },
+    ],
+  },
+  {
+    name: "notes",
+    label: "Notes",
+    type: "textarea",
+  },
+];
+
 export const config = {
+  aboutUrl: "https://code4recovery.org",
   batchSize: 25,
   colors: {
     slate: {
@@ -191,6 +269,7 @@ export const config = {
       text: "text-rose-600",
     },
   },
+  meetingFields,
   sourceLabel: "GitHub",
   sourceLink: "https://github.com/code4recovery/oiaa-cms",
 };

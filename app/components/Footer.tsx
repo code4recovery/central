@@ -1,4 +1,4 @@
-import { config, formatString } from "~/helpers";
+import { config } from "~/helpers";
 import { strings } from "~/i18n";
 import { GithubLogo } from "~/icons";
 
@@ -10,6 +10,8 @@ export function Footer() {
           <a
             className="text-gray-400 hover:text-gray-500"
             href={config.sourceLink}
+            target="_blank"
+            rel="noreferrer"
           >
             <span className="sr-only">{config.sourceLabel}</span>
             <GithubLogo className="h-8 w-8" />
@@ -17,9 +19,9 @@ export function Footer() {
         </div>
         <div className="mt-8 md:order-1 md:mt-0">
           <p className="text-center text-sm leading-5 text-gray-500">
-            {formatString(strings.developed_by, {
-              developer: "Code for Recovery",
-            })}
+            <a href={config.aboutUrl} target="_blank" rel="noreferrer">
+              {strings.about}
+            </a>
           </p>
         </div>
       </div>

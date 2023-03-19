@@ -16,6 +16,7 @@ export function Table({
   };
   rows: {
     id: string;
+    link?: string;
     [index: string]: string | number | string[] | undefined;
   }[];
 }) {
@@ -47,9 +48,13 @@ export function Table({
         {rows.map((row) => (
           <tr key={row.id}>
             <td className="w-full max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
-              <Link to={row.id} className={cx(text, "underline")}>
-                {row[keys[0]]}
-              </Link>
+              {row.link ? (
+                <Link to={row.link} className={cx(text, "underline")}>
+                  {row[keys[0]]}
+                </Link>
+              ) : (
+                row[keys[0]]
+              )}
               <dl className="font-normal lg:hidden">
                 {keys.slice(1, 3).map(
                   (key, index) =>

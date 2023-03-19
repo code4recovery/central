@@ -22,7 +22,7 @@ export default function Index() {
       description={formatString(strings.meetings_description, {
         meetings_count,
       })}
-      cta={<Button url="/create" label={strings.meetings_add} />}
+      cta={<Button url="/meetings/create" label={strings.meetings_add} />}
     >
       <Table
         columns={{
