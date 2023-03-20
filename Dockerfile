@@ -1,5 +1,9 @@
 FROM node:17-slim
 
+
+# Install openssl for Prisma
+RUN apt-get update && apt-get install -y openssl
+
 WORKDIR /usr/app
 COPY ./ /usr/app
 
