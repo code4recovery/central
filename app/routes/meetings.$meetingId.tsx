@@ -3,11 +3,10 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { Form, Template } from "~/components";
-import { getMeetings } from "~/data";
 import { config } from "~/helpers";
 
 export const loader = async ({ params }: LoaderArgs) => {
-  return json({ meeting: getMeetings(params.meetingId) });
+  return json({ meeting: {} });
 };
 
 export const action = async ({ params }: ActionArgs) => {
