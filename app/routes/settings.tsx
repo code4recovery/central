@@ -1,4 +1,4 @@
-import { Form, Template } from "~/components";
+import { Form, Separator, Template } from "~/components";
 import { getAccount, getUser } from "~/data";
 import { formatClasses as cx } from "~/helpers";
 import { strings } from "~/i18n";
@@ -44,11 +44,7 @@ export default function Settings() {
             },
           ]}
         />
-        <div className="hidden sm:block" aria-hidden="true">
-          <div className="py-5">
-            <div className="border-t border-gray-300" />
-          </div>
-        </div>
+        <Separator />
         <Form
           title={strings.settings_account_title}
           description={strings.settings_account_description}

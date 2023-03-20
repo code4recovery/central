@@ -73,22 +73,19 @@ export function Table({
                 )}
               </dl>
             </td>
-            {keys.slice(1, 4).map(
-              (key, index) =>
-                !!row[key] && (
-                  <td
-                    key={key}
-                    className={cx("p-3", {
-                      "hidden lg:table-cell": index === 0,
-                      "hidden sm:table-cell": index === 1,
-                      "text-center": columns[key].align === "center",
-                      "text-right": columns[key].align === "right",
-                    })}
-                  >
-                    {row[key]}
-                  </td>
-                )
-            )}
+            {keys.slice(1, 4).map((key, index) => (
+              <td
+                key={key}
+                className={cx("p-3", {
+                  "hidden lg:table-cell": index === 0,
+                  "hidden sm:table-cell": index === 1,
+                  "text-center": columns[key].align === "center",
+                  "text-right": columns[key].align === "right",
+                })}
+              >
+                {row[key]}
+              </td>
+            ))}
           </tr>
         ))}
       </tbody>

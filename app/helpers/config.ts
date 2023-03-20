@@ -278,6 +278,7 @@ export const config = {
     "Friday",
     "Saturday",
   ],
+  home: "/meetings",
   meetingFields,
   sourceLabel: "GitHub",
   sourceLink: "https://github.com/code4recovery/oiaa-cms",

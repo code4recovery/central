@@ -9,7 +9,7 @@ import {
 import { Link, NavLink } from "@remix-run/react";
 
 import { getAccount, getUser } from "~/data";
-import { formatClasses as cx } from "~/helpers";
+import { config, formatClasses as cx } from "~/helpers";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo as Logo } from "~/icons";
 
@@ -19,7 +19,7 @@ export function Header() {
     primary: [
       {
         label: strings.meetings_title,
-        url: "/",
+        url: "/meetings",
       },
       {
         label: strings.activity_title,
@@ -58,7 +58,7 @@ export function Header() {
               <div className="flex h-16 justify-between">
                 <div className="flex px-2 lg:px-0">
                   <div className="flex flex-shrink-0 items-center">
-                    <Link to="/">
+                    <Link to={config.home}>
                       <Logo className={cx("h-8 w-auto", text)} />
                     </Link>
                   </div>
