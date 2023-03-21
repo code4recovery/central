@@ -14,9 +14,19 @@ type Meeting = {
 };
 
 async function seed() {
+  await db.account.deleteMany();
   await db.meeting.deleteMany();
+  await db.user.deleteMany();
   const meetings = await getMeetings();
   await Promise.all(meetings.map((data) => db.meeting.create({ data })));
+  await db.account.create({
+    data: {
+      name: "Online Intergroup of AA",
+      url: "https://aa-intergroup.org/meetings",
+      meetingCount: meetings.length,
+      theme: "rose",
+    },
+  });
 }
 
 seed();
@@ -45,7 +55,7 @@ async function getMeetings(): Promise<Meeting[]> {
         meetings.push({
           name: row.name,
           slug: row.slug,
-          day: config.days.indexOf(day),
+          day: config.days.indexOf(day.toLowerCase()),
           time,
           timezone: row.timezone,
         });

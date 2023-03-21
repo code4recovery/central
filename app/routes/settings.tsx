@@ -12,14 +12,11 @@ export const meta: MetaFunction = () => ({
 
 export default function Settings() {
   const {
+    name: entity,
+    url,
     theme: { text },
   } = getAccount();
   const { name, email } = getUser();
-  const {
-    name: entity,
-    url,
-    theme: { name: theme },
-  } = getAccount();
   return (
     <Template title={strings.settings_title}>
       <>
@@ -82,7 +79,7 @@ export default function Settings() {
               name: "theme",
               label: strings.settings_account_theme,
               type: "colors",
-              value: theme,
+              value: "emerald",
             },
           ]}
         />

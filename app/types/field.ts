@@ -1,6 +1,12 @@
 export type Field = {
-  name: string;
+  defaultImage?: React.ReactNode;
+  helpText?: string;
   label: string;
+  name: string;
+  options?: { value: string; label: string }[];
+  placeholder?: string;
+  required?: boolean;
+  span?: number;
   type:
     | "checkboxes"
     | "colors"
@@ -12,10 +18,5 @@ export type Field = {
     | "textarea"
     | "time"
     | "url";
-  span?: number;
-  options?: { value: string; label: string }[];
-  helpText?: string;
-  placeholder?: string;
   value?: string | string[];
-  defaultImage?: React.ReactNode;
 };

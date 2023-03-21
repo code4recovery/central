@@ -1,4 +1,4 @@
-import { Button } from "~/components";
+import { Button, Input, Label } from "~/components";
 import { getAccount } from "~/data";
 import { config, formatClasses as cx } from "~/helpers";
 import type { Field } from "~/types";
@@ -15,9 +15,6 @@ export function Form({
   const {
     theme: { name: theme, focusRing, text },
   } = getAccount();
-
-  const fieldClassNames =
-    "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6";
 
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
@@ -46,6 +43,7 @@ export function Form({
                     name,
                     options,
                     placeholder,
+                    required,
                     span,
                     type,
                     value,
@@ -66,32 +64,29 @@ export function Form({
                       })}
                       key={name}
                     >
-                      <label
-                        htmlFor={name}
-                        className="block text-sm font-medium leading-6 mb-1.5 text-gray-900"
-                      >
-                        {label}
-                      </label>
+                      <Label htmlFor={name}>{label}</Label>
                       {["email", "number", "text", "time", "url"].includes(
                         type
                       ) && (
-                        <input
-                          type={type}
+                        <Input
                           name={name}
-                          id={name}
                           placeholder={placeholder}
-                          className={cx(focusRing, fieldClassNames)}
-                          defaultValue={value ? `${value}` : undefined}
+                          required={required}
+                          type={
+                            type as "email" | "number" | "text" | "time" | "url"
+                          }
+                          value={value as string}
                         />
                       )}
                       {type === "textarea" && (
                         <textarea
+                          className={cx(focusRing, config.fieldClassNames)}
+                          defaultValue={value ? `${value}` : undefined}
                           id={name}
                           name={name}
-                          rows={3}
-                          className={cx(focusRing, fieldClassNames)}
                           placeholder={placeholder}
-                          defaultValue={value ? `${value}` : undefined}
+                          required={required}
+                          rows={3}
                         />
                       )}
                       {type === "colors" && (
@@ -99,10 +94,10 @@ export function Form({
                           {Object.keys(config.colors).map((color) => {
                             const {
                               background,
+                              backgroundHover,
                               focusRing,
                               label,
                               text,
-                              backgroundHover,
                             } =
                               config.colors[
                                 color as keyof typeof config.colors
@@ -134,10 +129,10 @@ export function Form({
                         <select
                           name={name}
                           id={name}
-                          className={fieldClassNames}
+                          className={config.fieldClassNames}
                           defaultValue={value ? `${value}` : undefined}
                         >
-                          <option></option>
+                          {!required && <option></option>}
                           {options?.map(({ value: optionValue, label }) => (
                             <option key={optionValue} value={`${optionValue}`}>
                               {label}
