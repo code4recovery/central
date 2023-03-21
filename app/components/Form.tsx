@@ -138,19 +138,18 @@ export function Form({
                           defaultValue={value ? `${value}` : undefined}
                         >
                           <option></option>
-
-                          {options?.map(({ value, option }) => (
-                            <option key={value} value={value}>
-                              {option}
+                          {options?.map(({ value: optionValue, label }) => (
+                            <option key={optionValue} value={`${optionValue}`}>
+                              {label}
                             </option>
                           ))}
                         </select>
                       )}
                       {type === "checkboxes" && (
                         <div className="items-start grid grid-cols-3 gap-x-5 gap-y-3">
-                          {options?.map(({ option, value: optionValue }) => (
+                          {options?.map(({ value: optionValue, label }) => (
                             <div
-                              className="flex items-center gap-2 m-0"
+                              className="flex items-top gap-2 m-0"
                               key={optionValue}
                             >
                               <input
@@ -158,7 +157,7 @@ export function Form({
                                 name={name}
                                 type="checkbox"
                                 className={cx(
-                                  "h-4 w-4 rounded border-gray-300 m-0",
+                                  "h-4 w-4 rounded border-gray-300 m-0 mt-0.5",
                                   focusRing,
                                   text
                                 )}
@@ -171,7 +170,7 @@ export function Form({
                                 htmlFor={`${optionValue}`}
                                 className="text-sm"
                               >
-                                {option}
+                                {label}
                               </label>
                             </div>
                           ))}

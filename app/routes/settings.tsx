@@ -1,8 +1,14 @@
+import type { MetaFunction } from "@remix-run/node";
+
 import { Form, Separator, Template } from "~/components";
 import { getAccount, getUser } from "~/data";
 import { formatClasses as cx } from "~/helpers";
 import { strings } from "~/i18n";
 import { DefaultUserIcon, DefaultAccountLogo } from "~/icons";
+
+export const meta: MetaFunction = () => ({
+  title: strings.settings_title,
+});
 
 export default function Settings() {
   const {

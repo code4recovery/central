@@ -1,5 +1,11 @@
+import type { MetaFunction } from "@remix-run/node";
+
 import { strings } from "~/i18n";
 import { Table, Template } from "~/components";
+
+export const meta: MetaFunction = () => ({
+  title: strings.activity_title,
+});
 
 export default function Activity() {
   return (

@@ -1,6 +1,16 @@
 import { strings } from "~/i18n";
 import type { Field } from "~/types";
 
+const days = [
+  "sunday",
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+];
+
 const meetingFields: Field[] = [
   {
     name: "name",
@@ -12,36 +22,10 @@ const meetingFields: Field[] = [
     label: "Day",
     span: 4,
     type: "select",
-    options: [
-      {
-        value: 0,
-        option: strings.days_sunday,
-      },
-      {
-        value: 1,
-        option: strings.days_monday,
-      },
-      {
-        value: 2,
-        option: strings.days_tuesday,
-      },
-      {
-        value: 3,
-        option: strings.days_wednesday,
-      },
-      {
-        value: 4,
-        option: strings.days_thursday,
-      },
-      {
-        value: 5,
-        option: strings.days_friday,
-      },
-      {
-        value: 6,
-        option: strings.days_saturday,
-      },
-    ],
+    options: days.map((day, index) => ({
+      value: `${index}`,
+      label: strings.days[day as keyof typeof strings.days],
+    })),
   },
   {
     name: "time",
@@ -59,14 +43,16 @@ const meetingFields: Field[] = [
     name: "types",
     label: "Types",
     type: "checkboxes",
-    options: [
-      { value: "BA", option: "Babysitting Available" },
-      { value: "C", option: "Closed" },
-      { value: "DB", option: "Digital Basket" },
-      { value: "BE", option: "Newcomer" },
-      { value: "O", option: "Open" },
-      { value: "A", option: "Secular" },
-    ],
+    options: Object.keys(strings.types)
+      .sort((a, b) =>
+        strings.types[a as keyof typeof strings.types].localeCompare(
+          strings.types[b as keyof typeof strings.types]
+        )
+      )
+      .map((type) => ({
+        value: type,
+        label: strings.types[type as keyof typeof strings.types],
+      })),
   },
   {
     name: "notes",
@@ -269,17 +255,7 @@ export const config = {
       text: "text-rose-600",
     },
   },
-  days: [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ],
+  days,
   home: "/meetings",
   meetingFields,
-  sourceLabel: "GitHub",
-  sourceLink: "https://github.com/code4recovery/oiaa-cms",
 };

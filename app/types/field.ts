@@ -13,9 +13,9 @@ export type Field = {
     | "time"
     | "url";
   span?: number;
-  options?: { value: string | number; option: string }[];
+  options?: { value: string; label: string }[];
   helpText?: string;
   placeholder?: string;
-  value?: string | number | string[] | number[];
+  value?: string | string[];
   defaultImage?: React.ReactNode;
 };

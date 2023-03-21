@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 
 import { Button, Table, Template } from "~/components";
 import { config, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
+
+export const meta: MetaFunction = () => ({
+  title: strings.meetings_title,
+});
 
 export async function loader() {
   const meetings = await db.meeting.findMany();
@@ -14,7 +19,14 @@ export async function loader() {
     meetings: meetings.map((meeting) => ({
       ...meeting,
       link: `/meetings/${meeting.id}`,
-      day: meeting.day ? config.days[meeting.day] : undefined,
+      day:
+        typeof meeting.day !== "undefined"
+          ? strings.days[
+              config.days[
+                meeting.day as keyof typeof config.days
+              ] as keyof typeof strings.days
+            ]
+          : undefined,
     })),
   });
 }
@@ -30,7 +42,7 @@ export default function Index() {
       description={formatString(strings.meetings_description, {
         meetings_count: meetings.length,
       })}
-      cta={<Button url="/meetings/create" label={strings.meetings_add} />}
+      cta={<Button url="/meetings/add" label={strings.meetings_add} />}
     >
       <Table
         columns={{
