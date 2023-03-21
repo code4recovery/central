@@ -13,7 +13,7 @@ export function Form({
   fields: Field[];
 }) {
   const {
-    theme: { name: theme, focusRing, text },
+    theme: { label: theme, focusRing, text },
   } = getAccount();
 
   return (
