@@ -1,5 +1,5 @@
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,12 +7,13 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
-import { config } from "~/helpers";
 import { strings } from "~/i18n";
 import styles from "./tailwind.css";
-import { getUserSession } from "~/utils";
+import { UserContext } from "./contexts";
+import { getUserOrRedirect } from "~/utils";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -23,26 +24,12 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({ request }: LoaderArgs) {
-  const insecureRoutes = ["/"];
-  const url = new URL(request.url);
-
-  const session = await getUserSession(request);
-  const userId = session.get("userId");
-
-  if (insecureRoutes.includes(url.pathname)) {
-    if (userId && typeof userId === "string") {
-      throw redirect(config.home);
-    }
-  } else {
-    if (!userId || typeof userId !== "string") {
-      const searchParams = new URLSearchParams([["redirectTo", url.pathname]]);
-      throw redirect(`/?${searchParams}`);
-    }
-  }
-  return null;
+  const user = await getUserOrRedirect(request);
+  return json({ user });
 }
 
 export default function App() {
+  const { user } = useLoaderData();
   return (
     <html lang="en" className="h-full">
       <head>
@@ -50,7 +37,9 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-gray-200 flex flex-col h-full">
-        <Outlet />
+        <UserContext.Provider value={user}>
+          <Outlet />
+        </UserContext.Provider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

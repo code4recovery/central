@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useContext } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -8,13 +8,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, NavLink } from "@remix-run/react";
 
-import { getAccount, getUser } from "~/data";
+import { UserContext } from "~/contexts";
+import { getAccount } from "~/data";
 import { config, formatClasses as cx } from "~/helpers";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo as Logo } from "~/icons";
 
 export function Header() {
-  const user = getUser();
+  const user = useContext(UserContext);
   const navItems = {
     primary: [
       {
@@ -48,6 +49,8 @@ export function Header() {
   const {
     theme: { text, focusRing, border },
   } = getAccount();
+
+  if (!user) return null;
 
   return (
     <header>

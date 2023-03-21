@@ -33,8 +33,7 @@ export async function loader() {
 
 export default function Index() {
   const { meetings } = useLoaderData();
-  const batchSize = 25;
-  const [showing, setShowing] = useState(batchSize);
+  const [showing, setShowing] = useState(config.batchSize);
 
   return (
     <Template
@@ -57,7 +56,7 @@ export default function Index() {
         <div className="pt-10 flex justify-center">
           <Button
             label={formatString(strings.load_more, { count: config.batchSize })}
-            onClick={() => setShowing(showing + batchSize)}
+            onClick={() => setShowing(showing + config.batchSize)}
           />
         </div>
       )}

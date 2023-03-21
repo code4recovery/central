@@ -1,4 +1,6 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import { config } from "~/helpers";
+import { db } from "./db.server";
 
 if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET must be set");
@@ -26,7 +28,7 @@ export async function createUserSession(userId: string, redirectTo: string) {
   });
 }
 
-export function getUserSession(request: Request) {
+function getUserSession(request: Request) {
   return storage.getSession(request.headers.get("Cookie"));
 }
 
@@ -37,4 +39,31 @@ export async function logout(request: Request) {
       "Set-Cookie": await storage.destroySession(session),
     },
   });
+}
+
+export async function getUserOrRedirect(request: Request) {
+  const url = new URL(request.url);
+  const routeShouldBeSecure = config.insecureRoutes.includes(url.pathname);
+
+  const session = await getUserSession(request);
+  const userId: string = session.get("userId");
+  const userIsLoggedIn = userId && typeof userId === "string";
+
+  if (routeShouldBeSecure && !userIsLoggedIn) {
+    throw redirect(config.home);
+  } else if (!routeShouldBeSecure && userIsLoggedIn) {
+    const searchParams = new URLSearchParams([["redirectTo", url.pathname]]);
+    throw redirect(`/?${searchParams}`);
+  }
+
+  const user = await db.user.findFirst({
+    where: { id: userId },
+  });
+
+  // log out if session is bad
+  if (!user) {
+    await logout(request);
+  }
+
+  return user;
 }
