@@ -14,10 +14,10 @@ export const meta: MetaFunction = () => ({
 
 export default function CreateMeeting() {
   return (
-    <Template title={strings.meetings_add}>
+    <Template title={strings.meeting_add}>
       <Form
-        title={strings.meetings_details}
-        description={strings.meetings_details_description}
+        title={strings.meeting_details}
+        description={strings.meeting_details_description}
         fields={config.meetingFields}
       />
     </Template>

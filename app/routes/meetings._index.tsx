@@ -1,46 +1,59 @@
-import { useContext, useState } from "react";
-import { useLoaderData } from "@remix-run/react";
+import { useContext, useEffect, useState } from "react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { json } from "@remix-run/node";
-import type { MetaFunction } from "@remix-run/node";
+import type { ActionArgs, MetaFunction } from "@remix-run/node";
+import invariant from "tiny-invariant";
 
 import { Button, Table, Template } from "~/components";
-import { config, formatDateDiff, formatString } from "~/helpers";
+import { UserContext } from "~/contexts";
+import { config, formatMeetings, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
-import { UserContext } from "~/contexts";
 
 export const meta: MetaFunction = () => ({
   title: strings.meetings_title,
 });
 
-export async function loader() {
+export async function action({ request }: ActionArgs) {
+  const formData = await request.formData();
+
+  const skip = formData.get("skip");
+  invariant(skip && typeof skip === "string");
+
   const meetings = await db.meeting.findMany({
-    take: 25,
-    orderBy: { updatedAt: "desc" },
+    take: config.batchSize,
+    skip: Number(skip),
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
 
-  return json({
-    meetings: meetings.map((meeting) => ({
-      ...meeting,
-      link: `/meetings/${meeting.id}`,
-      updated: formatDateDiff(meeting.updatedAt ?? meeting.createdAt),
-      start: meeting.start
-        ? meeting.start.toLocaleTimeString("en-us", {
-            weekday: "short",
-            hour: "numeric",
-            minute: "2-digit",
-            timeZoneName: "short",
-            timeZone: meeting.timezone || undefined,
-          })
-        : "Ongoing",
-    })),
+  return json(formatMeetings(meetings));
+}
+
+export async function loader() {
+  const meetings = await db.meeting.findMany({
+    take: config.batchSize,
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
+  return json(formatMeetings(meetings));
 }
 
 export default function Index() {
-  const { meetings } = useLoaderData();
-  const [showing, setShowing] = useState(config.batchSize);
+  const [meetings, setMeetings] = useState(useLoaderData<typeof loader>());
+  const more = useActionData();
   const user = useContext(UserContext);
+  const { state } = useNavigation();
+  const submitting = state === "submitting";
+
+  useEffect(() => {
+    if (more) {
+      setMeetings([...meetings, ...more]);
+    }
+  }, [more]);
 
   if (!user) return null;
 
@@ -50,26 +63,32 @@ export default function Index() {
       description={formatString(strings.meetings_description, {
         meetings_count: user.accountMeetingCount,
       })}
-      cta={<Button url="/meetings/add" label={strings.meetings_add} />}
+      cta={<Button url="/meetings/add" label={strings.meeting_add} />}
     >
       <Table
         columns={{
-          name: { label: "Name" },
-          start: { label: "When" },
-          timezone: { label: "Timezone" },
-          updated: { label: "Updated", align: "right" },
+          name: { label: strings.meeting_name },
+          start: { label: strings.meeting_when },
+          timezone: { label: strings.meeting_timezone },
+          updated: { label: strings.updated, align: "right" },
         }}
-        rows={meetings.slice(0, showing)}
+        rows={meetings}
       />
-      {showing < meetings.length && (
-        <div className="pt-10 flex justify-center">
-          <Button
-            label={formatString(strings.load_more, {
-              count: config.batchSize,
-            })}
-            onClick={() => setShowing(showing + config.batchSize)}
-          />
-        </div>
+      {meetings.length < user.accountMeetingCount && (
+        <Form method="post" className="pt-10 flex justify-center">
+          <fieldset disabled={submitting}>
+            <input type="hidden" name="skip" value={meetings.length} />
+            <Button
+              label={
+                submitting
+                  ? strings.loading
+                  : formatString(strings.load_more, {
+                      count: config.batchSize,
+                    })
+              }
+            />
+          </fieldset>
+        </Form>
       )}
     </Template>
   );

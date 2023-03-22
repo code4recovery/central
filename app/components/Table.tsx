@@ -17,7 +17,7 @@ export function Table({
   rows: {
     id: string;
     link?: string;
-    [index: string]: string | number | string[] | undefined;
+    [index: string]: string | number | string[] | undefined | null;
   }[];
 }) {
   const keys = Object.keys(columns);

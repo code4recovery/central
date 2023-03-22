@@ -7,7 +7,7 @@ import { config } from "~/helpers";
 import { strings } from "~/i18n";
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings_edit_title,
+  title: strings.meeting_edit,
 });
 
 export const loader = async ({ params }: LoaderArgs) => {
@@ -21,10 +21,10 @@ export const action = async ({ params }: ActionArgs) => {
 export default function EditMeeting() {
   const { meeting } = useLoaderData();
   return (
-    <Template title={strings.meetings_edit_title}>
+    <Template title={strings.meeting_edit}>
       <Form
-        title={strings.meetings_details}
-        description={strings.meetings_details_description}
+        title={strings.meeting_details}
+        description={strings.meeting_details_description}
         fields={config.meetingFields.map((field) => ({
           ...field,
           value: meeting[field.name],

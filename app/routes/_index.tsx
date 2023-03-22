@@ -1,5 +1,5 @@
 import type { ActionArgs, MetaFunction } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import md5 from "blueimp-md5";
 
@@ -36,6 +36,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
+  const { state } = useNavigation();
+  const submitting = state === "submitting";
   return (
     <>
       <div className="flex flex-grow flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -49,15 +51,20 @@ export default function Index() {
           className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 mt-8 sm:mx-auto sm:w-full sm:max-w-md"
           method="post"
         >
-          <Label htmlFor="email">{strings.settings_user_email}</Label>
-          <Input
-            autoComplete="email"
-            autoFocus
-            name="email"
-            type="email"
-            required
-          />
-          <Button label={strings.sign_in_submit} className="mt-6 w-full" />
+          <fieldset disabled={submitting}>
+            <Label htmlFor="email">{strings.settings_user_email}</Label>
+            <Input
+              autoComplete="email"
+              autoFocus
+              name="email"
+              type="email"
+              required
+            />
+            <Button
+              label={submitting ? strings.loading : strings.sign_in_submit}
+              className="mt-6 w-full"
+            />
+          </fieldset>
         </Form>
       </div>
       <Footer />

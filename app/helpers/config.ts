@@ -14,12 +14,12 @@ const days = [
 const meetingFields: Field[] = [
   {
     name: "name",
-    label: "Name",
+    label: strings.meeting_name,
     type: "text",
   },
   {
     name: "day",
-    label: "Day",
+    label: strings.meeting_day,
     span: 4,
     type: "select",
     options: days.map((day, index) => ({
@@ -29,19 +29,19 @@ const meetingFields: Field[] = [
   },
   {
     name: "time",
-    label: "Time",
+    label: strings.meeting_time,
     span: 4,
     type: "time",
   },
   {
     name: "duration",
-    label: "Duration",
+    label: strings.meeting_duration,
     span: 4,
     type: "number",
   },
   {
     name: "types",
-    label: "Types",
+    label: strings.meeting_types,
     type: "checkboxes",
     options: Object.keys(strings.types)
       .sort((a, b) =>
