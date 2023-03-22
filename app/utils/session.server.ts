@@ -52,6 +52,9 @@ export async function getUserOrRedirect(request: Request) {
 
   const user = await db.user.findFirst({
     where: { id: userId },
+    include: {
+      accounts: true,
+    },
   });
 
   if (secure && !user) {

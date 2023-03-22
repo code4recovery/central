@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import md5 from "blueimp-md5";
 
 import { config, getGoogleSheet } from "~/helpers";
 
@@ -9,6 +10,7 @@ type Meeting = {
   slug: string;
   day?: number;
   time?: string;
+  start?: Date;
   duration?: number;
   timezone?: string;
 };
@@ -19,12 +21,23 @@ async function seed() {
   await db.user.deleteMany();
   const meetings = await getMeetings();
   await Promise.all(meetings.map((data) => db.meeting.create({ data })));
-  await db.account.create({
+
+  const email = process.env.USER_EMAIL ?? "foo@example.com";
+  await db.user.create({
     data: {
-      name: "Online Intergroup of AA",
-      url: "https://aa-intergroup.org/meetings",
-      meetingCount: meetings.length,
-      theme: "rose",
+      name: process.env.USER_NAME,
+      email,
+      emailHash: md5(email),
+      accounts: {
+        create: [
+          {
+            name: "Online Intergroup of AA",
+            url: "https://aa-intergroup.org/meetings",
+            meetingCount: meetings.length,
+            theme: "rose",
+          },
+        ],
+      },
     },
   });
 }
@@ -38,29 +51,34 @@ async function getMeetings(): Promise<Meeting[]> {
   );
   const meetings: Meeting[] = [];
 
-  rows.slice(0, 50).forEach((row) => {
+  rows.slice(0, 20).forEach((row) => {
     row.times
       .split("\n")
       .filter((e) => e.includes(":")) //make sure there's a time
       .forEach((dayTime) => {
-        let [day, time, ampm] = dayTime.split(" ");
-        let [hours, minutes] = time.split(":").map((e) => Number(e));
-
-        if (ampm === "PM") hours = hours + 12;
-        time = [
-          String(hours).padStart(2, "0"),
-          String(minutes).padStart(2, "0"),
-        ].join(":");
-
         meetings.push({
           name: row.name,
           slug: row.slug,
-          day: config.days.indexOf(day.toLowerCase()),
-          time,
+          start: convertDayTime(dayTime),
           timezone: row.timezone,
         });
       });
   });
 
   return meetings;
+}
+
+function convertDayTime(dayTime: string) {
+  let [day, time, ampm] = dayTime.toLowerCase().split(" ");
+  const dayIndex = config.days.indexOf(day);
+  const date = new Date();
+  const dayDiff = dayIndex - date.getDay();
+  date.setDate(date.getDate() + dayDiff);
+  let [hours, minutes] = time.split(":").map((e) => Number(e));
+  if (ampm === "PM") hours = hours + 12;
+  date.setHours(hours);
+  date.setMinutes(minutes);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
 }

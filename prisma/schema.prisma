@@ -14,9 +14,7 @@ model Meeting {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   slug      String?
   name      String
-  time      String?
   timezone  String?
-  day       Int?
   start     DateTime?
   duration  Int?
   createdAt DateTime  @default(now())

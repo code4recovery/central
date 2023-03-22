@@ -37,7 +37,13 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-gray-200 flex flex-col h-full">
-        <UserContext.Provider value={user}>
+        <UserContext.Provider
+          value={{
+            ...user,
+            accountMeetingCount: user.accounts[0].meetingCount,
+            accountTheme: user.accounts[0].theme,
+          }}
+        >
           <Outlet />
         </UserContext.Provider>
         <ScrollRestoration />
