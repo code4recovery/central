@@ -38,7 +38,7 @@ async function getMeetings(): Promise<Meeting[]> {
   );
   const meetings: Meeting[] = [];
 
-  rows.slice(0, 20).forEach((row) => {
+  rows.slice(0, 50).forEach((row) => {
     row.times
       .split("\n")
       .filter((e) => e.includes(":")) //make sure there's a time

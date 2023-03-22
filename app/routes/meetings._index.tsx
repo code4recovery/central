@@ -4,7 +4,7 @@ import { json } from "@remix-run/node";
 import type { MetaFunction } from "@remix-run/node";
 
 import { Button, Table, Template } from "~/components";
-import { config, formatString } from "~/helpers";
+import { config, formatDateDiff, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
@@ -13,12 +13,16 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader() {
-  const meetings = await db.meeting.findMany();
+  const meetings = await db.meeting.findMany({
+    take: 25,
+    orderBy: { updatedAt: "desc" },
+  });
 
   return json({
     meetings: meetings.map((meeting) => ({
       ...meeting,
       link: `/meetings/${meeting.id}`,
+      updated: formatDateDiff(meeting.updatedAt ?? meeting.createdAt),
       day:
         typeof meeting.day !== "undefined"
           ? strings.days[
@@ -48,7 +52,7 @@ export default function Index() {
           name: { label: "Name" },
           day: { label: "Day" },
           time: { label: "Time" },
-          timezone: { label: "Timezone", align: "right" },
+          updated: { label: "Updated", align: "right" },
         }}
         rows={meetings.slice(0, showing)}
       />

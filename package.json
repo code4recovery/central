@@ -7,7 +7,9 @@
     "dev:node": "cross-env NODE_ENV=development nodemon --require dotenv/config ./server.js --watch ./server.js",
     "dev:remix": "remix watch",
     "start": "cross-env NODE_ENV=production node ./server.js",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "seed": "node --require esbuild-register prisma/seed.ts",
+    "push": "npx prisma db push"
   },
   "prisma": {
     "seed": "node --require esbuild-register prisma/seed.ts"

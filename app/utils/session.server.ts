@@ -34,6 +34,7 @@ function getUserSession(request: Request) {
 
 export async function logout(request: Request) {
   const session = await getUserSession(request);
+  console.log("logging out");
   return redirect("/", {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
@@ -43,26 +44,23 @@ export async function logout(request: Request) {
 
 export async function getUserOrRedirect(request: Request) {
   const url = new URL(request.url);
-  const routeShouldBeSecure = config.insecureRoutes.includes(url.pathname);
+
+  const secure = !config.insecureRoutes.includes(url.pathname);
 
   const session = await getUserSession(request);
   const userId: string = session.get("userId");
-  const userIsLoggedIn = userId && typeof userId === "string";
-
-  if (routeShouldBeSecure && !userIsLoggedIn) {
-    throw redirect(config.home);
-  } else if (!routeShouldBeSecure && userIsLoggedIn) {
-    const searchParams = new URLSearchParams([["redirectTo", url.pathname]]);
-    throw redirect(`/?${searchParams}`);
-  }
 
   const user = await db.user.findFirst({
     where: { id: userId },
   });
 
-  // log out if session is bad
-  if (!user) {
-    await logout(request);
+  if (secure && !user) {
+    const searchParams = new URLSearchParams({ go: url.pathname });
+    throw redirect(`/?${searchParams}`);
+  }
+
+  if (!secure && user) {
+    throw redirect(config.home);
   }
 
   return user;
