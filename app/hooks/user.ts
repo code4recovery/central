@@ -5,6 +5,7 @@ import type { User } from "~/types";
 export const UserContext = createContext<User>({
   accountName: "",
   accountUrl: "",
+  currentAccountID: "",
   email: "",
   emailHash: "",
   meetingCount: 0,

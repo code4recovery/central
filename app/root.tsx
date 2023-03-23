@@ -50,6 +50,7 @@ export default function App() {
             ...user,
             accountName,
             accountUrl,
+            currentAccountID: user.currentAccountID,
             meetingCount,
             theme: config.themes[themeName as keyof typeof config.themes],
             themeName,

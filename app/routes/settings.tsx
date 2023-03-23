@@ -1,19 +1,38 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { ActionFunction, MetaFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 
 import { Form, Separator, Template } from "~/components";
-import { formatClasses as cx } from "~/helpers";
+import { formatClasses as cx, validFormData } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultUserIcon, DefaultAccountLogo } from "~/icons";
+import { db } from "~/utils";
 
 export const meta: MetaFunction = () => ({
   title: strings.settings_title,
 });
 
+export const action: ActionFunction = async ({ request }) => {
+  const { accountID, name, url, theme } = await validFormData(request);
+
+  if (typeof accountID !== "undefined") {
+    await db.account.update({
+      where: { id: accountID as string },
+      data: {
+        name: name as string,
+        url: url as string,
+        theme: theme as string,
+      },
+    });
+  }
+  return redirect(request.url);
+};
+
 export default function Settings() {
   const {
     accountName,
     accountUrl,
+    currentAccountID,
     name,
     email,
     theme: { text },
@@ -25,6 +44,10 @@ export default function Settings() {
         title={strings.settings_user_title}
         description={strings.settings_user_description}
         fields={[
+          {
+            name: "form",
+            value: "user",
+          },
           {
             label: strings.settings_user_name,
             name: "name",
@@ -54,8 +77,12 @@ export default function Settings() {
         description={strings.settings_account_description}
         fields={[
           {
+            name: "accountID",
+            value: currentAccountID,
+          },
+          {
             label: strings.settings_account_entity,
-            name: "entity",
+            name: "name",
             type: "text",
             value: accountName,
           },

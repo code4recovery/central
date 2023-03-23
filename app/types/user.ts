@@ -1,6 +1,7 @@
 export type User = {
   accountName: string;
   accountUrl: string;
+  currentAccountID: string;
   email: string;
   emailHash: string;
   meetingCount: number;
