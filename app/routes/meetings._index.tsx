@@ -61,20 +61,20 @@ export default function Index() {
     <Template
       title={strings.meetings_title}
       description={formatString(strings.meetings_description, {
-        meetings_count: user.accountMeetingCount,
+        meetings_count: user.meetingCount,
       })}
       cta={<Button url="/meetings/add" label={strings.meeting_add} />}
     >
       <Table
         columns={{
           name: { label: strings.meeting_name },
-          start: { label: strings.meeting_when },
+          when: { label: strings.meeting_when },
           timezone: { label: strings.meeting_timezone },
           updated: { label: strings.updated, align: "right" },
         }}
         rows={meetings}
       />
-      {meetings.length < user.accountMeetingCount && (
+      {meetings.length < user.meetingCount && (
         <Form method="post" className="pt-10 flex justify-center">
           <fieldset disabled={submitting}>
             <input type="hidden" name="skip" value={meetings.length} />

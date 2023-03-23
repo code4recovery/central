@@ -28,7 +28,7 @@ export function Input({
   return (
     <input
       autoComplete={autoComplete}
-      className={cx(className, focusRing, config.fieldClassNames)}
+      className={cx(config.fieldClassNames, focusRing, className)}
       defaultValue={value ? `${value}` : undefined}
       id={name}
       name={name}

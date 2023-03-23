@@ -1,7 +1,7 @@
 import type { ActionArgs, MetaFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Form, useNavigation } from "@remix-run/react";
 import invariant from "tiny-invariant";
-import md5 from "blueimp-md5";
 
 import { Button, Footer, Input, Label } from "~/components";
 import { config } from "~/helpers";
@@ -15,20 +15,13 @@ export async function action({ request }: ActionArgs) {
 
   invariant(email && typeof email === "string");
 
-  const emailHash = md5(email);
-
   let user = await db.user.findFirst({ where: { email } });
 
-  if (!user) {
-    user = await db.user.create({
-      data: {
-        email,
-        emailHash,
-      },
-    });
+  if (user) {
+    return await createUserSession(user.id, config.home);
   }
 
-  return await createUserSession(user.id, config.home);
+  return redirect("/");
 }
 
 export const meta: MetaFunction = () => ({

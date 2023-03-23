@@ -63,7 +63,7 @@ export function Table({
                         <dt className="sr-only">{columns[key].label}</dt>
                         <dd
                           className={cx("mt-1 truncate", {
-                            "sm:hidden": index === 2,
+                            "sm:hidden": index === 1,
                           })}
                         >
                           {row[key]}

@@ -5,13 +5,19 @@ import { useLoaderData } from "@remix-run/react";
 import { Form, Template } from "~/components";
 import { config } from "~/helpers";
 import { strings } from "~/i18n";
+import { db } from "~/utils";
 
 export const meta: MetaFunction = () => ({
   title: strings.meeting_edit,
 });
 
 export const loader = async ({ params }: LoaderArgs) => {
-  return json({ meeting: {} });
+  const meeting = await db.meeting.findUnique({
+    where: { id: params.meetingId },
+  });
+  return json({
+    meeting: { ...meeting, day: `${meeting?.day}` },
+  });
 };
 
 export const action = async ({ params }: ActionArgs) => {

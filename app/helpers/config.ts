@@ -1,5 +1,6 @@
 import { strings } from "~/i18n";
 import type { Field } from "~/types";
+import { timezones } from "./timezones";
 
 const days = [
   "sunday",
@@ -13,36 +14,66 @@ const days = [
 
 const meetingFields: Field[] = [
   {
-    name: "name",
+    className: "text-xl font-semibold py-2",
     label: strings.meeting_name,
+    name: "name",
     type: "text",
   },
   {
-    name: "day",
     label: strings.meeting_day,
-    span: 4,
-    type: "select",
+    name: "day",
     options: days.map((day, index) => ({
       value: `${index}`,
       label: strings.days[day as keyof typeof strings.days],
     })),
+    span: 3,
+    type: "select",
   },
   {
-    name: "time",
     label: strings.meeting_time,
-    span: 4,
+    name: "time",
+    span: 3,
     type: "time",
   },
   {
-    name: "duration",
+    label: strings.meeting_timezone,
+    name: "timezone",
+    options: timezones.map((tz) => ({ value: tz, label: tz })),
+    span: 3,
+    type: "select",
+  },
+  {
     label: strings.meeting_duration,
-    span: 4,
+    name: "duration",
+    span: 3,
     type: "number",
   },
   {
-    name: "types",
-    label: strings.meeting_types,
+    label: "Notes",
+    name: "notes",
+    type: "textarea",
+  },
+  {
+    label: strings.meeting_languages,
+    name: "languages",
+    options: Object.keys(strings.language_types)
+      .sort((a, b) =>
+        strings.language_types[
+          a as keyof typeof strings.language_types
+        ].localeCompare(
+          strings.language_types[b as keyof typeof strings.language_types]
+        )
+      )
+      .map((type) => ({
+        value: type,
+        label:
+          strings.language_types[type as keyof typeof strings.language_types],
+      })),
     type: "checkboxes",
+  },
+  {
+    label: strings.meeting_types,
+    name: "types",
     options: Object.keys(strings.types)
       .sort((a, b) =>
         strings.types[a as keyof typeof strings.types].localeCompare(
@@ -53,11 +84,7 @@ const meetingFields: Field[] = [
         value: type,
         label: strings.types[type as keyof typeof strings.types],
       })),
-  },
-  {
-    name: "notes",
-    label: "Notes",
-    type: "textarea",
+    type: "checkboxes",
   },
 ];
 
@@ -257,7 +284,7 @@ export const config = {
   },
   days,
   fieldClassNames:
-    "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
+    "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm leading-6",
   home: "/meetings",
   insecureRoutes: ["/"],
   meetingFields,

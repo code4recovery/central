@@ -11,25 +11,28 @@ datasource db {
 }
 
 model Meeting {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   slug      String?
   name      String
   timezone  String?
-  start     DateTime?
+  day       Int?
+  time      String?
   duration  Int?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  email      String    @unique
-  emailHash  String
-  name       String?
-  accountIDs String[]  @db.ObjectId
-  accounts   Account[] @relation(fields: [accountIDs], references: [id])
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  email            String    @unique
+  emailHash        String
+  name             String?
+  currentAccountID String
+  accountIDs       String[]  @db.ObjectId
+  accounts         Account[] @relation(fields: [accountIDs], references: [id])
 }
 
 model Account {

@@ -6,12 +6,13 @@ import { config, getGoogleSheet } from "~/helpers";
 const db = new PrismaClient();
 
 type Meeting = {
-  name: string;
-  slug: string;
   day?: number;
-  time?: string;
-  start?: Date;
   duration?: number;
+  name: string;
+  notes?: string;
+  slug: string;
+  start?: Date;
+  time?: string;
   timezone?: string;
 };
 
@@ -22,22 +23,23 @@ async function seed() {
   const meetings = await getMeetings();
   await Promise.all(meetings.map((data) => db.meeting.create({ data })));
 
+  const account = await db.account.create({
+    data: {
+      name: "Online Intergroup of AA",
+      url: "https://aa-intergroup.org/meetings",
+      meetingCount: meetings.length,
+      theme: "rose",
+    },
+  });
+
   const email = process.env.USER_EMAIL ?? "foo@example.com";
   await db.user.create({
     data: {
-      name: process.env.USER_NAME,
+      name: process.env.USER_NAME ?? "Joe Q.",
       email,
       emailHash: md5(email),
-      accounts: {
-        create: [
-          {
-            name: "Online Intergroup of AA",
-            url: "https://aa-intergroup.org/meetings",
-            meetingCount: meetings.length,
-            theme: "rose",
-          },
-        ],
-      },
+      accounts: { connect: { id: account.id } },
+      currentAccountID: account.id,
     },
   });
 }
@@ -52,33 +54,35 @@ async function getMeetings(): Promise<Meeting[]> {
   const meetings: Meeting[] = [];
 
   rows.slice(0, 20).forEach((row) => {
-    row.times
-      .split("\n")
-      .filter((e) => e.includes(":")) //make sure there's a time
-      .forEach((dayTime) => {
-        meetings.push({
-          name: row.name,
-          slug: row.slug,
-          start: convertDayTime(dayTime),
-          timezone: row.timezone,
-        });
-      });
+    const meeting = {
+      name: row.name,
+      slug: row.slug,
+      timezone: row.timezone,
+      notes: row.notes,
+    };
+    if (!row.times.trim().length) {
+      meetings.push(meeting);
+    } else {
+      row.times
+        .split("\n")
+        .filter((e) => e.includes(":")) //make sure there's a time
+        .forEach((dayTime) =>
+          meetings.push({
+            ...meeting,
+            ...convertDayTime(dayTime),
+          })
+        );
+    }
   });
 
   return meetings;
 }
 
 function convertDayTime(dayTime: string) {
-  let [day, time, ampm] = dayTime.toLowerCase().split(" ");
-  const dayIndex = config.days.indexOf(day);
-  const date = new Date();
-  const dayDiff = dayIndex - date.getDay();
-  date.setDate(date.getDate() + dayDiff);
+  let [dayName, time, ampm] = dayTime.toLowerCase().split(" ");
+  const day = config.days.indexOf(dayName);
   let [hours, minutes] = time.split(":").map((e) => Number(e));
   if (ampm === "PM") hours = hours + 12;
-  date.setHours(hours);
-  date.setMinutes(minutes);
-  date.setSeconds(0);
-  date.setMilliseconds(0);
-  return date;
+  time = [hours, minutes].map((n) => String(n).padStart(2, "0")).join(":");
+  return { day, time };
 }

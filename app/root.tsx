@@ -9,6 +9,7 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
+import { Account } from "@prisma/client";
 
 import { strings } from "~/i18n";
 import styles from "./tailwind.css";
@@ -30,6 +31,9 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function App() {
   const { user } = useLoaderData();
+  const { meetingCount, theme } = user.accounts.find(
+    ({ id }: Account) => id === user.currentAccountID
+  );
   return (
     <html lang="en" className="h-full">
       <head>
@@ -40,8 +44,8 @@ export default function App() {
         <UserContext.Provider
           value={{
             ...user,
-            accountMeetingCount: user.accounts[0].meetingCount,
-            accountTheme: user.accounts[0].theme,
+            meetingCount,
+            theme,
           }}
         >
           <Outlet />

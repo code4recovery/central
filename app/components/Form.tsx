@@ -37,6 +37,7 @@ export function Form({
               <div className="grid grid-cols-12 gap-5">
                 {fields.map(
                   ({
+                    className,
                     defaultImage: DefaultImage,
                     helpText,
                     label,
@@ -69,6 +70,7 @@ export function Form({
                         type
                       ) && (
                         <Input
+                          className={className}
                           name={name}
                           placeholder={placeholder}
                           required={required}
@@ -80,7 +82,11 @@ export function Form({
                       )}
                       {type === "textarea" && (
                         <textarea
-                          className={cx(focusRing, config.fieldClassNames)}
+                          className={cx(
+                            focusRing,
+                            config.fieldClassNames,
+                            className
+                          )}
                           defaultValue={value ? `${value}` : undefined}
                           id={name}
                           name={name}
@@ -115,6 +121,7 @@ export function Form({
                                   focusRing,
                                   text,
                                   backgroundHover,
+                                  className,
                                   {
                                     "ring ring-offset-1": color === theme,
                                   }
@@ -129,7 +136,7 @@ export function Form({
                         <select
                           name={name}
                           id={name}
-                          className={config.fieldClassNames}
+                          className={cx(config.fieldClassNames, className)}
                           defaultValue={value ? `${value}` : undefined}
                         >
                           {!required && <option></option>}
@@ -141,7 +148,7 @@ export function Form({
                         </select>
                       )}
                       {type === "checkboxes" && (
-                        <div className="items-start grid grid-cols-3 gap-x-5 gap-y-3">
+                        <div className="items-start gap-x-5 gap-y-3 grid grid-cols-4">
                           {options?.map(({ value: optionValue, label }) => (
                             <div
                               className="flex items-top gap-2 m-0"
@@ -154,7 +161,8 @@ export function Form({
                                 className={cx(
                                   "h-4 w-4 rounded border-gray-300 m-0 mt-0.5",
                                   focusRing,
-                                  text
+                                  text,
+                                  className
                                 )}
                                 defaultChecked={
                                   Array.isArray(value) &&
@@ -162,8 +170,9 @@ export function Form({
                                 }
                               />
                               <label
+                                className="text-sm truncate"
                                 htmlFor={`${optionValue}`}
-                                className="text-sm"
+                                title={label}
                               >
                                 {label}
                               </label>

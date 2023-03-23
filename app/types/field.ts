@@ -1,4 +1,5 @@
 export type Field = {
+  className?: string;
   defaultImage?: React.ReactNode;
   helpText?: string;
   label: string;
