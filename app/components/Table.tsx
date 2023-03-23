@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 import { Link } from "@remix-run/react";
 
-import { getAccount } from "~/data";
 import { formatClasses as cx } from "~/helpers";
+import { useUser } from "~/hooks";
 
 export function Table({
   columns,
@@ -23,7 +23,7 @@ export function Table({
   const keys = Object.keys(columns);
   const {
     theme: { text },
-  } = getAccount();
+  } = useUser();
   return (
     <table className="min-w-full divide-y divide-gray-400 text-left text-sm">
       <thead>

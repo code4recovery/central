@@ -11,9 +11,10 @@ import {
 } from "@remix-run/react";
 import { Account } from "@prisma/client";
 
-import { strings } from "~/i18n";
 import styles from "./tailwind.css";
-import { UserContext } from "./contexts";
+import { config } from "./helpers";
+import { UserContext } from "./hooks";
+import { strings } from "~/i18n";
 import { getUserOrRedirect } from "~/utils";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
@@ -31,9 +32,12 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function App() {
   const { user } = useLoaderData();
-  const { meetingCount, theme } = user.accounts.find(
-    ({ id }: Account) => id === user.currentAccountID
-  );
+  const {
+    meetingCount,
+    name: accountName,
+    theme: themeName,
+    url: accountUrl,
+  } = user.accounts.find(({ id }: Account) => id === user.currentAccountID);
   return (
     <html lang="en" className="h-full">
       <head>
@@ -44,8 +48,11 @@ export default function App() {
         <UserContext.Provider
           value={{
             ...user,
+            accountName,
+            accountUrl,
             meetingCount,
-            theme,
+            theme: config.themes[themeName as keyof typeof config.themes],
+            themeName,
           }}
         >
           <Outlet />

@@ -1,6 +1,6 @@
 import { Button, Input, Label } from "~/components";
-import { getAccount } from "~/data";
 import { config, formatClasses as cx } from "~/helpers";
+import { useUser } from "~/hooks";
 import type { Field } from "~/types";
 
 export function Form({
@@ -14,7 +14,7 @@ export function Form({
 }) {
   const {
     theme: { label: theme, focusRing, text },
-  } = getAccount();
+  } = useUser();
 
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
@@ -97,7 +97,7 @@ export function Form({
                       )}
                       {type === "colors" && (
                         <div className="grid grid-cols-5 gap-2 items-top">
-                          {Object.keys(config.colors).map((color) => {
+                          {Object.keys(config.themes).map((color) => {
                             const {
                               background,
                               backgroundHover,
@@ -105,8 +105,8 @@ export function Form({
                               label,
                               text,
                             } =
-                              config.colors[
-                                color as keyof typeof config.colors
+                              config.themes[
+                                color as keyof typeof config.themes
                               ];
                             return (
                               <input

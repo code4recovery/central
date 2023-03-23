@@ -91,7 +91,14 @@ const meetingFields: Field[] = [
 export const config = {
   aboutUrl: "https://code4recovery.org",
   batchSize: 25,
-  colors: {
+  days,
+  defaultTheme: "indigo",
+  fieldClassNames:
+    "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm leading-6",
+  home: "/meetings",
+  insecureRoutes: ["/"],
+  meetingFields,
+  themes: {
     slate: {
       label: "Slate",
       background: "bg-slate-600",
@@ -282,10 +289,4 @@ export const config = {
       text: "text-rose-600",
     },
   },
-  days,
-  fieldClassNames:
-    "block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset text-sm leading-6",
-  home: "/meetings",
-  insecureRoutes: ["/"],
-  meetingFields,
 };

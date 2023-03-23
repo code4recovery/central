@@ -1,7 +1,18 @@
 export type User = {
+  accountName: string;
+  accountUrl: string;
   email: string;
   emailHash: string;
   meetingCount: number;
   name?: string;
-  theme: string;
+  theme: {
+    background: string;
+    backgroundHover: string;
+    border: string;
+    focusOutline: string;
+    focusRing: string;
+    label: string;
+    text: string;
+  };
+  themeName: string;
 };

@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
+
 import { formatClasses as cx } from "~/helpers";
-import { getAccount } from "~/data";
+import { useUser } from "~/hooks";
 
 export function Button({
   className,
@@ -15,7 +16,7 @@ export function Button({
 }) {
   const {
     theme: { background, focusOutline, backgroundHover },
-  } = getAccount();
+  } = useUser();
 
   const buttonClass = cx(
     "disabled:text-gray-500 disabled:bg-gray-300 flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",

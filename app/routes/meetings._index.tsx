@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Form,
   useActionData,
@@ -10,8 +10,8 @@ import type { ActionArgs, MetaFunction } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
 import { Button, Table, Template } from "~/components";
-import { UserContext } from "~/contexts";
 import { config, formatMeetings, formatString } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
@@ -45,7 +45,7 @@ export async function loader() {
 export default function Index() {
   const [meetings, setMeetings] = useState(useLoaderData<typeof loader>());
   const more = useActionData();
-  const user = useContext(UserContext);
+  const user = useUser();
   const { state } = useNavigation();
   const submitting = state === "submitting";
 
@@ -54,8 +54,6 @@ export default function Index() {
       setMeetings([...meetings, ...more]);
     }
   }, [more]);
-
-  if (!user) return null;
 
   return (
     <Template

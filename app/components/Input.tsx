@@ -1,5 +1,5 @@
-import { getAccount } from "~/data";
 import { config } from "~/helpers";
+import { useUser } from "~/hooks";
 import { formatClasses as cx } from "~/helpers";
 
 export function Input({
@@ -23,8 +23,7 @@ export function Input({
 }) {
   const {
     theme: { focusRing },
-  } = getAccount();
-
+  } = useUser();
   return (
     <input
       autoComplete={autoComplete}
