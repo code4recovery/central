@@ -6,7 +6,7 @@ import {
   QuestionMarkCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Link, NavLink } from "@remix-run/react";
+import { Form, Link, NavLink } from "@remix-run/react";
 
 import { config, formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
@@ -91,7 +91,10 @@ export function Header() {
                   </div>
                 </div>
                 <div className="flex flex-1 items-center justify-center px-2 lg:px-0 lg:ml-6 lg:justify-end">
-                  <div className="w-full max-w-lg lg:max-w-xs">
+                  <Form
+                    action="/meetings"
+                    className="w-full max-w-lg lg:max-w-xs"
+                  >
                     <label htmlFor="search" className="sr-only">
                       {strings.search}
                     </label>
@@ -113,7 +116,7 @@ export function Header() {
                         type="search"
                       />
                     </div>
-                  </div>
+                  </Form>
                 </div>
                 <div className="flex items-center lg:hidden">
                   <Disclosure.Button

@@ -148,7 +148,11 @@ export function Form({
                           <select
                             name={name}
                             id={name}
-                            className={cx(config.fieldClassNames, className)}
+                            className={cx(
+                              config.fieldClassNames,
+                              focusRing,
+                              className
+                            )}
                             defaultValue={value ? `${value}` : undefined}
                           >
                             {!required && <option></option>}

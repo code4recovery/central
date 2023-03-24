@@ -5,7 +5,7 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react";
-import { json } from "@remix-run/node";
+import { json, LoaderArgs } from "@remix-run/node";
 import type { ActionArgs, MetaFunction } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
@@ -34,7 +34,18 @@ export async function action({ request }: ActionArgs) {
   return json(formatMeetings(meetings));
 }
 
-export async function loader() {
+export async function loader({ request }: LoaderArgs) {
+  const url = new URL(request.url);
+  const search = url.searchParams.get("search");
+  if (search) {
+    const result = await db.meeting.findRaw({
+      filter: {
+        $text: {
+          $search: search.toString(),
+        },
+      },
+    });
+  }
   const meetings = await db.meeting.findMany({
     take: config.batchSize,
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],

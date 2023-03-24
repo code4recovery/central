@@ -29,7 +29,7 @@ async function seed() {
       name: "Online Intergroup of AA",
       url: "https://aa-intergroup.org/meetings",
       meetingCount: meetings.length,
-      theme: "rose",
+      theme: "sky",
     },
   });
 

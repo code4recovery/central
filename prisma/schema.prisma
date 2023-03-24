@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex"]
 }
 
 datasource db {
@@ -22,6 +23,8 @@ model Meeting {
   notes     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@fulltext([name, slug, notes])
 }
 
 model User {

@@ -49,12 +49,14 @@ export async function getUserOrRedirect(request: Request) {
   const session = await getUserSession(request);
   const userId: string = session.get("userId");
 
-  const user = await db.user.findFirst({
-    where: { id: userId },
-    include: {
-      accounts: true,
-    },
-  });
+  let user = userId
+    ? await db.user.findFirst({
+        where: { id: userId },
+        include: {
+          accounts: true,
+        },
+      })
+    : undefined;
 
   if (secure && !user) {
     const searchParams = new URLSearchParams({ go: url.pathname });
@@ -65,5 +67,18 @@ export async function getUserOrRedirect(request: Request) {
     throw redirect(config.home);
   }
 
-  return user;
+  const account = user?.accounts.find(
+    ({ id }) => id === user?.currentAccountID
+  );
+
+  const theme = account?.theme ?? config.defaultTheme;
+
+  return {
+    ...user,
+    accountName: account?.name ?? "",
+    accountUrl: account?.url ?? "",
+    meetingCount: account?.meetingCount ?? 0,
+    theme: config.themes[theme as keyof typeof config.themes],
+    themeName: theme,
+  };
 }
