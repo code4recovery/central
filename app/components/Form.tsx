@@ -129,17 +129,14 @@ export function Form({
                                   type="radio"
                                   name={name}
                                   value={color}
-                                  defaultChecked={color === theme}
+                                  defaultChecked={color === value}
                                   className={cx(
-                                    "relative h-10 flex cursor-pointer justify-center rounded w-full border-0",
+                                    "relative h-10 flex cursor-pointer justify-center rounded w-full border-0 checked:ring-2 checked:ring-offset-1",
                                     background,
-                                    focusRing,
-                                    text,
                                     backgroundHover,
                                     className,
-                                    {
-                                      "ring ring-offset-1": color === theme,
-                                    }
+                                    focusRing,
+                                    text
                                   )}
                                   aria-label={label}
                                 />

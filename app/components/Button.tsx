@@ -15,7 +15,7 @@ export function Button({
   url?: string;
 }) {
   const {
-    theme: { background, focusOutline, backgroundHover },
+    theme: { background, backgroundHover, focusOutline },
   } = useUser();
 
   const buttonClass = cx(

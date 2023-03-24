@@ -67,7 +67,7 @@ export default function Index() {
         columns={{
           name: { label: strings.meeting_name },
           when: { label: strings.meeting_when },
-          timezone: { label: strings.meeting_timezone },
+          types: { label: strings.meeting_types },
           updated: { label: strings.updated, align: "right" },
         }}
         rows={meetings}
@@ -81,7 +81,10 @@ export default function Index() {
                 submitting
                   ? strings.loading
                   : formatString(strings.load_more, {
-                      count: config.batchSize,
+                      count: Math.min(
+                        config.batchSize,
+                        user.meetingCount - meetings.length
+                      ),
                     })
               }
             />

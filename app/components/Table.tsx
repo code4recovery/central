@@ -3,6 +3,13 @@ import { Link } from "@remix-run/react";
 
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
+import { strings } from "~/i18n";
+
+type Row = {
+  id: string;
+  link?: string;
+  [index: string]: string | number | string[] | undefined | null;
+};
 
 export function Table({
   columns,
@@ -14,16 +21,39 @@ export function Table({
       align?: "left" | "center" | "right";
     };
   };
-  rows: {
-    id: string;
-    link?: string;
-    [index: string]: string | number | string[] | undefined | null;
-  }[];
+  rows: Row[];
 }) {
   const keys = Object.keys(columns);
   const {
-    theme: { text },
+    theme: { text, background, border },
   } = useUser();
+
+  const showValue = (key: keyof Row, row: Row) => {
+    const value = row[key] as string;
+    if (key === "types" && value) {
+      return (
+        <div className="flex gap-1">
+          {value.split(",").map((type) => (
+            <span
+              className={cx(
+                "px-1 rounded text-xs bg-opacity-10 border border-opacity-20",
+                background,
+                border
+              )}
+              key={type}
+            >
+              {strings.types[type as keyof typeof strings.types] ??
+                strings.language_types[
+                  type as keyof typeof strings.language_types
+                ]}
+            </span>
+          ))}
+        </div>
+      );
+    }
+    return row[key];
+  };
+
   return (
     <table className="min-w-full divide-y divide-gray-400 text-left text-sm">
       <thead>
@@ -50,7 +80,7 @@ export function Table({
             <td className="w-full max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
               {row.link ? (
                 <Link to={row.link} className={cx(text, "underline")}>
-                  {row[keys[0]]}
+                  {showValue(keys[0], row)}
                 </Link>
               ) : (
                 row[keys[0]]
@@ -66,7 +96,7 @@ export function Table({
                             "sm:hidden": index === 1,
                           })}
                         >
-                          {row[key]}
+                          {showValue(key, row)}
                         </dd>
                       </Fragment>
                     )
@@ -83,7 +113,7 @@ export function Table({
                   "text-right": columns[key].align === "right",
                 })}
               >
-                {row[key]}
+                {showValue(key, row)}
               </td>
             ))}
           </tr>

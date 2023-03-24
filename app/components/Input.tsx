@@ -3,7 +3,6 @@ import { useUser } from "~/hooks";
 import { formatClasses as cx } from "~/helpers";
 
 export function Input({
-  autoComplete,
   autoFocus,
   className,
   name,
@@ -12,7 +11,6 @@ export function Input({
   type,
   value,
 }: {
-  autoComplete?: "email";
   autoFocus?: boolean;
   className?: string;
   name: string;
@@ -26,7 +24,6 @@ export function Input({
   } = useUser();
   return (
     <input
-      autoComplete={autoComplete}
       className={cx(config.fieldClassNames, focusRing, className)}
       defaultValue={value ? `${value}` : undefined}
       id={name}

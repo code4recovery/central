@@ -46,13 +46,7 @@ export default function Index() {
         >
           <fieldset disabled={submitting}>
             <Label htmlFor="email">{strings.settings_user_email}</Label>
-            <Input
-              autoComplete="email"
-              autoFocus
-              name="email"
-              type="email"
-              required
-            />
+            <Input autoFocus name="email" type="email" required />
             <Button
               label={submitting ? strings.loading : strings.sign_in_submit}
               className="mt-6 w-full"

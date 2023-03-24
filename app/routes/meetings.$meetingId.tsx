@@ -33,7 +33,9 @@ export default function EditMeeting() {
         description={strings.meeting_details_description}
         fields={config.meetingFields.map((field) => ({
           ...field,
-          value: meeting[field.name],
+          value: ["types", "languages"].includes(field.name)
+            ? meeting.types.split(",")
+            : meeting[field.name],
         }))}
       />
     </Template>

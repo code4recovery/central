@@ -58,7 +58,13 @@ export function Header() {
               <div className="flex h-16 justify-between">
                 <div className="flex px-2 lg:px-0">
                   <div className="flex flex-shrink-0 items-center">
-                    <Link to={config.home}>
+                    <Link
+                      to={config.home}
+                      className={cx(
+                        "focus-visible:ring-2 h-8 outline-none w-auto",
+                        focusRing
+                      )}
+                    >
                       <Logo className={cx("h-8 w-auto", text)} />
                     </Link>
                   </div>
@@ -74,7 +80,8 @@ export function Header() {
                               [border]: isActive,
                               "border-transparent": !isActive,
                             },
-                            "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium"
+                            "border-b-2 focus-visible:ring-2 font-medium inline-flex items-center outline-none pt-1 px-1 text-sm",
+                            focusRing
                           )
                         }
                       >

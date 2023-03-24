@@ -105,7 +105,7 @@ export const config = {
       backgroundHover: "hover:bg-slate-500",
       border: "border-slate-500",
       focusOutline: "focus-visible:outline-slate-600",
-      focusRing: "focus:ring-slate-500",
+      focusRing: "focus:ring-slate-500 checked:ring-slate-500",
       text: "text-slate-600",
     },
     gray: {
@@ -114,7 +114,7 @@ export const config = {
       backgroundHover: "hover:bg-gray-500",
       border: "border-gray-500",
       focusOutline: "focus-visible:outline-gray-600",
-      focusRing: "focus:ring-gray-500",
+      focusRing: "focus:ring-gray-500 checked:ring-gray-500",
       text: "text-gray-600",
     },
     neutral: {
@@ -123,7 +123,7 @@ export const config = {
       backgroundHover: "hover:bg-neutral-500",
       border: "border-neutral-500",
       focusOutline: "focus-visible:outline-neutral-600",
-      focusRing: "focus:ring-neutral-500",
+      focusRing: "focus:ring-neutral-500 checked:ring-neutral-500",
       text: "text-neutral-600",
     },
     stone: {
@@ -132,7 +132,7 @@ export const config = {
       backgroundHover: "hover:bg-stone-500",
       border: "border-stone-500",
       focusOutline: "focus-visible:outline-stone-600",
-      focusRing: "focus:ring-stone-500",
+      focusRing: "focus:ring-stone-500 checked:ring-stone-500",
       text: "text-stone-600",
     },
     red: {
@@ -141,7 +141,7 @@ export const config = {
       backgroundHover: "hover:bg-red-500",
       border: "border-red-500",
       focusOutline: "focus-visible:outline-red-600",
-      focusRing: "focus:ring-red-500",
+      focusRing: "focus:ring-red-500 checked:ring-red-500",
       text: "text-red-600",
     },
     orange: {
@@ -150,7 +150,7 @@ export const config = {
       backgroundHover: "hover:bg-orange-500",
       border: "border-orange-500",
       focusOutline: "focus-visible:outline-orange-600",
-      focusRing: "focus:ring-orange-500",
+      focusRing: "focus:ring-orange-500 checked:ring-orange-500",
       text: "text-orange-600",
     },
     amber: {
@@ -159,7 +159,7 @@ export const config = {
       backgroundHover: "hover:bg-amber-500",
       border: "border-amber-500",
       focusOutline: "focus-visible:outline-amber-600",
-      focusRing: "focus:ring-amber-500",
+      focusRing: "focus:ring-amber-500 checked:ring-amber-500",
       text: "text-amber-600",
     },
     yellow: {
@@ -168,7 +168,7 @@ export const config = {
       backgroundHover: "hover:bg-yellow-500",
       border: "border-yellow-500",
       focusOutline: "focus-visible:outline-yellow-600",
-      focusRing: "focus:ring-yellow-500",
+      focusRing: "focus:ring-yellow-500 checked:ring-yellow-500",
       text: "text-yellow-600",
     },
     lime: {
@@ -177,7 +177,7 @@ export const config = {
       backgroundHover: "hover:bg-lime-500",
       border: "border-lime-500",
       focusOutline: "focus-visible:outline-lime-600",
-      focusRing: "focus:ring-lime-500",
+      focusRing: "focus:ring-lime-500 checked:ring-lime-500",
       text: "text-lime-600",
     },
     green: {
@@ -186,7 +186,7 @@ export const config = {
       backgroundHover: "hover:bg-green-500",
       border: "border-green-500",
       focusOutline: "focus-visible:outline-green-600",
-      focusRing: "focus:ring-green-500",
+      focusRing: "focus:ring-green-500 checked:ring-green-500",
       text: "text-green-600",
     },
     emerald: {
@@ -195,7 +195,7 @@ export const config = {
       backgroundHover: "hover:bg-emerald-500",
       border: "border-emerald-500",
       focusOutline: "focus-visible:outline-emerald-600",
-      focusRing: "focus:ring-emerald-500",
+      focusRing: "focus:ring-emerald-500 checked:ring-emerald-500",
       text: "text-emerald-600",
     },
     teal: {
@@ -204,7 +204,7 @@ export const config = {
       backgroundHover: "hover:bg-teal-500",
       border: "border-teal-500",
       focusOutline: "focus-visible:outline-teal-600",
-      focusRing: "focus:ring-teal-500",
+      focusRing: "focus:ring-teal-500 checked:ring-teal-500",
       text: "text-teal-600",
     },
     cyan: {
@@ -213,7 +213,7 @@ export const config = {
       backgroundHover: "hover:bg-cyan-500",
       border: "border-cyan-500",
       focusOutline: "focus-visible:outline-cyan-600",
-      focusRing: "focus:ring-cyan-500",
+      focusRing: "focus:ring-cyan-500 checked:ring-cyan-500",
       text: "text-cyan-600",
     },
     sky: {
@@ -222,7 +222,7 @@ export const config = {
       backgroundHover: "hover:bg-sky-500",
       border: "border-sky-500",
       focusOutline: "focus-visible:outline-sky-600",
-      focusRing: "focus:ring-sky-500",
+      focusRing: "focus:ring-sky-500 checked:ring-sky-500",
       text: "text-sky-600",
     },
     blue: {
@@ -231,7 +231,7 @@ export const config = {
       backgroundHover: "hover:bg-blue-500",
       border: "border-blue-500",
       focusOutline: "focus-visible:outline-blue-600",
-      focusRing: "focus:ring-blue-500",
+      focusRing: "focus:ring-blue-500 checked:ring-blue-500",
       text: "text-blue-600",
     },
     indigo: {
@@ -240,7 +240,7 @@ export const config = {
       backgroundHover: "hover:bg-indigo-500",
       border: "border-indigo-500",
       focusOutline: "focus-visible:outline-indigo-600",
-      focusRing: "focus:ring-indigo-500",
+      focusRing: "focus:ring-indigo-500 checked:ring-indigo-500",
       text: "text-indigo-600",
     },
     violet: {
@@ -249,7 +249,7 @@ export const config = {
       backgroundHover: "hover:bg-violet-500",
       border: "border-violet-500",
       focusOutline: "focus-visible:outline-violet-600",
-      focusRing: "focus:ring-violet-500",
+      focusRing: "focus:ring-violet-500 checked:ring-violet-500",
       text: "text-violet-600",
     },
     purple: {
@@ -258,7 +258,7 @@ export const config = {
       backgroundHover: "hover:bg-purple-500",
       border: "border-purple-500",
       focusOutline: "focus-visible:outline-purple-600",
-      focusRing: "focus:ring-purple-500",
+      focusRing: "focus:ring-purple-500 checked:ring-purple-500",
       text: "text-purple-600",
     },
     fuchsia: {
@@ -267,7 +267,7 @@ export const config = {
       backgroundHover: "hover:bg-fuchsia-500",
       border: "border-fuchsia-500",
       focusOutline: "focus-visible:outline-fuchsia-600",
-      focusRing: "focus:ring-fuchsia-500",
+      focusRing: "focus:ring-fuchsia-500 checked:ring-fuchsia-500",
       text: "text-fuchsia-600",
     },
     pink: {
@@ -276,7 +276,7 @@ export const config = {
       backgroundHover: "hover:bg-pink-500",
       border: "border-pink-500",
       focusOutline: "focus-visible:outline-pink-600",
-      focusRing: "focus:ring-pink-500",
+      focusRing: "focus:ring-pink-500 checked:ring-pink-500",
       text: "text-pink-600",
     },
     rose: {
@@ -285,7 +285,7 @@ export const config = {
       backgroundHover: "hover:bg-rose-500",
       border: "border-rose-500",
       focusOutline: "focus-visible:outline-rose-600",
-      focusRing: "focus:ring-rose-500",
+      focusRing: "focus:ring-rose-500 checked:ring-rose-500",
       text: "text-rose-600",
     },
   },

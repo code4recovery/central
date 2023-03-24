@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import md5 from "blueimp-md5";
 
 import { config, getGoogleSheet } from "~/helpers";
+import { strings } from "~/i18n";
 
 const db = new PrismaClient();
 
@@ -53,12 +54,13 @@ async function getMeetings(): Promise<Meeting[]> {
   );
   const meetings: Meeting[] = [];
 
-  rows.slice(0, 20).forEach((row) => {
+  rows.slice(0, 50).forEach((row) => {
     const meeting = {
       name: row.name,
       slug: row.slug,
       timezone: row.timezone,
       notes: row.notes,
+      types: convertTypes(row.types),
     };
     if (!row.times.trim().length) {
       meetings.push(meeting);
@@ -78,11 +80,33 @@ async function getMeetings(): Promise<Meeting[]> {
   return meetings;
 }
 
-function convertDayTime(dayTime: string) {
+const convertDayTime = (dayTime: string) => {
   let [dayName, time, ampm] = dayTime.toLowerCase().split(" ");
   const day = config.days.indexOf(dayName);
   let [hours, minutes] = time.split(":").map((e) => Number(e));
   if (ampm === "PM") hours = hours + 12;
   time = [hours, minutes].map((n) => String(n).padStart(2, "0")).join(":");
   return { day, time };
-}
+};
+
+const allTypes = { ...strings.types, ...strings.language_types };
+const typeKeys = Object.keys(allTypes);
+const typeValues = Object.values(allTypes);
+const notFound: string[] = [];
+
+const convertTypes = (types: string) =>
+  types
+    .split(",")
+    .map((type) => type.trim())
+    .map((type) => {
+      const typeIndex = typeValues.indexOf(type);
+      if (typeIndex !== -1) {
+        return typeKeys[typeIndex];
+      }
+      if (!notFound.includes(type)) {
+        console.log(type);
+      }
+    })
+    .filter((e) => e)
+    .sort()
+    .join();

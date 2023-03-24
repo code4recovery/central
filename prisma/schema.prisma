@@ -17,6 +17,7 @@ model Meeting {
   timezone  String?
   day       Int?
   time      String?
+  types     String?
   duration  Int?
   notes     String?
   createdAt DateTime @default(now())

@@ -13,15 +13,25 @@ export const meta: MetaFunction = () => ({
 });
 
 export const action: ActionFunction = async ({ request }) => {
-  const { accountID, name, url, theme } = await validFormData(request);
+  const { accountID, email, userID, name, url, theme } = await validFormData(
+    request
+  );
 
-  if (typeof accountID !== "undefined") {
+  if (accountID) {
     await db.account.update({
       where: { id: accountID as string },
       data: {
         name: name as string,
         url: url as string,
         theme: theme as string,
+      },
+    });
+  } else if (userID) {
+    await db.user.update({
+      where: { id: accountID as string },
+      data: {
+        name: name as string,
+        email: email as string,
       },
     });
   }
