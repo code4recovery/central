@@ -7,7 +7,6 @@ import {
 } from "@remix-run/react";
 import { json, LoaderArgs } from "@remix-run/node";
 import type { ActionArgs, MetaFunction } from "@remix-run/node";
-import invariant from "tiny-invariant";
 
 import { Button, Table, Template } from "~/components";
 import { config, formatMeetings, formatString } from "~/helpers";
@@ -23,11 +22,10 @@ export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
 
   const skip = formData.get("skip");
-  invariant(skip && typeof skip === "string");
 
   const meetings = await db.meeting.findMany({
     take: config.batchSize,
-    skip: Number(skip),
+    skip: skip ? Number(skip) : undefined,
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
 
@@ -35,26 +33,27 @@ export async function action({ request }: ActionArgs) {
 }
 
 export async function loader({ request }: LoaderArgs) {
-  const url = new URL(request.url);
-  const search = url.searchParams.get("search");
-  if (search) {
-    const result = await db.meeting.findRaw({
-      filter: {
-        $text: {
-          $search: search.toString(),
+  const search = new URL(request.url).searchParams.get("search");
+  const meetingIDs = await searchMeetings(search);
+  const meetings = search
+    ? await db.meeting.findMany({
+        orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+        where: {
+          id: {
+            in: meetingIDs,
+          },
         },
-      },
-    });
-  }
-  const meetings = await db.meeting.findMany({
-    take: config.batchSize,
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-  });
-  return json(formatMeetings(meetings));
+      })
+    : await db.meeting.findMany({
+        orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+        take: config.batchSize,
+      });
+  return json({ loadedMeetings: formatMeetings(meetings), search });
 }
 
 export default function Index() {
-  const [meetings, setMeetings] = useState(useLoaderData<typeof loader>());
+  const { loadedMeetings, search } = useLoaderData<typeof loader>();
+  const [meetings, setMeetings] = useState(loadedMeetings);
   const more = useActionData();
   const user = useUser();
   const { state } = useNavigation();
@@ -82,8 +81,13 @@ export default function Index() {
           updated: { label: strings.updated, align: "right" },
         }}
         rows={meetings}
+        noResults={
+          search
+            ? formatString(strings.meetings_none_search, { search })
+            : strings.meetings_none
+        }
       />
-      {meetings.length < user.meetingCount && (
+      {!search && meetings.length < user.meetingCount && (
         <Form method="post" className="pt-10 flex justify-center">
           <fieldset disabled={submitting}>
             <input type="hidden" name="skip" value={meetings.length} />
@@ -104,4 +108,28 @@ export default function Index() {
       )}
     </Template>
   );
+}
+
+async function searchMeetings(search: string | null) {
+  if (!search) {
+    return [];
+  }
+  const searchString = search
+    .split('"')
+    .join("")
+    .split(" ")
+    .filter((e) => e)
+    .map((e) => `"${e}"`)
+    .join(" ");
+  const result = await db.meeting.findRaw({
+    filter: {
+      $text: {
+        $search: searchString,
+      },
+    },
+  });
+  if (!Array.isArray(result) || !result.length) {
+    return [];
+  }
+  return result.map((foo) => foo._id["$oid"]) as string[];
 }

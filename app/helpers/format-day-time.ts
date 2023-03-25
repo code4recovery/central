@@ -7,12 +7,15 @@ export function formatDayTime(
   time: string | null,
   timezone: string | null
 ) {
-  if (day === null || time === null || timezone === null) {
+  if (day === null || !time || !timezone) {
     return strings.ongoing;
   }
 
   const weekday = day === 0 ? 7 : day;
-  const [hour, minute] = time.split(":").map((s) => Number(s));
+  const [hour, minute] = time
+    .split(":")
+    .map((s) => Number(s))
+    .filter((e) => !isNaN(e));
 
   const start = DateTime.fromObject(
     { weekday, hour, minute },

@@ -6,7 +6,7 @@ import {
   QuestionMarkCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Form, Link, NavLink } from "@remix-run/react";
+import { Link, NavLink, useSearchParams } from "@remix-run/react";
 
 import { config, formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
@@ -14,6 +14,9 @@ import { strings } from "~/i18n";
 import { DefaultAccountLogo as Logo } from "~/icons";
 
 export function Header() {
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get("search") || undefined;
+
   const user = useUser();
   const navItems = {
     primary: [
@@ -91,9 +94,19 @@ export function Header() {
                   </div>
                 </div>
                 <div className="flex flex-1 items-center justify-center px-2 lg:px-0 lg:ml-6 lg:justify-end">
-                  <Form
+                  <form
                     action="/meetings"
                     className="w-full max-w-lg lg:max-w-xs"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const form = e.target as HTMLFormElement;
+                      const formData = new FormData(form);
+                      if (!formData.get("search")?.toString()) {
+                        location.assign("/meetings");
+                      } else {
+                        form.submit();
+                      }
+                    }}
                   >
                     <label htmlFor="search" className="sr-only">
                       {strings.search}
@@ -101,22 +114,24 @@ export function Header() {
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <MagnifyingGlassIcon
-                          className="h-5 w-5 text-gray-400"
                           aria-hidden="true"
+                          className="h-5 w-5 text-gray-400"
                         />
                       </div>
                       <input
-                        id="search"
-                        name="search"
+                        autoComplete="off"
                         className={cx(
                           "block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
                           focusRing
                         )}
+                        defaultValue={search}
+                        id="search"
+                        name="search"
                         placeholder={strings.search}
                         type="search"
                       />
                     </div>
-                  </Form>
+                  </form>
                 </div>
                 <div className="flex items-center lg:hidden">
                   <Disclosure.Button
@@ -135,16 +150,16 @@ export function Header() {
                 </div>
                 <div className="hidden lg:ml-4 lg:flex lg:items-center">
                   <button
-                    type="button"
                     className={cx(
                       "flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2",
                       focusRing
                     )}
+                    type="button"
                   >
                     <span className="sr-only">{strings.help_show}</span>
                     <QuestionMarkCircleIcon
-                      className="h-6 w-6"
                       aria-hidden="true"
+                      className="h-6 w-6"
                     />
                   </button>
 

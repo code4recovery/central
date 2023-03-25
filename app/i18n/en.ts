@@ -52,6 +52,8 @@ export const strings = {
   meeting_types: "Types",
   meeting_when: "When",
   meetings_description: "You have %meetings_count% meetings in your account.",
+  meetings_none: "No meetings added yet",
+  meetings_none_search: "No meetings matched “%search%”",
   meetings_title: "Meetings",
   ongoing: "Ongoing",
   reports_description: "A list of all the reports in your account",
