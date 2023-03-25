@@ -1,4 +1,4 @@
-import type { ActionArgs, MetaFunction } from "@remix-run/node";
+import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useNavigation, useSearchParams } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -10,7 +10,7 @@ import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
 import { createUserSession, db } from "~/utils";
 
-export async function action({ request }: ActionArgs) {
+export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const email = formData.get("email");
 
@@ -26,7 +26,7 @@ export async function action({ request }: ActionArgs) {
   }
 
   return redirect("/");
-}
+};
 
 export const meta: MetaFunction = () => ({
   title: strings.sign_in_title,
@@ -59,10 +59,10 @@ export default function Index() {
               value={searchParams.get("go") ?? undefined}
             />
             <Label htmlFor="email">{strings.settings_user_email}</Label>
-            <Input autoFocus name="email" type="email" required />
+            <Input autoFocus name="email" required type="email" />
             <Button
-              label={submitting ? strings.loading : strings.sign_in_submit}
               className="mt-6 w-full"
+              label={submitting ? strings.loading : strings.sign_in_submit}
             />
           </fieldset>
         </Form>

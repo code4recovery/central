@@ -14,7 +14,6 @@ type Row = {
 export function Table({
   columns,
   rows,
-  noResults,
 }: {
   columns: {
     [index: string]: {
@@ -23,12 +22,13 @@ export function Table({
     };
   };
   rows: Row[];
-  noResults: string;
 }) {
   const keys = Object.keys(columns);
   const {
     theme: { text, background, border },
   } = useUser();
+
+  if (!rows.length) return null;
 
   const showValue = (key: keyof Row, row: Row) => {
     const value = row[key] as string;
@@ -56,7 +56,7 @@ export function Table({
     return row[key];
   };
 
-  return !!rows.length ? (
+  return (
     <table className="min-w-full divide-y divide-gray-400 text-left text-sm">
       <thead>
         <tr>
@@ -144,9 +144,5 @@ export function Table({
         })}
       </tbody>
     </table>
-  ) : (
-    <div className="bg-gray-100 p-16 rounded shadow text-center text-gray-600 text-lg">
-      {noResults}
-    </div>
   );
 }

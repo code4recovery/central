@@ -1,10 +1,10 @@
-import type { ActionArgs, MetaFunction } from "@remix-run/node";
+import type { ActionFunction, MetaFunction } from "@remix-run/node";
 
 import { Form, Template } from "~/components";
 import { config } from "~/helpers";
 import { strings } from "~/i18n";
 
-export const action = async ({ params }: ActionArgs) => {
+export const action: ActionFunction = async ({ params }) => {
   console.log(params.meetingId);
 };
 

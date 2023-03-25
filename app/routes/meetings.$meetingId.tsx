@@ -1,4 +1,8 @@
-import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
@@ -7,31 +11,28 @@ import { config, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
-export const meta: MetaFunction = () => ({
-  title: strings.meeting_edit,
-});
+export const action: ActionFunction = async ({ params }) => {
+  console.log(params.meetingId);
+};
 
-export const loader = async ({ params }: LoaderArgs) => {
+export const loader: LoaderFunction = async ({ params }) => {
   if (!validObjectId(params.meetingId)) {
-    // todo consider a "invalid meeting id" message
     return redirect("/meetings");
   }
-
   const meeting = await db.meeting.findFirst({
     where: { id: params.meetingId },
   });
   if (!meeting) {
-    // todo consider a "meeting not found" message
     return redirect("/meetings");
   }
   return json({
-    meeting: { ...meeting, day: `${meeting?.day}` },
+    meeting: { ...meeting, day: meeting?.day?.toString() },
   });
 };
 
-export const action = async ({ params }: ActionArgs) => {
-  console.log(params.meetingId);
-};
+export const meta: MetaFunction = () => ({
+  title: strings.meeting_edit,
+});
 
 export default function EditMeeting() {
   const { meeting } = useLoaderData();

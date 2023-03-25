@@ -1,7 +1,5 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
 
-import { logout } from "~/utils/session.server";
+import { logout } from "~/utils";
 
-export const loader = async ({ request }: LoaderArgs) => {
-  return logout(request);
-};
+export const loader: LoaderFunction = async ({ request }) => logout(request);
