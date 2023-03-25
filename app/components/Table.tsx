@@ -77,49 +77,71 @@ export function Table({
         </tr>
       </thead>
       <tbody className="divide-y divide-gray-300 text-gray-700">
-        {rows.map((row) => (
-          <tr key={row.id}>
-            <td className="w-full max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
-              {row.link ? (
-                <Link to={row.link} className={cx(text, "underline")}>
-                  {showValue(keys[0], row)}
-                </Link>
-              ) : (
-                row[keys[0]]
+        {rows.map((row) => {
+          const stack = (
+            <dl className="font-normal lg:hidden">
+              {keys.slice(1, 3).map(
+                (key, index) =>
+                  !!row[key] && (
+                    <Fragment key={key}>
+                      <dt className="sr-only">{columns[key].label}</dt>
+                      <dd
+                        className={cx("mt-1 truncate", {
+                          "sm:hidden": index === 1,
+                        })}
+                      >
+                        {showValue(key, row)}
+                      </dd>
+                    </Fragment>
+                  )
               )}
-              <dl className="font-normal lg:hidden">
-                {keys.slice(1, 3).map(
-                  (key, index) =>
-                    !!row[key] && (
-                      <Fragment key={key}>
-                        <dt className="sr-only">{columns[key].label}</dt>
-                        <dd
-                          className={cx("mt-1 truncate", {
-                            "sm:hidden": index === 1,
-                          })}
-                        >
-                          {showValue(key, row)}
-                        </dd>
-                      </Fragment>
-                    )
+            </dl>
+          );
+          return (
+            <tr
+              key={row.id}
+              className={cx({
+                "hover:bg-gray-100 hover:bg-opacity-50 cursor-pointer":
+                  !!row.link,
+              })}
+            >
+              <td className="w-full max-w-0 font-medium sm:w-auto sm:max-w-none">
+                {row.link ? (
+                  <Link to={row.link} className="block p-3">
+                    <div className={cx(text, "underline")}>
+                      {showValue(keys[0], row)}
+                    </div>
+                    {stack}
+                  </Link>
+                ) : (
+                  <div className="p-3">
+                    {row[keys[0]]}
+                    {stack}
+                  </div>
                 )}
-              </dl>
-            </td>
-            {keys.slice(1, 4).map((key, index) => (
-              <td
-                key={key}
-                className={cx("p-3", {
-                  "hidden lg:table-cell": index === 0,
-                  "hidden sm:table-cell": index === 1,
-                  "text-center": columns[key].align === "center",
-                  "text-right": columns[key].align === "right",
-                })}
-              >
-                {showValue(key, row)}
               </td>
-            ))}
-          </tr>
-        ))}
+              {keys.slice(1, 4).map((key, index) => (
+                <td
+                  key={key}
+                  className={cx({
+                    "hidden lg:table-cell": index === 0,
+                    "hidden sm:table-cell": index === 1,
+                    "text-center": columns[key].align === "center",
+                    "text-right": columns[key].align === "right",
+                  })}
+                >
+                  {!!row.link ? (
+                    <Link to={row.link} className="block p-3">
+                      {showValue(key, row)}
+                    </Link>
+                  ) : (
+                    showValue(key, row)
+                  )}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   ) : (

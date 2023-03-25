@@ -1,9 +1,9 @@
 import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { Form, Template } from "~/components";
-import { config } from "~/helpers";
+import { config, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
@@ -12,9 +12,18 @@ export const meta: MetaFunction = () => ({
 });
 
 export const loader = async ({ params }: LoaderArgs) => {
-  const meeting = await db.meeting.findUnique({
+  if (!validObjectId(params.meetingId)) {
+    // todo consider a "invalid meeting id" message
+    return redirect("/meetings");
+  }
+
+  const meeting = await db.meeting.findFirst({
     where: { id: params.meetingId },
   });
+  if (!meeting) {
+    // todo consider a "meeting not found" message
+    return redirect("/meetings");
+  }
   return json({
     meeting: { ...meeting, day: `${meeting?.day}` },
   });

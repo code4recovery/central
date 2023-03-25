@@ -78,7 +78,7 @@ export const strings = {
   sign_in_title: "Sign in or create an account",
   sign_out: "Sign out",
   time: {
-    just_now: "just now",
+    just_now: "Just now",
     minutes_ago: "%minutes% minutes ago",
     hour_ago: "1 hour ago",
     hours_ago: "%hours% hours ago",

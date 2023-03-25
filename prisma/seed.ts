@@ -59,7 +59,7 @@ async function getMeetings(): Promise<Meeting[]> {
       name: row.name,
       slug: row.slug,
       timezone: row.timezone,
-      notes: row.notes,
+      notes: row.notes.trim(),
       types: convertTypes(row.types),
     };
     if (!row.times.trim().length) {
