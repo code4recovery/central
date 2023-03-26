@@ -9,7 +9,7 @@ This project uses the following third-party services:
 - [Google Cloud Run](https://cloud.google.com/run)
 - [Google Sheets API](https://developers.google.com/sheets/api)
 - [MongoDB](https://www.mongodb.com/) (we use [Atlas](https://www.mongodb.com/atlas/database))
-- Google Cloud Storage (coming soon)
+- [Google Cloud Storage](https://cloud.google.com/storage)
 - Google Geocoding API (coming soon)
 - Google TimeZone API (coming soon)
 - SendGrid (coming soon)
@@ -22,11 +22,22 @@ Interested in making your own copy of this service, or adapting it to your needs
 Create a `.env` file that looks like this, and replace
 
 ```sh
+# MongoDB connection URL
 DATABASE_URL="mongodb+srv://<user>:<password>@cluster0.t0piiqe.mongodb.net/<database>"
 
+# Google Sheets API
 GOOGLE_SHEET_API_KEY="<your.google.sheets.api.key>"
 
+# Google Cloud Storage
+GOOGLE_CLOUD_BUCKET="<your.bucket>"
+GOOGLE_CLOUD_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n<private.key.goes.here>==\n-----END PRIVATE KEY-----\n"
+
+# Random salt
 SESSION_SECRET="<make.up.a.cryptographic.salt>"
+
+# Initial account seed
+USER_NAME="Josh R."
+USER_EMAIL="josh@joshreisner.com"
 ```
 
 You may wish to seed your database with an existing Meeting Guide JSON feed. Coming soon.

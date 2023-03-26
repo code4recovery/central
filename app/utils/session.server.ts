@@ -75,6 +75,7 @@ export async function getUserOrRedirect(request: Request) {
 
   return {
     ...user,
+    accountID: account?.id ?? "",
     accountName: account?.name ?? "",
     accountUrl: account?.url ?? "",
     meetingCount: account?.meetingCount ?? 0,

@@ -9,26 +9,24 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { Account } from "@prisma/client";
 
 import styles from "./tailwind.css";
-import { config } from "./helpers";
 import { UserContext } from "./hooks";
 import { strings } from "~/i18n";
 import { getUserOrRedirect } from "~/utils";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
+export async function loader({ request }: LoaderArgs) {
+  const user = await getUserOrRedirect(request);
+  return json({ user });
+}
+
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: strings.app_name,
   viewport: "width=device-width,initial-scale=1",
 });
-
-export async function loader({ request }: LoaderArgs) {
-  const user = await getUserOrRedirect(request);
-  return json({ user });
-}
 
 export default function App() {
   const { user } = useLoaderData();

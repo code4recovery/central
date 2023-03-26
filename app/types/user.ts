@@ -1,4 +1,5 @@
 export type User = {
+  accountID: string;
   accountName: string;
   accountUrl: string;
   currentAccountID: string;

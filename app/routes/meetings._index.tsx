@@ -69,7 +69,7 @@ export default function Index() {
     >
       {!meetings.length && (
         <Alert
-          alertText={
+          message={
             search
               ? formatString(strings.meetings_none_search, { search })
               : strings.meetings_none

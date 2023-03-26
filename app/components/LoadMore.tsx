@@ -15,7 +15,7 @@ export function LoadMore({
   const submitting = state === "submitting";
 
   return (
-    <Form method="post" className="pt-10 flex justify-center">
+    <Form method="post" className="flex justify-center">
       <fieldset disabled={submitting}>
         <input type="hidden" name="skip" value={loadedCount} />
         <Button

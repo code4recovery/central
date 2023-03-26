@@ -3,6 +3,7 @@ import { config } from "~/helpers";
 import type { User } from "~/types";
 
 export const UserContext = createContext<User>({
+  accountID: "",
   accountName: "",
   accountUrl: "",
   currentAccountID: "",

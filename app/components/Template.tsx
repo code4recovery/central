@@ -31,7 +31,7 @@ export function Template({
           </div>
         )}
         {children && (
-          <div className="-mx-4 my-8 mb-16 sm:-mx-0">{children}</div>
+          <div className="-mx-4 my-8 mb-16 sm:-mx-0 space-y-8">{children}</div>
         )}
       </main>
       <Footer />
