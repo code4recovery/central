@@ -28,6 +28,7 @@ export const strings = {
     ITA: "Italian",
     JA: "Japanese",
     KOR: "Korean",
+    LT: "Lithuanian",
     POL: "Polish",
     POR: "Portuguese",
     PUN: "Punjabi",

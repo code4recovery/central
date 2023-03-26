@@ -12,17 +12,21 @@ datasource db {
 }
 
 model Meeting {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  slug      String?
-  name      String
-  timezone  String?
-  day       Int?
-  time      String?
-  types     String?
-  duration  Int?
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug                   String?
+  name                   String
+  timezone               String?
+  day                    Int?
+  time                   String?
+  types                  String?
+  duration               Int?
+  notes                  String?
+  conference_url         String?
+  conference_url_notes   String?
+  conference_phone       String?
+  conference_phone_notes String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
   @@fulltext([name, slug, notes])
 }

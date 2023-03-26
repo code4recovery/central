@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import md5 from "blueimp-md5";
+import { DateTime } from "luxon";
 
-import { config, getGoogleSheet } from "~/helpers";
+import { getGoogleSheet } from "~/helpers";
 import { strings } from "~/i18n";
 
 const db = new PrismaClient();
@@ -11,38 +12,49 @@ type Meeting = {
   duration?: number;
   name: string;
   notes?: string;
-  slug: string;
+  slug?: string;
   start?: Date;
   time?: string;
   timezone?: string;
 };
 
 async function seed() {
-  await db.account.deleteMany();
   await db.meeting.deleteMany();
-  await db.user.deleteMany();
   const meetings = await getMeetings();
   await Promise.all(meetings.map((data) => db.meeting.create({ data })));
 
-  const account = await db.account.create({
-    data: {
-      name: "Online Intergroup of AA",
-      url: "https://aa-intergroup.org/meetings",
-      meetingCount: meetings.length,
-      theme: "sky",
-    },
-  });
+  const url = "https://aa-intergroup.org/meetings";
+  let account = await db.account.findFirst({ where: { url } });
+  if (!account) {
+    account = await db.account.create({
+      data: {
+        name: "Online Intergroup of AA",
+        url,
+        meetingCount: meetings.length,
+        theme: "sky",
+      },
+    });
+  }
 
   const email = process.env.USER_EMAIL ?? "foo@example.com";
-  await db.user.create({
-    data: {
-      name: process.env.USER_NAME ?? "Joe Q.",
+  const user = await db.user.findUnique({
+    where: {
       email,
-      emailHash: md5(email),
-      accounts: { connect: { id: account.id } },
-      currentAccountID: account.id,
     },
   });
+  if (!user) {
+    await db.user.create({
+      data: {
+        name: process.env.USER_NAME ?? "Joe Q.",
+        email,
+        emailHash: md5(email),
+        accounts: { connect: { id: account.id } },
+        currentAccountID: account.id,
+      },
+    });
+  }
+
+  console.log(`${meetings.length} meetings imported`);
 }
 
 seed();
@@ -54,24 +66,26 @@ async function getMeetings(): Promise<Meeting[]> {
   );
   const meetings: Meeting[] = [];
 
-  rows.slice(0, 50).forEach((row) => {
+  rows.slice(50, 100).forEach((row) => {
     const meeting = {
       name: row.name,
-      slug: row.slug,
       timezone: row.timezone,
-      notes: row.notes.trim(),
+      notes: row.notes,
       types: convertTypes(row.types),
+      conference_url: row.url,
+      conference_url_notes: row.access_code,
     };
-    if (!row.times.trim().length) {
+    if (!row.times.length) {
       meetings.push(meeting);
     } else {
       row.times
         .split("\n")
-        .filter((e) => e.includes(":")) //make sure there's a time
+        .map((e) => e.trim())
+        .filter((e) => e)
         .forEach((dayTime) =>
           meetings.push({
             ...meeting,
-            ...convertDayTime(dayTime),
+            ...convertDayTime(dayTime, meeting.timezone),
           })
         );
     }
@@ -80,13 +94,25 @@ async function getMeetings(): Promise<Meeting[]> {
   return meetings;
 }
 
-const convertDayTime = (dayTime: string) => {
-  let [dayName, time, ampm] = dayTime.toLowerCase().split(" ");
-  const day = config.days.indexOf(dayName);
-  let [hours, minutes] = time.split(":").map((e) => Number(e));
-  if (ampm === "PM") hours = hours + 12;
-  time = [hours, minutes].map((n) => String(n).padStart(2, "0")).join(":");
-  return { day, time };
+const convertDayTime = (dayTime: string, timezone: string) => {
+  const start = DateTime.fromFormat(dayTime, "cccc h:mm a", {
+    zone: timezone,
+  });
+
+  if (!start.isValid) {
+    console.error(`invalid ${dayTime} ${timezone}: ${start.invalidReason}`);
+    return {
+      day: undefined,
+      time: undefined,
+      timezone: undefined,
+    };
+  }
+
+  return {
+    day: start.weekday === 7 ? 0 : start.weekday,
+    time: start.toFormat("HH:mm"),
+    timezone: start.toFormat("z"),
+  };
 };
 
 const allTypes = { ...strings.types, ...strings.language_types };
@@ -104,7 +130,7 @@ const convertTypes = (types: string) =>
         return typeKeys[typeIndex];
       }
       if (!notFound.includes(type)) {
-        console.log(type);
+        console.error(`type not found: ${type}`);
       }
     })
     .filter((e) => e)

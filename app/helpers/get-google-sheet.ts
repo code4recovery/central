@@ -16,7 +16,7 @@ export async function getGoogleSheet(sheetId: string) {
   values.forEach((value: string[]) => {
     const row: Row = {};
     headers.forEach((header, index) => {
-      row[header] = value[index];
+      row[header] = value[index] ? value[index].trim() : "";
     });
     rows.push(row);
   });

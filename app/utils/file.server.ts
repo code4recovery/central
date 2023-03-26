@@ -15,7 +15,20 @@ export async function saveFeedToStorage(accountID: string) {
   });
 
   const meetings = (await db.meeting.findMany()).map(
-    ({ slug, id, name, timezone, notes, types, day, time }) => ({
+    ({
+      slug,
+      id,
+      name,
+      timezone,
+      notes,
+      types,
+      day,
+      time,
+      conference_url,
+      conference_url_notes,
+      conference_phone,
+      conference_phone_notes,
+    }) => ({
       slug: slug || id,
       name,
       timezone,
@@ -23,6 +36,10 @@ export async function saveFeedToStorage(accountID: string) {
       types: types?.split(",") ?? [],
       day,
       time,
+      conference_url,
+      conference_url_notes,
+      conference_phone,
+      conference_phone_notes,
     })
   );
 
@@ -30,5 +47,8 @@ export async function saveFeedToStorage(accountID: string) {
 
   await storage.bucket(bucket).file(filename).save(contents);
 
-  return `https://storage.googleapis.com/${bucket}/${filename}`;
+  //const metadata = await storage.bucket(bucket).file(filename).getMetadata();
+  //console.log(JSON.stringify(metadata));
+
+  return `https://${bucket}.storage.googleapis.com/${filename}`;
 }
