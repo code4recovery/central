@@ -1,7 +1,9 @@
 export const strings = {
   about: "About this software",
   activity_description: "A log of recent site activity",
+  activity_none: "No activity yet. Edit a meeting to add some activity here.",
   activity_title: "Activity",
+  activity_update: "Updated",
   app_name: "Unity",
   days: {
     friday: "Friday",

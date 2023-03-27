@@ -5,6 +5,7 @@ export type User = {
   currentAccountID: string;
   email: string;
   emailHash: string;
+  id: string;
   meetingCount: number;
   name?: string;
   theme: {

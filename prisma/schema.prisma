@@ -12,7 +12,7 @@ datasource db {
 }
 
 model Meeting {
-  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                     String     @id @default(auto()) @map("_id") @db.ObjectId
   slug                   String?
   name                   String
   timezone               String?
@@ -25,22 +25,25 @@ model Meeting {
   conference_url_notes   String?
   conference_phone       String?
   conference_phone_notes String?
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  Activity               Activity[]
 
   @@fulltext([name, slug, notes])
 }
 
 model User {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  email            String    @unique
+  id               String     @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  email            String     @unique
   emailHash        String
   name             String?
   currentAccountID String
-  accountIDs       String[]  @db.ObjectId
-  accounts         Account[] @relation(fields: [accountIDs], references: [id])
+  accountIDs       String[]   @db.ObjectId
+  accounts         Account[]  @relation(fields: [accountIDs], references: [id])
+  activityIDs      String[]   @db.ObjectId
+  activities       Activity[] @relation()
 }
 
 model Account {
@@ -53,4 +56,25 @@ model Account {
   meetingCount Int
   userIDs      String[] @db.ObjectId
   users        User[]   @relation(fields: [userIDs], references: [id])
+}
+
+model Activity {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  userID    String   @db.ObjectId
+  user      User     @relation(fields: [userID], references: [id])
+  type      String
+  meetingID String   @db.ObjectId
+  meeting   Meeting  @relation(fields: [meetingID], references: [id])
+  Change    Change[]
+}
+
+model Change {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime @default(now())
+  field      String
+  before     String
+  after      String
+  activityID String   @db.ObjectId
+  activity   Activity @relation(fields: [activityID], references: [id])
 }

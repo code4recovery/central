@@ -24,7 +24,7 @@ async function seed() {
   await Promise.all(meetings.map((data) => db.meeting.create({ data })));
 
   const url = "https://aa-intergroup.org/meetings";
-  let account = await db.account.findFirst({ where: { url } });
+  let account = await db.account.findFirst();
   if (!account) {
     account = await db.account.create({
       data: {
