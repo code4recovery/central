@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { Alert, Table, Template } from "~/components";
-import { formatDateDiff, formatString } from "~/helpers";
+import { formatUpdated, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
@@ -21,7 +21,7 @@ export const loader: LoaderFunction = async () => {
       meeting: undefined,
       meetingName: activity.meeting.name,
       link: `/meetings/${activity.meeting.id}`,
-      createdAt: formatDateDiff(activity.createdAt),
+      createdAt: formatUpdated(activity.createdAt),
       type: formatString(strings.activity_update, {
         properties: activity.changes.map(({ field }) => field).join(","),
       }),
