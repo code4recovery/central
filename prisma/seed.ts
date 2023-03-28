@@ -6,6 +6,8 @@ import { getGoogleSheet } from "~/helpers";
 import { strings } from "~/i18n";
 
 const db = new PrismaClient();
+const typesNotFound: string[] = [];
+const languagesNotFound: string[] = [];
 
 type Meeting = {
   day?: number;
@@ -19,6 +21,8 @@ type Meeting = {
 };
 
 async function seed() {
+  await db.change.deleteMany();
+  await db.activity.deleteMany();
   await db.meeting.deleteMany();
   const meetings = await getMeetings();
   await Promise.all(meetings.map((data) => db.meeting.create({ data })));
@@ -55,6 +59,14 @@ async function seed() {
   }
 
   console.log(`${meetings.length} meetings imported`);
+
+  if (typesNotFound.length) {
+    console.log({ typesNotFound });
+  }
+
+  if (languagesNotFound.length) {
+    console.log({ languagesNotFound });
+  }
 }
 
 seed();
@@ -72,6 +84,9 @@ async function getMeetings(): Promise<Meeting[]> {
       timezone: row.timezone,
       notes: row.notes,
       types: convertTypes(row.types),
+      languages: convertLanguages(
+        [...row.types.split(","), ...row.languages.split(",")].join(",")
+      ),
       conference_url: row.url,
       conference_url_notes: row.access_code,
     };
@@ -115,24 +130,48 @@ const convertDayTime = (dayTime: string, timezone: string) => {
   };
 };
 
-const allTypes = { ...strings.types, ...strings.language_types };
-const typeKeys = Object.keys(allTypes);
-const typeValues = Object.values(allTypes);
-const notFound: string[] = [];
+const convertLanguages = (languages: string) =>
+  [
+    ...new Set(
+      languages
+        .split(",")
+        .map((e) => e.trim())
+        .map((e) => {
+          const index = Object.values(strings.language_types).indexOf(e);
+          if (index !== -1) {
+            return Object.keys(strings.language_types)[index];
+          }
+          if (
+            !languagesNotFound.includes(e) &&
+            !Object.values(strings.types).includes(e)
+          ) {
+            languagesNotFound.push(e);
+          }
+        })
+        .filter((e) => e)
+        .sort()
+    ),
+  ].join();
 
 const convertTypes = (types: string) =>
-  types
-    .split(",")
-    .map((type) => type.trim())
-    .map((type) => {
-      const typeIndex = typeValues.indexOf(type);
-      if (typeIndex !== -1) {
-        return typeKeys[typeIndex];
-      }
-      if (!notFound.includes(type)) {
-        console.error(`type not found: ${type}`);
-      }
-    })
-    .filter((e) => e)
-    .sort()
-    .join();
+  [
+    ...new Set(
+      types
+        .split(",")
+        .map((e) => e.trim())
+        .map((e) => {
+          const index = Object.values(strings.types).indexOf(e);
+          if (index !== -1) {
+            return Object.keys(strings.types)[index];
+          }
+          if (
+            !typesNotFound.includes(e) &&
+            !Object.values(strings.language_types).includes(e)
+          ) {
+            typesNotFound.push(e);
+          }
+        })
+        .filter((e) => e)
+        .sort()
+    ),
+  ].join();

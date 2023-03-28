@@ -24,6 +24,8 @@ export function Input({
   } = useUser();
   return (
     <input
+      autoComplete="off"
+      autoFocus={autoFocus}
       className={cx(config.fieldClassNames, focusRing, className)}
       defaultValue={value ? `${value}` : undefined}
       id={name}
@@ -31,7 +33,6 @@ export function Input({
       placeholder={placeholder}
       required={required}
       type={type}
-      autoFocus={autoFocus}
     />
   );
 }

@@ -28,6 +28,7 @@ export async function saveFeedToStorage(accountID: string) {
       conference_url_notes,
       conference_phone,
       conference_phone_notes,
+      updatedAt,
     }) => ({
       slug: slug || id,
       name,
@@ -40,15 +41,13 @@ export async function saveFeedToStorage(accountID: string) {
       conference_url_notes,
       conference_phone,
       conference_phone_notes,
+      updated: updatedAt.toISOString().split("T").join(" ").split("Z").join(""),
     })
   );
 
   const contents = JSON.stringify(meetings);
 
   await storage.bucket(bucket).file(filename).save(contents);
-
-  //const metadata = await storage.bucket(bucket).file(filename).getMetadata();
-  //console.log(JSON.stringify(metadata));
 
   return `https://${bucket}.storage.googleapis.com/${filename}`;
 }

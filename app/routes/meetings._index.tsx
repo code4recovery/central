@@ -82,7 +82,7 @@ export default function Index() {
           name: { label: strings.meeting_name },
           when: { label: strings.meeting_when },
           types: { label: strings.meeting_types },
-          updated: { label: strings.updated, align: "right" },
+          updatedAt: { label: strings.updated, align: "right" },
         }}
         rows={meetings}
       />

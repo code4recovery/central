@@ -1,17 +1,17 @@
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Activity } from "@prisma/client";
 
-import { strings } from "~/i18n";
 import { Alert, Table, Template } from "~/components";
+import { formatDateDiff, formatString } from "~/helpers";
+import { strings } from "~/i18n";
 import { db } from "~/utils";
-import { formatDateDiff } from "~/helpers";
 
 export const loader: LoaderFunction = async () => {
   const activities = await db.activity.findMany({
     take: 25,
-    include: { meeting: true, user: true },
+    include: { meeting: true, user: true, changes: true },
+    orderBy: [{ createdAt: "desc" }],
   });
   return json({
     activities: activities.map((activity) => ({
@@ -22,7 +22,9 @@ export const loader: LoaderFunction = async () => {
       meetingName: activity.meeting.name,
       link: `/meetings/${activity.meeting.id}`,
       createdAt: formatDateDiff(activity.createdAt),
-      type: strings[`activity_${activity.type}` as keyof typeof strings],
+      type: formatString(strings.activity_update, {
+        properties: activity.changes.map(({ field }) => field).join(","),
+      }),
     })),
   });
 };

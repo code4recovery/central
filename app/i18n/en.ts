@@ -3,7 +3,7 @@ export const strings = {
   activity_description: "A log of recent site activity",
   activity_none: "No activity yet. Edit a meeting to add some activity here.",
   activity_title: "Activity",
-  activity_update: "Updated",
+  activity_update: "Updated %properties%",
   app_name: "Unity",
   days: {
     friday: "Friday",

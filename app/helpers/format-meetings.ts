@@ -6,7 +6,7 @@ export function formatMeetings(meetings: Meeting[]) {
   return meetings.map((meeting) => ({
     ...meeting,
     link: `/meetings/${meeting.id}`,
-    updated: formatDateDiff(meeting.updatedAt ?? meeting.createdAt),
+    updatedAt: formatDateDiff(meeting.updatedAt),
     when: formatDayTime(meeting.day, meeting.time, meeting.timezone),
   }));
 }

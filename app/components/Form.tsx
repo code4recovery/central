@@ -174,9 +174,6 @@ export function Form({
                                 key={optionValue}
                               >
                                 <input
-                                  id={`${optionValue}`}
-                                  name={name}
-                                  type="checkbox"
                                   className={cx(
                                     "h-4 w-4 rounded border-gray-300 m-0 mt-0.5",
                                     focusRing,
@@ -187,6 +184,10 @@ export function Form({
                                     Array.isArray(value) &&
                                     value?.includes(optionValue)
                                   }
+                                  id={`${optionValue}`}
+                                  name={name}
+                                  type="checkbox"
+                                  value={`${optionValue}`}
                                 />
                                 <label
                                   className="text-sm truncate"

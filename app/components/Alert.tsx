@@ -19,10 +19,10 @@ export function Alert({
       className={cx(
         "border-l-4 flex gap-3 p-4 rounded-none md:rounded shadow",
         {
-          "bg-red-50 border-red-400 text-red-600": type === "danger",
-          "bg-blue-50 border-blue-400 text-blue-600": type === "info",
-          "bg-green-50 border-green-400 text-green-600": type === "success",
-          "bg-yellow-50 border-yellow-400 text-yellow-600": type === "warning",
+          "bg-red-50 border-red-400 text-red-700": type === "danger",
+          "bg-blue-50 border-blue-400 text-blue-700": type === "info",
+          "bg-green-50 border-green-400 text-green-700": type === "success",
+          "bg-yellow-50 border-yellow-400 text-yellow-700": type === "warning",
         }
       )}
     >

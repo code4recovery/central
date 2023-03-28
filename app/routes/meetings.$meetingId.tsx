@@ -21,8 +21,34 @@ export const action: ActionFunction = async ({ request }) => {
   const meeting = await db.meeting.findUnique({ where: { id: meetingID } });
 
   if (!meeting) {
-    return json({ error: "meeting not found" });
+    return json({ error: "Meeting not found." });
   }
+
+  // todo refactor
+  const formatValue = (name: string) => {
+    if (["day", "duration"].includes(name)) {
+      const value = formData.get(name)?.toString();
+      return value ? parseInt(value) : null;
+    }
+    if (["languages", "types"].includes(name)) {
+      return formData.getAll(name).join(",");
+    }
+    return formData.get(name)?.toString();
+  };
+
+  // get changed fields
+  const changes = config.meetingFields
+    .filter(
+      ({ name }) => formatValue(name) !== meeting[name as keyof typeof meeting]
+    )
+    .map(({ name }) => [[name], formatValue(name)]);
+
+  // exit if no changes
+  if (!changes.length) {
+    return json({ info: "Nothing was updated." });
+  }
+
+  // create an activity record
   const activity = await db.activity.create({
     data: {
       type: "update",
@@ -30,20 +56,25 @@ export const action: ActionFunction = async ({ request }) => {
       userID,
     },
   });
-  const changes = config.meetingFields
-    .filter(
-      ({ name }) => formData.get(name) !== meeting[name as keyof typeof meeting]
-    )
-    .forEach(async ({ name }) => {
+
+  // save individual changes
+  changes.forEach(
+    async ([field, value]) =>
       await db.change.create({
         data: {
           activityID: activity.id ?? "",
-          before: `${meeting[name as keyof typeof meeting]}`,
-          after: `${formData.get(name)}`,
-          field: name,
+          before: `${meeting[field as keyof typeof meeting]}`,
+          after: `${value}`,
+          field: `${field}`,
         },
-      });
-    });
+      })
+  );
+
+  // update meeting
+  await db.meeting.update({
+    data: Object.fromEntries(changes),
+    where: { id: meetingID },
+  });
 
   try {
     await saveFeedToStorage(accountID);
@@ -82,6 +113,7 @@ export default function EditMeeting() {
   return (
     <Template title={strings.meeting_edit}>
       {data?.error && <Alert type="danger" message={data.error} />}
+      {data?.info && <Alert type="info" message={data.info} />}
       {data?.success && <Alert type="success" message={data.success} />}
       <Form
         title={strings.meeting_details}
@@ -89,9 +121,10 @@ export default function EditMeeting() {
         fields={[
           ...config.meetingFields.map((field) => ({
             ...field,
-            value: ["types", "languages"].includes(field.name)
-              ? meeting.types.split(",")
-              : meeting[field.name],
+            value:
+              field.type === "checkboxes"
+                ? meeting[field.name].split(",")
+                : meeting[field.name],
           })),
           {
             name: "accountID",
