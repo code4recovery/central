@@ -51,14 +51,14 @@ export const meta: MetaFunction = () => ({
 export default function Index() {
   const { loadedMeetings, search } = useLoaderData<typeof loader>();
   const [meetings, setMeetings] = useState(loadedMeetings);
-  const more = useActionData();
+  const actionData = useActionData();
   const user = useUser();
 
   useEffect(() => {
-    if (more) {
-      setMeetings([...meetings, ...more]);
+    if (actionData) {
+      setMeetings([...meetings, ...actionData]);
     }
-  }, [more]);
+  }, [actionData]);
 
   return (
     <Template

@@ -2,7 +2,7 @@ import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 
-import { Alert, Form, Separator, Template } from "~/components";
+import { Alerts, Form, Separator, Template } from "~/components";
 import { userFields, accountFields } from "~/fields";
 import { validFormData } from "~/helpers";
 import { useUser } from "~/hooks";
@@ -54,11 +54,10 @@ export default function Settings() {
     themeName,
     id: userID,
   } = useUser();
-  const data = useActionData();
+  const actionData = useActionData();
   return (
     <Template title={strings.settings_title}>
-      {data?.info && <Alert type="info" message={data.info} />}
-      {data?.success && <Alert type="success" message={data.success} />}
+      {actionData && <Alerts data={actionData} />}
       <Form
         title={strings.settings_user_title}
         description={strings.settings_user_description}

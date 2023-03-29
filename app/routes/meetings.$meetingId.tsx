@@ -6,7 +6,7 @@ import type {
 import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
-import { Alert, Form, Template } from "~/components";
+import { Alerts, Form, Template } from "~/components";
 import { validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
 import { meetingFields } from "~/fields";
@@ -110,12 +110,10 @@ export const meta: MetaFunction = () => ({
 export default function EditMeeting() {
   const { meeting } = useLoaderData();
   const { accountID, id } = useUser();
-  const data = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>();
   return (
     <Template title={strings.meeting_edit}>
-      {data?.error && <Alert type="danger" message={data.error} />}
-      {data?.info && <Alert type="info" message={data.info} />}
-      {data?.success && <Alert type="success" message={data.success} />}
+      {actionData && <Alerts data={actionData} />}
       <Form
         title={strings.meeting_details}
         description={strings.meeting_details_description}

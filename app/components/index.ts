@@ -1,4 +1,5 @@
 export * from "./Alert";
+export * from "./Alerts";
 export * from "./Button";
 export * from "./Footer";
 export * from "./Form";

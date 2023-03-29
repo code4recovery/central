@@ -1,15 +1,16 @@
 import { DateTime } from "luxon";
 
-export function formatUpdated(date: Date) {
-  const datetime = DateTime.fromJSDate(date).toLocal();
+export function formatUpdated(updatedAt: Date) {
+  const now = DateTime.local();
+  const datetime = DateTime.fromJSDate(updatedAt).toLocal();
 
-  const diff = datetime.diffNow(["days"]).toObject();
+  if (datetime.hasSame(now, "year") && datetime.hasSame(now, "week")) {
+    if (datetime.hasSame(now, "day")) {
+      // today, show time
+      return datetime.toLocaleString(DateTime.TIME_SIMPLE);
+    }
 
-  if (!diff.days || diff.days > -1) {
-    return datetime.toLocaleString(DateTime.TIME_SIMPLE);
-  }
-
-  if (diff.days > -6) {
+    // this week, show day and time
     return datetime.toLocaleString({
       weekday: "short",
       hour: "numeric",
@@ -17,5 +18,6 @@ export function formatUpdated(date: Date) {
     });
   }
 
+  // show date
   return datetime.toLocaleString(DateTime.DATE_FULL);
 }
