@@ -1,28 +1,30 @@
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useNavigation, useSearchParams } from "@remix-run/react";
-import invariant from "tiny-invariant";
 
 import { Button, Footer, Input, Label } from "~/components";
-import { config, formatClasses as cx } from "~/helpers";
+import { config, formatClasses as cx, validFormData } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
 import { createUserSession, db } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const email = formData.get("email");
-
-  invariant(email && typeof email === "string");
+  const { email, go } = await validFormData(request, [
+    {
+      name: "email",
+      type: "email",
+      required: true,
+    },
+    {
+      name: "go",
+    },
+  ]);
 
   const user = await db.user.findFirst({ where: { email } });
 
   if (user) {
-    return await createUserSession(
-      user.id,
-      formData.get("go")?.toString() ?? config.home
-    );
+    return await createUserSession(user.id, go ?? config.home);
   }
 
   return redirect("/");

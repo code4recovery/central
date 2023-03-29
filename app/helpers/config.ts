@@ -1,103 +1,11 @@
-import { strings } from "~/i18n";
-import type { Field } from "~/types";
-import { timezones } from "./timezones";
-
-const days = [
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-];
-
-const meetingFields: Field[] = [
-  {
-    className: "text-xl font-semibold py-2",
-    label: strings.meeting_name,
-    name: "name",
-    type: "text",
-  },
-  {
-    label: strings.meeting_day,
-    name: "day",
-    options: days.map((day, index) => ({
-      value: `${index}`,
-      label: strings.days[day as keyof typeof strings.days],
-    })),
-    span: 3,
-    type: "select",
-  },
-  {
-    label: strings.meeting_time,
-    name: "time",
-    span: 3,
-    type: "time",
-  },
-  {
-    label: strings.meeting_timezone,
-    name: "timezone",
-    options: timezones.map((tz) => ({ value: tz, label: tz })),
-    span: 3,
-    type: "select",
-  },
-  {
-    label: strings.meeting_duration,
-    name: "duration",
-    span: 3,
-    type: "number",
-  },
-  {
-    label: "Notes",
-    name: "notes",
-    type: "textarea",
-  },
-  {
-    label: strings.meeting_languages,
-    name: "languages",
-    options: Object.keys(strings.language_types)
-      .sort((a, b) =>
-        strings.language_types[
-          a as keyof typeof strings.language_types
-        ].localeCompare(
-          strings.language_types[b as keyof typeof strings.language_types]
-        )
-      )
-      .map((type) => ({
-        value: type,
-        label:
-          strings.language_types[type as keyof typeof strings.language_types],
-      })),
-    type: "checkboxes",
-  },
-  {
-    label: strings.meeting_types,
-    name: "types",
-    options: Object.keys(strings.types)
-      .sort((a, b) =>
-        strings.types[a as keyof typeof strings.types].localeCompare(
-          strings.types[b as keyof typeof strings.types]
-        )
-      )
-      .map((type) => ({
-        value: type,
-        label: strings.types[type as keyof typeof strings.types],
-      })),
-    type: "checkboxes",
-  },
-];
-
 export const config = {
   aboutUrl: "https://code4recovery.org",
   batchSize: 25,
-  days,
   defaultTheme: "indigo",
   fieldClassNames:
     "block border-0 leading-6 py-1.5 rounded-md ring-1 ring-gray-300 ring-inset shadow-sm text-gray-900 w-full placeholder:text-gray-400 focus:ring-2 focus:ring-inset",
   home: "/meetings",
   insecureRoutes: ["/"],
-  meetingFields,
   themes: {
     slate: {
       label: "Slate",

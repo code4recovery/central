@@ -8,17 +8,18 @@ import type {
 } from "@remix-run/node";
 
 import { Alert, Button, LoadMore, Table, Template } from "~/components";
-import { config, formatMeetings, formatString } from "~/helpers";
+import { config, formatMeetings, formatString, validFormData } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, searchMeetings } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const skip = formData.get("skip");
+  const { skip } = await validFormData(request, [
+    { name: "skip", type: "number" },
+  ]);
   const meetings = await db.meeting.findMany({
     take: config.batchSize,
-    skip: skip ? Number(skip) : undefined,
+    skip: Number(skip),
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
   return json(formatMeetings(meetings));

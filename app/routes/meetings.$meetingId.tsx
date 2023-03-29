@@ -7,8 +7,9 @@ import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
 import { Alert, Form, Template } from "~/components";
-import { config, validObjectId } from "~/helpers";
+import { validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
+import { meetingFields } from "~/fields";
 import { strings } from "~/i18n";
 import { db, saveFeedToStorage } from "~/utils";
 
@@ -37,7 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
   };
 
   // get changed fields
-  const changes = config.meetingFields
+  const changes = meetingFields()
     .filter(
       ({ name }) => formatValue(name) !== meeting[name as keyof typeof meeting]
     )
@@ -119,7 +120,7 @@ export default function EditMeeting() {
         title={strings.meeting_details}
         description={strings.meeting_details_description}
         fields={[
-          ...config.meetingFields.map((field) => ({
+          ...meetingFields().map((field) => ({
             ...field,
             value:
               field.type === "checkboxes"
