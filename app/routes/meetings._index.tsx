@@ -14,9 +14,9 @@ import { strings } from "~/i18n";
 import { db, searchMeetings } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { skip } = await validFormData(request, [
-    { name: "skip", type: "number" },
-  ]);
+  const { skip } = await validFormData(request, {
+    skip: { type: "number" },
+  });
   const meetings = await db.meeting.findMany({
     take: config.batchSize,
     skip: Number(skip),

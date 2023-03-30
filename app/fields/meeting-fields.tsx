@@ -1,16 +1,14 @@
 import { strings } from "~/i18n";
-import type { Field } from "~/types";
+import type { Fields } from "~/types";
 
-export const meetingFields = (): Field[] => [
-  {
+export const meetingFields = (): Fields => ({
+  name: {
     className: "text-xl font-semibold py-2",
     label: strings.meeting_name,
-    name: "name",
     type: "text",
   },
-  {
+  day: {
     label: strings.meeting_day,
-    name: "day",
     options: days.map((day, index) => ({
       value: `${index}`,
       label: strings.days[day as keyof typeof strings.days],
@@ -18,33 +16,48 @@ export const meetingFields = (): Field[] => [
     span: 3,
     type: "select",
   },
-  {
+  time: {
     label: strings.meeting_time,
-    name: "time",
     span: 3,
     type: "time",
   },
-  {
+  timezone: {
     label: strings.meeting_timezone,
-    name: "timezone",
     options: timezones.map((tz) => ({ value: tz, label: tz })),
     span: 3,
     type: "select",
   },
-  {
+  duration: {
     label: strings.meeting_duration,
-    name: "duration",
     span: 3,
     type: "number",
   },
-  {
+  conference_url: {
+    label: strings.meeting_conference_url,
+    type: "url",
+    span: 6,
+  },
+  conference_url_notes: {
+    label: strings.meeting_conference_url_notes,
+    type: "text",
+    span: 6,
+  },
+  conference_phone: {
+    label: strings.meeting_conference_phone,
+    type: "tel",
+    span: 6,
+  },
+  conference_phone_notes: {
+    label: strings.meeting_conference_phone_notes,
+    type: "text",
+    span: 6,
+  },
+  notes: {
     label: "Notes",
-    name: "notes",
     type: "textarea",
   },
-  {
+  languages: {
     label: strings.meeting_languages,
-    name: "languages",
     options: Object.keys(strings.language_types)
       .sort((a, b) =>
         strings.language_types[
@@ -60,9 +73,8 @@ export const meetingFields = (): Field[] => [
       })),
     type: "checkboxes",
   },
-  {
+  types: {
     label: strings.meeting_types,
-    name: "types",
     options: Object.keys(strings.types)
       .sort((a, b) =>
         strings.types[a as keyof typeof strings.types].localeCompare(
@@ -75,7 +87,7 @@ export const meetingFields = (): Field[] => [
       })),
     type: "checkboxes",
   },
-];
+});
 
 const days = [
   "sunday",

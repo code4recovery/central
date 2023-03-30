@@ -1,6 +1,6 @@
 import { strings } from "~/i18n";
 import { DefaultUserIcon } from "~/icons";
-import { Field } from "~/types";
+import { Fields } from "~/types";
 
 export const userFields = ({
   name,
@@ -12,31 +12,27 @@ export const userFields = ({
   email?: string;
   text?: string;
   userID?: string;
-}) =>
-  [
-    {
-      name: "userID",
-      value: userID,
-    },
-    {
-      label: strings.settings_user_name,
-      name: "name",
-      placeholder: strings.settings_user_name_placeholder,
-      span: 6,
-      type: "text",
-      value: name,
-    },
-    {
-      label: strings.settings_user_email,
-      name: "email",
-      span: 6,
-      type: "email",
-      value: email,
-    },
-    {
-      defaultImage: <DefaultUserIcon className={text} />,
-      label: strings.settings_user_avatar,
-      name: "avatar",
-      type: "image",
-    },
-  ] as Field[];
+}): Fields => ({
+  userID: {
+    type: "hidden",
+    value: userID,
+  },
+  name: {
+    label: strings.settings_user_name,
+    placeholder: strings.settings_user_name_placeholder,
+    span: 6,
+    type: "text",
+    value: name,
+  },
+  email: {
+    label: strings.settings_user_email,
+    span: 6,
+    type: "email",
+    value: email,
+  },
+  avatar: {
+    defaultImage: <DefaultUserIcon className={text} />,
+    label: strings.settings_user_avatar,
+    type: "image",
+  },
+});

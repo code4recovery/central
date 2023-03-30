@@ -1,11 +1,12 @@
-import type { Field } from "~/types";
+import type { Fields } from "~/types";
 
-export async function validFormData(request: Request, fields: Field[]) {
+export async function validFormData(request: Request, fields: Fields) {
   const formData = await request.formData();
   const data: { [key: string]: string } = {};
   const errors = [];
 
-  fields.forEach(({ name, type = "hidden", required }) => {
+  Object.keys(fields).forEach((name) => {
+    const { type, required } = fields[name];
     data[name] = formData.get(name)?.toString() ?? "";
     if (typeof data[name] !== "string") {
       errors.push(`${name} should be a string`);

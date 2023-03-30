@@ -1,24 +1,21 @@
+import { InputType } from "./input-type";
+
 export type Field = {
   className?: string;
   defaultImage?: React.ReactNode;
   helpText?: string;
   label?: string;
-  name: string;
   options?: { value: string; label: string }[];
   placeholder?: string;
   required?: boolean;
   span?: number;
-  type?:
+  type:
     | "checkboxes"
     | "colors"
-    | "email"
     | "hidden"
     | "image"
-    | "number"
     | "select"
-    | "text"
     | "textarea"
-    | "time"
-    | "url";
+    | InputType;
   value?: string | string[];
 };

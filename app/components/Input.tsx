@@ -1,6 +1,7 @@
 import { config } from "~/helpers";
 import { useUser } from "~/hooks";
 import { formatClasses as cx } from "~/helpers";
+import { InputType } from "~/types";
 
 export function Input({
   autoFocus,
@@ -16,7 +17,7 @@ export function Input({
   name: string;
   placeholder?: string;
   required?: boolean;
-  type: "email" | "number" | "text" | "time" | "url";
+  type: InputType;
   value?: string;
 }) {
   const {

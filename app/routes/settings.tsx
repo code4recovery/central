@@ -16,7 +16,7 @@ export const meta: MetaFunction = () => ({
 export const action: ActionFunction = async ({ request }) => {
   const { accountID, email, userID, name, url, theme } = await validFormData(
     request,
-    [...userFields({}), ...accountFields({})]
+    { ...userFields({}), ...accountFields({}) }
   );
 
   if (accountID) {

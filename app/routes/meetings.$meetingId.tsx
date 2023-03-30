@@ -38,11 +38,11 @@ export const action: ActionFunction = async ({ request }) => {
   };
 
   // get changed fields
-  const changes = meetingFields()
+  const changes = Object.keys(meetingFields())
     .filter(
-      ({ name }) => formatValue(name) !== meeting[name as keyof typeof meeting]
+      (name) => formatValue(name) !== meeting[name as keyof typeof meeting]
     )
-    .map(({ name }) => [[name], formatValue(name)]);
+    .map((name) => [[name], formatValue(name)]);
 
   // exit if no changes
   if (!changes.length) {
@@ -111,33 +111,37 @@ export default function EditMeeting() {
   const { meeting } = useLoaderData();
   const { accountID, id } = useUser();
   const actionData = useActionData<typeof action>();
+
+  const fields = meetingFields();
+  Object.keys(fields).forEach((name) => {
+    fields[name] = {
+      ...fields[name],
+      value:
+        fields[name].type === "checkboxes"
+          ? meeting[name].split(",")
+          : meeting[name],
+    };
+  });
+  fields["accountID"] = {
+    type: "hidden",
+    value: accountID,
+  };
+  fields["meetingID"] = {
+    type: "hidden",
+    value: meeting.id,
+  };
+  fields["userID"] = {
+    type: "hidden",
+    value: id,
+  };
+
   return (
     <Template title={strings.meeting_edit}>
       {actionData && <Alerts data={actionData} />}
       <Form
         title={strings.meeting_details}
         description={strings.meeting_details_description}
-        fields={[
-          ...meetingFields().map((field) => ({
-            ...field,
-            value:
-              field.type === "checkboxes"
-                ? meeting[field.name].split(",")
-                : meeting[field.name],
-          })),
-          {
-            name: "accountID",
-            value: accountID,
-          },
-          {
-            name: "meetingID",
-            value: meeting.id,
-          },
-          {
-            name: "userID",
-            value: id,
-          },
-        ]}
+        fields={fields}
       />
     </Template>
   );

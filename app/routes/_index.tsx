@@ -10,16 +10,15 @@ import { DefaultAccountLogo } from "~/icons";
 import { createUserSession, db } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { email, go } = await validFormData(request, [
-    {
-      name: "email",
+  const { email, go } = await validFormData(request, {
+    email: {
       type: "email",
       required: true,
     },
-    {
-      name: "go",
+    go: {
+      type: "hidden",
     },
-  ]);
+  });
 
   const user = await db.user.findFirst({ where: { email } });
 
