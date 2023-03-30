@@ -1,8 +1,8 @@
 import { DateTime } from "luxon";
 
-export function formatUpdated(updatedAt: Date) {
+export function formatUpdated(updatedAt: string) {
   const now = DateTime.local();
-  const datetime = DateTime.fromJSDate(updatedAt, { zone: "utc" }).toLocal();
+  const datetime = DateTime.fromISO(updatedAt).toLocal();
 
   if (datetime.hasSame(now, "year") && datetime.hasSame(now, "week")) {
     if (datetime.hasSame(now, "day")) {

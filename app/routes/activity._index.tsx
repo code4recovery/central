@@ -21,7 +21,7 @@ export const loader: LoaderFunction = async () => {
       meeting: undefined,
       meetingName: activity.meeting.name,
       link: `/meetings/${activity.meeting.id}`,
-      createdAt: formatUpdated(activity.createdAt),
+      createdAt: formatUpdated(activity.createdAt.toISOString()),
       type: formatString(strings.activity_update, {
         properties: activity.changes.map(({ field }) => field).join(","),
       }),

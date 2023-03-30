@@ -22,7 +22,7 @@ export const action: ActionFunction = async ({ request }) => {
     skip: Number(skip),
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
   });
-  return json(formatMeetings(meetings));
+  return json(meetings);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -41,7 +41,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         take: config.batchSize,
       });
-  return json({ loadedMeetings: formatMeetings(meetings), search });
+  return json({ loadedMeetings: meetings, search });
 };
 
 export const meta: MetaFunction = () => ({
@@ -85,7 +85,7 @@ export default function Index() {
           types: { label: strings.meeting_types },
           updatedAt: { label: strings.updated, align: "right" },
         }}
-        rows={meetings}
+        rows={formatMeetings(meetings)}
       />
       {!search && meetings.length < user.meetingCount && (
         <LoadMore
