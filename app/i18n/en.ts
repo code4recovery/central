@@ -14,6 +14,7 @@ export const strings = {
     tuesday: "Tuesday",
     wednesday: "Wednesday",
   },
+  email_login_subject: "Confirm your email address to log in",
   help_show: "Show help",
   language_types: {
     AM: "Amharic",

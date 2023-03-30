@@ -39,6 +39,10 @@ export function Header() {
           label: strings.settings_title,
           url: "/settings",
         },
+        {
+          label: "Email",
+          url: "/email",
+        },
       ],
       [
         {

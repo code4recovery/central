@@ -20,7 +20,9 @@ export function Alerts({
     <>
       {alertTypes.map(
         (type) =>
-          data[type] && <Alert type={type} message={data[type] as string} />
+          data[type] && (
+            <Alert key={type} type={type} message={data[type] as string} />
+          )
       )}
     </>
   );
