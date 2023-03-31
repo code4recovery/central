@@ -30,14 +30,14 @@ export const loader: LoaderFunction = async () => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.activity_title,
+  title: strings.activity,
 });
 
 export default function Activity() {
   const { activities } = useLoaderData();
   return (
     <Template
-      title={strings.activity_title}
+      title={strings.activity}
       description={strings.activity_description}
     >
       {!activities.length && (

@@ -10,7 +10,7 @@ import { strings } from "~/i18n";
 import { db } from "~/utils";
 
 export const meta: MetaFunction = () => ({
-  title: strings.settings_title,
+  title: strings.settings,
 });
 
 export const action: ActionFunction = async ({ request }) => {
@@ -56,7 +56,7 @@ export default function Settings() {
   } = useUser();
   const actionData = useActionData();
   return (
-    <Template title={strings.settings_title}>
+    <Template title={strings.settings}>
       {actionData && <Alerts data={actionData} />}
       <Form
         title={strings.settings_user_title}

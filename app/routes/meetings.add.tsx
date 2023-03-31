@@ -9,7 +9,7 @@ export const action: ActionFunction = async ({ params }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings_title,
+  title: strings.meetings,
 });
 
 export default function CreateMeeting() {

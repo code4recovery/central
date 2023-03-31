@@ -45,7 +45,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings_title,
+  title: strings.meetings,
 });
 
 export default function Index() {
@@ -62,7 +62,7 @@ export default function Index() {
 
   return (
     <Template
-      title={strings.meetings_title}
+      title={strings.meetings}
       description={formatString(strings.meetings_description, {
         meetings_count: user.meetingCount,
       })}
