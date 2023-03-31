@@ -39,6 +39,7 @@ model User {
   updatedAt        DateTime   @updatedAt
   email            String     @unique
   emailHash        String
+  loginToken       String?
   name             String?
   currentAccountID String
   accountIDs       String[]   @db.ObjectId

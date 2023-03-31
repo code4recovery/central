@@ -5,7 +5,6 @@ export const config = {
   fieldClassNames:
     "block border-0 leading-6 py-1.5 rounded-md ring-1 ring-gray-300 ring-inset shadow-sm text-gray-900 w-full placeholder:text-gray-400 focus:ring-2 focus:ring-inset",
   home: "/meetings",
-  insecureRoutes: ["/"],
   themes: {
     slate: {
       label: "Slate",

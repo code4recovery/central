@@ -81,10 +81,6 @@ gsutil cors set cors.json gs://<bucket_name>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      href="https://fonts.googleapis.com/css?family=3DLato:400,700,900"
-      rel="stylesheet"
-    />
     <title>{{ subject }}</title>
     <style type="text/css">
       /* Global Resets */
@@ -94,7 +90,7 @@ gsutil cors set cors.json gs://<bucket_name>
       table,
       td,
       div {
-        font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: Helvetica, Arial, sans-serif;
       }
 
       img {
@@ -251,16 +247,16 @@ gsutil cors set cors.json gs://<bucket_name>
         box-shadow: none;
       }
 
-      .button_link.plum:hover {
-        background-color: #4a154b !important;
-        border-color: #4a154b !important;
+      .button_link:hover {
+        background-color: {{ accentColor }} !important;
+        border-color: {{ accentColor }} !important;
       }
 
-      .button_link_wrapper.plum:hover {
-        background-color: #4a154b !important;
+      .button_link_wrapper:hover {
+        background-color: {{ accentColor }} !important;
       }
 
-      .button_link.plum:hover::after {
+      .button_link:hover::after {
         box-shadow: none;
       }
 
@@ -723,22 +719,22 @@ gsutil cors set cors.json gs://<bucket_name>
                                 display: inline-block;
                                 position: relative;
                                 border-radius: 4px;
-                                background-color: #312e81;
+                                background-color: {{ accentColor }};
                                 width: 100%;
                                 text-align: center;
                               "
                               class="button_link_wrapper"
                               ><a
-                                class="button_link sm_full_width sm_border_box plum restyle_button"
+                                class="button_link sm_full_width sm_border_box restyle_button"
                                 href="{{ buttonLink }}"
                                 style="
                                   border-top: 13px solid;
                                   border-bottom: 13px solid;
                                   border-right: 24px solid;
                                   border-left: 24px solid;
-                                  border-color: #611f69;
+                                  border-color: {{ accentColor }};
                                   border-radius: 4px;
-                                  background-color: #312e81;
+                                  background-color: {{ accentColor }};
                                   color: #ffffff;
                                   font-size: 16px;
                                   line-height: 18px;
@@ -747,7 +743,7 @@ gsutil cors set cors.json gs://<bucket_name>
                                   font-size: 14px;
                                   border-top: 20px solid;
                                   border-bottom: 20px solid;
-                                  border-color: #312e81;
+                                  border-color: {{ accentColor }} !important;
                                   line-height: 14px;
                                   letter-spacing: 0.8px;
                                   text-transform: uppercase;

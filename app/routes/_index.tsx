@@ -1,13 +1,18 @@
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { Form, useNavigation, useSearchParams } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import {
+  Form,
+  useActionData,
+  useNavigation,
+  useSearchParams,
+} from "@remix-run/react";
 
-import { Button, Footer, Input, Label } from "~/components";
-import { config, formatClasses as cx, validFormData } from "~/helpers";
+import { Alerts, Button, Footer, Input, Label } from "~/components";
+import { formatClasses as cx, formatToken, validFormData } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
-import { createUserSession, db } from "~/utils";
+import { db, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const { email, go } = await validFormData(request, {
@@ -20,13 +25,31 @@ export const action: ActionFunction = async ({ request }) => {
     },
   });
 
-  const user = await db.user.findFirst({ where: { email } });
+  const user = await db.user.findFirst({
+    where: { email },
+  });
 
   if (user) {
-    return await createUserSession(user.id, go ?? config.home);
+    const loginToken = formatToken();
+    await db.user.update({
+      data: {
+        loginToken,
+      },
+      where: { id: user.id },
+    });
+    try {
+      const url = new URL(request.url);
+      const buttonLink = `${url.protocol}//${url.host}/auth/${
+        user.emailHash
+      }/${loginToken}${go ? `?go=${go}` : ""}`;
+      await sendMail(email, "login", buttonLink);
+    } catch (e) {
+      if (e instanceof Error) {
+        return json({ error: e.message });
+      }
+    }
   }
-
-  return redirect("/");
+  return json({ info: strings.login_email_sent });
 };
 
 export const meta: MetaFunction = () => ({
@@ -35,11 +58,12 @@ export const meta: MetaFunction = () => ({
 
 export default function Index() {
   const { state } = useNavigation();
-  const submitting = state === "submitting";
+  const idle = state === "idle";
   const {
     theme: { text },
   } = useUser();
   const [searchParams] = useSearchParams();
+  const actionData = useActionData();
   return (
     <>
       <div className="flex flex-grow flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -49,24 +73,27 @@ export default function Index() {
             {strings.sign_in_title}
           </h1>
         </div>
-        <Form
-          className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 mt-8 sm:mx-auto sm:w-full sm:max-w-md"
-          method="post"
-        >
-          <fieldset disabled={submitting}>
-            <input
-              name="go"
-              type="hidden"
-              value={searchParams.get("go") ?? undefined}
-            />
-            <Label htmlFor="email">{strings.settings_user_email}</Label>
-            <Input autoFocus name="email" required type="email" />
-            <Button
-              className="mt-6 w-full"
-              label={submitting ? strings.loading : strings.sign_in_submit}
-            />
-          </fieldset>
-        </Form>
+        <div className=" mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
+          {actionData && <Alerts data={actionData} />}
+          <Form
+            className="bg-white py-8 px-4 shadow sm:rounded sm:px-10"
+            method="post"
+          >
+            <fieldset disabled={!idle}>
+              <input
+                name="go"
+                type="hidden"
+                value={searchParams.get("go") ?? undefined}
+              />
+              <Label htmlFor="email">{strings.settings_user_email}</Label>
+              <Input autoFocus name="email" required type="email" />
+              <Button
+                className="mt-4 w-full"
+                label={!idle ? strings.loading : strings.sign_in_submit}
+              />
+            </fieldset>
+          </Form>
+        </div>
       </div>
       <Footer />
     </>

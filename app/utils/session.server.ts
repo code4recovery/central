@@ -44,7 +44,7 @@ export async function logout(request: Request) {
 export async function getUserOrRedirect(request: Request) {
   const url = new URL(request.url);
 
-  const secure = !config.insecureRoutes.includes(url.pathname);
+  const secure = url.pathname !== "/" && !url.pathname.startsWith("/auth");
 
   const session = await getUserSession(request);
   const userId: string = session.get("userId");

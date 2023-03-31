@@ -13,7 +13,7 @@ export function Alert({
   message: string;
   type: "warning" | "success" | "info" | "error";
 }) {
-  const iconProps = { "aria-hidden": true, className: "w-6" };
+  const iconProps = { "aria-hidden": true, className: "w-6 h-6 flex-shrink-0" };
   return (
     <div
       className={cx(
@@ -30,7 +30,7 @@ export function Alert({
       {type === "info" && <InformationCircleIcon {...iconProps} />}
       {type === "success" && <CheckCircleIcon {...iconProps} />}
       {type === "warning" && <ExclamationTriangleIcon {...iconProps} />}
-      <p className="flex-grow-0">{message}</p>
+      <p>{message}</p>
     </div>
   );
 }

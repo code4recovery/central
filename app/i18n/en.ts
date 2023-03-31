@@ -14,7 +14,18 @@ export const strings = {
     tuesday: "Tuesday",
     wednesday: "Wednesday",
   },
-  email_login_subject: "Confirm your email address to log in",
+  email: {
+    disclaimer:
+      "If you didn’t request this email, there’s nothing to worry about — you can safely ignore it.",
+    footer: "This email was sent by %app% on behalf of %accountName%.",
+    login: {
+      subject: "Confirm your email address to log in",
+      headline:
+        "Once you’ve confirmed that %email% is your email address, you’ll be logged in to the site.",
+      instructions: "Tap the button below to confirm:",
+      buttonText: "Confirm email",
+    },
+  },
   help_show: "Show help",
   language_types: {
     AM: "Amharic",
@@ -43,6 +54,8 @@ export const strings = {
   },
   load_more: "Load %count% more",
   loading: "Loading",
+  login_email_sent:
+    "Now check your email. If you have an account, you will receive an email with a link to log in.",
   meeting_add: "Add meeting",
   meeting_conference_phone: "Conference phone",
   meeting_conference_phone_notes: "Conference phone notes",

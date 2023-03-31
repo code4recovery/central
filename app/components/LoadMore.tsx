@@ -12,15 +12,15 @@ export function LoadMore({
   totalCount: number;
 }) {
   const { state } = useNavigation();
-  const submitting = state === "submitting";
+  const idle = state === "idle";
 
   return (
     <Form method="post" className="flex justify-center">
-      <fieldset disabled={submitting}>
+      <fieldset disabled={!idle}>
         <input type="hidden" name="skip" value={loadedCount} />
         <Button
           label={
-            submitting
+            !idle
               ? strings.loading
               : formatString(strings.load_more, {
                   count: Math.min(config.batchSize, totalCount - loadedCount),
