@@ -42,9 +42,14 @@ export async function logout(request: Request) {
 }
 
 export async function getUserOrRedirect(request: Request) {
-  const url = new URL(request.url);
+  const { pathname } = new URL(request.url);
 
-  const secure = url.pathname !== "/" && !url.pathname.startsWith("/auth");
+  const routeIsSecure = pathname !== "/" && !pathname.startsWith("/auth");
+  const routeIsStatic = pathname.endsWith(".svg");
+
+  if (routeIsStatic) {
+    return;
+  }
 
   const session = await getUserSession(request);
   const id = session.get("userId");
@@ -63,11 +68,11 @@ export async function getUserOrRedirect(request: Request) {
       data: { lastSeen: new Date(), admin: true },
       where: { id },
     });
-    if (!secure) {
+    if (!routeIsSecure) {
       throw redirect(config.home);
     }
-  } else if (secure) {
-    const searchParams = new URLSearchParams({ go: url.pathname });
+  } else if (routeIsSecure) {
+    const searchParams = new URLSearchParams({ go: pathname });
     throw redirect(`/?${searchParams}`);
   }
 

@@ -2,7 +2,6 @@ export * from "./config";
 export * from "./format-classes";
 export * from "./format-updated";
 export * from "./format-day-time";
-export * from "./format-meetings";
 export * from "./format-slug";
 export * from "./format-string";
 export * from "./format-token";

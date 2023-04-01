@@ -3,7 +3,6 @@ import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
   MagnifyingGlassIcon,
-  QuestionMarkCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Link, NavLink, useSearchParams } from "@remix-run/react";
@@ -38,6 +37,8 @@ export function Header() {
     theme: { text, focusRing, border },
   } = useUser();
 
+  const avatarUrl = `https://gravatar.com/avatar/${user.emailHash}`;
+
   return (
     <header>
       <Disclosure as="nav" className="bg-white shadow">
@@ -50,11 +51,11 @@ export function Header() {
                     <Link
                       to={config.home}
                       className={cx(
-                        "focus-visible:ring-2 h-8 outline-none w-auto",
+                        "focus-visible:ring-2 outline-none w-auto",
                         focusRing
                       )}
                     >
-                      <Logo className={cx("h-8 w-auto", text)} />
+                      <Logo className={cx("h-9 w-auto", text)} />
                     </Link>
                   </div>
                   <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
@@ -66,6 +67,7 @@ export function Header() {
                             item as keyof typeof navItems.primary
                           ]
                         }
+                        reloadDocument={item === "meetings" && !!search}
                         className={({ isActive }) =>
                           cx(
                             {
@@ -138,39 +140,21 @@ export function Header() {
                     )}
                   </Disclosure.Button>
                 </div>
-                <div className="hidden lg:ml-4 lg:flex lg:items-center">
-                  <button
-                    className={cx(
-                      "flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2",
-                      focusRing
-                    )}
-                    type="button"
-                  >
-                    <span className="sr-only">{strings.help_show}</span>
-                    <QuestionMarkCircleIcon
-                      aria-hidden="true"
-                      className="h-6 w-6"
-                    />
-                  </button>
-
-                  <Menu as="div" className="relative ml-4 flex-shrink-0">
-                    <div>
-                      <Menu.Button
-                        className={cx(
-                          "flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
-                          focusRing
-                        )}
-                      >
-                        <span className="sr-only">
-                          {strings.user_menu_open}
-                        </span>
-                        <img
-                          className="h-8 w-8 rounded-full"
-                          src={`https://gravatar.com/avatar/${user.emailHash}`}
-                          alt={user.name}
-                        />
-                      </Menu.Button>
-                    </div>
+                <div className="hidden lg:ml-6 lg:flex lg:items-center">
+                  <Menu as="div" className="relative flex-shrink-0">
+                    <Menu.Button
+                      className={cx(
+                        "flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
+                        focusRing
+                      )}
+                    >
+                      <span className="sr-only">{strings.user_menu_open}</span>
+                      <img
+                        className="h-8 w-8 rounded-full"
+                        src={avatarUrl}
+                        alt={user.name}
+                      />
+                    </Menu.Button>
                     <Transition
                       as={Fragment}
                       enter="transition ease-out duration-100"
@@ -248,8 +232,8 @@ export function Header() {
                   <div className="flex-shrink-0">
                     <img
                       className="h-10 w-10 rounded-full"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      alt=""
+                      src={avatarUrl}
+                      alt={user.name}
                     />
                   </div>
                   <div className="ml-3">
@@ -260,19 +244,6 @@ export function Header() {
                       {user.email}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    className={cx(
-                      "ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2",
-                      focusRing
-                    )}
-                  >
-                    <span className="sr-only">{strings.help_show}</span>
-                    <QuestionMarkCircleIcon
-                      className="h-6 w-6"
-                      aria-hidden="true"
-                    />
-                  </button>
                 </div>
                 <div className="mt-3 space-y-1 divide-gray-200 divide-y">
                   {navItems.secondary.map((group, index) => (

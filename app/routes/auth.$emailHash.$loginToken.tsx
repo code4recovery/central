@@ -1,4 +1,5 @@
-import { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 
 import { config } from "~/helpers";
 import { createUserSession, db } from "~/utils";
@@ -22,9 +23,5 @@ export const loader: LoaderFunction = async ({ params }) => {
     return await createUserSession(user.id, go ?? config.home);
   }
 
-  return null;
+  return redirect("/?msg=expired");
 };
-
-export default function In() {
-  return <div>sorry, something went wrong.</div>;
-}

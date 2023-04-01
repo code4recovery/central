@@ -4,7 +4,7 @@ export const strings = {
   activity_description: "A log of recent site activity",
   activity_none: "No activity yet. Edit a meeting to add some activity here.",
   activity_update: "Updated %properties%",
-  app_name: "Unity",
+  app_name: "Central",
   days: {
     friday: "Friday",
     monday: "Monday",
@@ -54,8 +54,6 @@ export const strings = {
   },
   load_more: "Load %count% more",
   loading: "Loading",
-  login_email_sent:
-    "Now check your email. If you have an account, you will receive an email with a link to log in.",
   meeting_add: "Add meeting",
   meeting_conference_phone: "Conference phone",
   meeting_conference_phone_notes: "Conference phone notes",
@@ -95,8 +93,11 @@ export const strings = {
   settings_user_name: "Name",
   settings_user_name_placeholder: "John P.",
   settings_user_title: "User Profile",
+  sign_in_email_sent:
+    "Now check your email. If you have an account, you will receive an email with a link to log in.",
+  sign_in_expired: "That link has expired, please try again.",
   sign_in_submit: "Sign in",
-  sign_in_title: "Sign in or create an account",
+  sign_in_title: "Sign in to your account",
   sign_out: "Sign out",
   types: {
     "11": "11th Step Meditation",

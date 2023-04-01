@@ -27,6 +27,9 @@ export const action: ActionFunction = async ({ request }) => {
 
   const user = await db.user.findFirst({
     where: { email },
+    include: {
+      accounts: true,
+    },
   });
 
   if (user) {
@@ -37,21 +40,22 @@ export const action: ActionFunction = async ({ request }) => {
       },
       where: { id: user.id },
     });
+    const account = user?.accounts.find(
+      ({ id }) => id === user?.currentAccountID
+    );
+
     try {
-      const url = new URL(request.url);
-      const baseURL = `${url.protocol}//${url.host}`;
-      const imageSrc = `${baseURL}/central-logo.svg`;
-      const buttonLink = `${baseURL}/auth/${user.emailHash}/${loginToken}${
+      const buttonLink = `/auth/${user.emailHash}/${loginToken}${
         go ? `?go=${go}` : ""
       }`;
-      await sendMail(email, "login", buttonLink, imageSrc);
+      await sendMail(email, "login", request, buttonLink, account?.name ?? "");
     } catch (e) {
       if (e instanceof Error) {
         return json({ error: e.message });
       }
     }
   }
-  return json({ info: strings.login_email_sent });
+  return json({ info: strings.sign_in_email_sent });
 };
 
 export const meta: MetaFunction = () => ({
@@ -65,7 +69,10 @@ export default function Index() {
     theme: { text },
   } = useUser();
   const [searchParams] = useSearchParams();
-  const actionData = useActionData();
+  const actionData = useActionData() ?? {};
+  if (searchParams.get("msg") === "expired") {
+    actionData.warning = strings.sign_in_expired;
+  }
   return (
     <>
       <div className="flex flex-grow flex-col justify-center py-12 sm:px-6 lg:px-8">

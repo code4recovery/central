@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
-import { LoaderFunction, json } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Button, Table, Template } from "~/components";
 import { formatUpdated } from "~/helpers";
@@ -10,6 +11,10 @@ export const loader: LoaderFunction = async () => {
   const users = await db.user.findMany();
   return json({ users });
 };
+
+export const meta: MetaFunction = () => ({
+  title: strings.users,
+});
 
 export default function Users() {
   const { users } = useLoaderData();

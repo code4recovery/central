@@ -5,6 +5,7 @@ export function DefaultAccountLogo({ className }: { className?: string }) {
       className={className}
       fill="none"
       viewBox="0 0 520 515"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="m260 13.247 213.667 122.175v244.156L260 501.753 46.333 379.578V135.422L260 13.247Z"

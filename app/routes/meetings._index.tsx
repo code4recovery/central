@@ -6,9 +6,16 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
+import { Meeting } from "@prisma/client";
 
 import { Alert, Button, LoadMore, Table, Template } from "~/components";
-import { config, formatMeetings, formatString, validFormData } from "~/helpers";
+import {
+  config,
+  formatDayTime,
+  formatString,
+  formatUpdated,
+  validFormData,
+} from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, searchMeetings } from "~/utils";
@@ -41,7 +48,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         take: config.batchSize,
       });
-  return json({ loadedMeetings: meetings, search });
+  return json({ meetings, search });
 };
 
 export const meta: MetaFunction = () => ({
@@ -49,7 +56,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
-  const { loadedMeetings, search } = useLoaderData<typeof loader>();
+  const { meetings: loadedMeetings, search } = useLoaderData();
   const [meetings, setMeetings] = useState(loadedMeetings);
   const actionData = useActionData();
   const user = useUser();
@@ -85,7 +92,12 @@ export default function Index() {
           types: { label: strings.meeting_types },
           updatedAt: { label: strings.updated, align: "right" },
         }}
-        rows={formatMeetings(meetings)}
+        rows={meetings.map((meeting: Meeting) => ({
+          ...meeting,
+          link: `/meetings/${meeting.id}`,
+          updatedAt: formatUpdated(meeting.updatedAt.toString()),
+          when: formatDayTime(meeting.day, meeting.time, meeting.timezone),
+        }))}
       />
       {!search && meetings.length < user.meetingCount && (
         <LoadMore
