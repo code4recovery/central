@@ -364,14 +364,6 @@ gsutil cors set cors.json gs://<bucket_name>
           margin-left: 20px !important;
         }
 
-        table[class="background_main"] .slack_logo_small_icon {
-          width: 80px !important;
-        }
-
-        table[class="background_main"] .slack_logo_small_icon img {
-          height: 21px !important;
-        }
-
         .social_img_bottom_margin {
           /*this class is for social_user_outreach email only*/
           margin-bottom: 20px !important;
@@ -461,7 +453,7 @@ gsutil cors set cors.json gs://<bucket_name>
           width: 50% !important;
         }
 
-        .slack_logo_style {
+        .logo_style {
           margin-top: -6px !important;
           margin-bottom: -12px !important;
         }
@@ -673,7 +665,7 @@ gsutil cors set cors.json gs://<bucket_name>
                       "
                       class="lg_margin_left_right xl_margin_bottom"
                     >
-                      <div style="margin-top: 18px" class="slack_logo_style">
+                      <div style="margin-top: 18px" class="logo_style">
                         <img
                           width="{{ imageWidth }}"
                           height="{{ imageHeight }}"
@@ -684,7 +676,7 @@ gsutil cors set cors.json gs://<bucket_name>
                             margin-left: 0px;
                           "
                           src="{{ imageSrc }}"
-                          alt="slack logo"
+                          alt="logo"
                         />
                       </div>
                       <h1>{{ subject }}</h1>

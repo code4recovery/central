@@ -4,7 +4,12 @@ import { strings } from "~/i18n";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
-export async function sendMail(to: string, type: "login", buttonLink: string) {
+export async function sendMail(
+  to: string,
+  type: "login",
+  buttonLink: string,
+  imageSrc: string
+) {
   const msg = {
     from: `${process.env.SENDGRID_SENDER}`,
     templateId: `${process.env.SENDGRID_TEMPLATE}`,
@@ -19,9 +24,9 @@ export async function sendMail(to: string, type: "login", buttonLink: string) {
           disclaimer: strings.email.disclaimer,
           footer: strings.email.footer,
           headline: strings.email[type].headline,
-          imageHeight: 36,
-          imageSrc: "https://slack.com/x-a4971999464706/img/slack_logo_240.png",
-          imageWidth: 120,
+          imageHeight: 48,
+          imageSrc,
+          imageWidth: 48.4667,
           instructions: strings.email[type].instructions,
           subject: strings.email[type].subject,
         },

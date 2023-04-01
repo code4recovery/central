@@ -15,7 +15,10 @@ import { UserContext } from "./hooks";
 import { strings } from "~/i18n";
 import { getUserOrRedirect } from "~/utils";
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+  { rel: "icon", href: "/central-logo.svg", type: "image/svg+xml" },
+];
 
 export async function loader({ request }: LoaderArgs) {
   const user = await getUserOrRedirect(request);

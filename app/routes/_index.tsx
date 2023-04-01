@@ -39,10 +39,12 @@ export const action: ActionFunction = async ({ request }) => {
     });
     try {
       const url = new URL(request.url);
-      const buttonLink = `${url.protocol}//${url.host}/auth/${
-        user.emailHash
-      }/${loginToken}${go ? `?go=${go}` : ""}`;
-      await sendMail(email, "login", buttonLink);
+      const baseURL = `${url.protocol}//${url.host}`;
+      const imageSrc = `${baseURL}/central-logo.svg`;
+      const buttonLink = `${baseURL}/auth/${user.emailHash}/${loginToken}${
+        go ? `?go=${go}` : ""
+      }`;
+      await sendMail(email, "login", buttonLink, imageSrc);
     } catch (e) {
       if (e instanceof Error) {
         return json({ error: e.message });
