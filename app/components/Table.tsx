@@ -135,7 +135,7 @@ export function Table({
                       {showValue(key, row)}
                     </Link>
                   ) : (
-                    showValue(key, row)
+                    <div className="p-3">{showValue(key, row)}</div>
                   )}
                 </td>
               ))}

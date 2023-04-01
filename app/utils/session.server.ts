@@ -47,24 +47,28 @@ export async function getUserOrRedirect(request: Request) {
   const secure = url.pathname !== "/" && !url.pathname.startsWith("/auth");
 
   const session = await getUserSession(request);
-  const userId: string = session.get("userId");
+  const id = session.get("userId");
 
-  let user = userId
+  const user = id
     ? await db.user.findFirst({
-        where: { id: userId },
+        where: { id },
         include: {
           accounts: true,
         },
       })
     : undefined;
 
-  if (secure && !user) {
+  if (user) {
+    await db.user.update({
+      data: { lastSeen: new Date(), admin: true },
+      where: { id },
+    });
+    if (!secure) {
+      throw redirect(config.home);
+    }
+  } else if (secure) {
     const searchParams = new URLSearchParams({ go: url.pathname });
     throw redirect(`/?${searchParams}`);
-  }
-
-  if (!secure && user) {
-    throw redirect(config.home);
   }
 
   const account = user?.accounts.find(

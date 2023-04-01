@@ -153,6 +153,13 @@ export const strings = {
   },
   updated: "Updated",
   user_menu_open: "Open user menu",
+  user_add: "Add User",
   users: "Users",
+  users_admin: "Admin",
+  users_admin_description:
+    "Admins may add, edit, and remove other users, and adjust account settings.",
   users_name: "Name",
+  users_role: "Role",
+  users_last_seen: "Last Seen",
+  users_last_seen_never: "Never",
 };

@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { LoaderFunction, json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Table, Template } from "~/components";
+import { Button, Table, Template } from "~/components";
 import { formatUpdated } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
@@ -14,15 +14,23 @@ export const loader: LoaderFunction = async () => {
 export default function Users() {
   const { users } = useLoaderData();
   return (
-    <Template title={strings.users}>
+    <Template
+      title={strings.users}
+      cta={<Button label={strings.user_add} url="/users/add" />}
+    >
       <Table
         columns={{
           name: { label: strings.users_name },
-          updatedAt: { label: strings.updated, align: "right" },
+          role: { label: strings.users_role },
+          lastSeen: { label: strings.users_last_seen, align: "right" },
         }}
         rows={users.map((user: User) => ({
           ...user,
-          updatedAt: formatUpdated(user.updatedAt.toString()),
+          role: "Admin",
+          link: `/users/${user.id}`,
+          lastSeen: user.lastSeen
+            ? formatUpdated(user.lastSeen.toString())
+            : strings.users_last_seen_never,
         }))}
       />
     </Template>

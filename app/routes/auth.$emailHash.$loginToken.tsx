@@ -14,6 +14,11 @@ export const loader: LoaderFunction = async ({ params }) => {
   });
 
   if (user) {
+    await db.user.update({
+      data: { lastSeen: new Date() },
+      where: { id: user.id },
+    });
+
     return await createUserSession(user.id, go ?? config.home);
   }
 

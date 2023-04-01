@@ -39,6 +39,8 @@ model User {
   updatedAt        DateTime   @updatedAt
   email            String     @unique
   emailHash        String
+  lastSeen         DateTime?
+  admin            Boolean
   loginToken       String?
   name             String?
   currentAccountID String
