@@ -78,6 +78,7 @@ gsutil cors set cors.json gs://<bucket_name>
 <details>
 
 <summary>Sample email template</summary>
+
 ```html
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -598,7 +599,6 @@ gsutil cors set cors.json gs://<bucket_name>
         border-left-style: solid;
       }
     </style>
-
   </head>
   <body>
     <!--[if mso
@@ -853,6 +853,7 @@ gsutil cors set cors.json gs://<bucket_name>
   </body>
 </html>
 ```
+
 </details>
 
 ## Deploy to Cloud Run
