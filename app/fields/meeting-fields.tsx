@@ -4,11 +4,11 @@ import type { Fields } from "~/types";
 export const meetingFields = (): Fields => ({
   name: {
     className: "text-xl font-semibold py-2",
-    label: strings.meeting_name,
+    label: strings.meetings.name,
     type: "text",
   },
   day: {
-    label: strings.meeting_day,
+    label: strings.meetings.day,
     options: days.map((day, index) => ({
       value: `${index}`,
       label: strings.days[day as keyof typeof strings.days],
@@ -17,38 +17,38 @@ export const meetingFields = (): Fields => ({
     type: "select",
   },
   time: {
-    label: strings.meeting_time,
+    label: strings.meetings.time,
     span: 3,
     type: "time",
   },
   timezone: {
-    label: strings.meeting_timezone,
+    label: strings.meetings.timezone,
     options: timezones.map((tz) => ({ value: tz, label: tz })),
     span: 3,
     type: "select",
   },
   duration: {
-    label: strings.meeting_duration,
+    label: strings.meetings.duration,
     span: 3,
     type: "number",
   },
   conference_url: {
-    label: strings.meeting_conference_url,
+    label: strings.meetings.conference_url,
     type: "url",
     span: 6,
   },
   conference_url_notes: {
-    label: strings.meeting_conference_url_notes,
+    label: strings.meetings.conference_url_notes,
     type: "text",
     span: 6,
   },
   conference_phone: {
-    label: strings.meeting_conference_phone,
+    label: strings.meetings.conference_phone,
     type: "tel",
     span: 6,
   },
   conference_phone_notes: {
-    label: strings.meeting_conference_phone_notes,
+    label: strings.meetings.conference_phone_notes,
     type: "text",
     span: 6,
   },
@@ -57,24 +57,21 @@ export const meetingFields = (): Fields => ({
     type: "textarea",
   },
   languages: {
-    label: strings.meeting_languages,
-    options: Object.keys(strings.language_types)
+    label: strings.meetings.languages,
+    options: Object.keys(strings.languages)
       .sort((a, b) =>
-        strings.language_types[
-          a as keyof typeof strings.language_types
-        ].localeCompare(
-          strings.language_types[b as keyof typeof strings.language_types]
+        strings.languages[a as keyof typeof strings.languages].localeCompare(
+          strings.languages[b as keyof typeof strings.languages]
         )
       )
       .map((type) => ({
         value: type,
-        label:
-          strings.language_types[type as keyof typeof strings.language_types],
+        label: strings.languages[type as keyof typeof strings.languages],
       })),
     type: "checkboxes",
   },
   types: {
-    label: strings.meeting_types,
+    label: strings.meetings.types,
     options: Object.keys(strings.types)
       .sort((a, b) =>
         strings.types[a as keyof typeof strings.types].localeCompare(

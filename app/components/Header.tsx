@@ -13,24 +13,23 @@ import { strings } from "~/i18n";
 import { DefaultAccountLogo as Logo } from "~/icons";
 
 export function Header() {
+  const { accountID } = useUser();
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search") || undefined;
 
   const user = useUser();
   const navItems = {
-    primary: {
-      meetings: "/meetings",
-      activity: "/activity",
-      reports: "/reports",
-    },
+    primary: [
+      ["/meetings", strings.meetings.title],
+      ["/activity", strings.activity.title],
+      ["/reports", strings.reports.title],
+    ],
     secondary: [
-      {
-        settings: "/settings",
-        users: "/users",
-      },
-      {
-        sign_out: "/auth/out",
-      },
+      [
+        [`/accounts/${accountID}`, strings.account.title],
+        ["/users", strings.users.title],
+      ],
+      [["/auth/out", strings.auth.out]],
     ],
   };
   const {
@@ -59,15 +58,11 @@ export function Header() {
                     </Link>
                   </div>
                   <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
-                    {Object.keys(navItems.primary).map((item, index) => (
+                    {navItems.primary.map(([url, label]) => (
                       <NavLink
-                        key={index}
-                        to={
-                          navItems.primary[
-                            item as keyof typeof navItems.primary
-                          ]
-                        }
-                        reloadDocument={item === "meetings" && !!search}
+                        key={url}
+                        to={url}
+                        reloadDocument={url === "/meetings" && !!search}
                         className={({ isActive }) =>
                           cx(
                             {
@@ -80,7 +75,7 @@ export function Header() {
                           )
                         }
                       >
-                        {strings[item as keyof typeof strings] as string}
+                        {label}
                       </NavLink>
                     ))}
                   </div>
@@ -101,7 +96,7 @@ export function Header() {
                     }}
                   >
                     <label htmlFor="search" className="sr-only">
-                      {strings.search}
+                      {strings.meetings.search}
                     </label>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -119,7 +114,7 @@ export function Header() {
                         defaultValue={search}
                         id="search"
                         name="search"
-                        placeholder={strings.search}
+                        placeholder={strings.meetings.search}
                         type="search"
                       />
                     </div>
@@ -148,7 +143,6 @@ export function Header() {
                         focusRing
                       )}
                     >
-                      <span className="sr-only">{strings.user_menu_open}</span>
                       <img
                         className="h-8 w-8 rounded-full"
                         src={avatarUrl}
@@ -167,17 +161,11 @@ export function Header() {
                       <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-gray-200 divide-y">
                         {navItems.secondary.map((group, index) => (
                           <div key={index} className="py-1">
-                            {Object.keys(group).map((item) => (
-                              <Menu.Item
-                                key={group[item as keyof typeof group]}
-                              >
+                            {group.map(([url, label]) => (
+                              <Menu.Item key={url}>
                                 {({ active }) => (
                                   <NavLink
-                                    to={
-                                      group[
-                                        item as keyof typeof group
-                                      ] as string
-                                    }
+                                    to={url}
                                     className={cx(
                                       {
                                         "bg-gray-100": active,
@@ -185,11 +173,7 @@ export function Header() {
                                       "block px-4 py-2 text-sm text-gray-700"
                                     )}
                                   >
-                                    {
-                                      strings[
-                                        item as keyof typeof strings
-                                      ] as string
-                                    }
+                                    {label}
                                   </NavLink>
                                 )}
                               </Menu.Item>
@@ -205,12 +189,10 @@ export function Header() {
 
             <Disclosure.Panel className="lg:hidden">
               <div className="space-y-1 pt-2 pb-3">
-                {Object.keys(navItems.primary).map((item) => (
+                {navItems.primary.map(([url, label]) => (
                   <NavLink
-                    key={
-                      navItems.primary[item as keyof typeof navItems.primary]
-                    }
-                    to={navItems.primary[item as keyof typeof navItems.primary]}
+                    key={url}
+                    to={url}
                     className={({ isActive }) =>
                       cx(
                         {
@@ -223,7 +205,7 @@ export function Header() {
                       )
                     }
                   >
-                    {strings[item as keyof typeof strings] as string}
+                    {label}
                   </NavLink>
                 ))}
               </div>
@@ -248,13 +230,13 @@ export function Header() {
                 <div className="mt-3 space-y-1 divide-gray-200 divide-y">
                   {navItems.secondary.map((group, index) => (
                     <div key={index} className="py-1">
-                      {Object.keys(group).map((item) => (
+                      {group.map(([url, label]) => (
                         <NavLink
-                          key={group[item as keyof typeof group] as string}
-                          to={group[item as keyof typeof group] as string}
+                          key={url}
+                          to={url}
                           className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                         >
-                          {strings[item as keyof typeof strings] as string}
+                          {label}
                         </NavLink>
                       ))}
                     </div>

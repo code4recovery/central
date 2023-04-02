@@ -45,9 +45,7 @@ export function Table({
               key={type}
             >
               {strings.types[type as keyof typeof strings.types] ??
-                strings.language_types[
-                  type as keyof typeof strings.language_types
-                ]}
+                strings.languages[type as keyof typeof strings.languages]}
             </span>
           ))}
         </div>

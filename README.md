@@ -1,23 +1,28 @@
-# Unity | Unify | Central
+# Central
 
-This is a free content management system to help service entities manage their directory of recovery meetings.
+Central is a free content management system to help service entities manage their directory of recovery meetings. It is currently in active development. Once it's ready, it will be deployed and usable by service entities for free with minimal configuration.
 
-## Services needed
+## Developer info
 
-This project uses the following third-party services:
+Central is developed on the MERN stack (MongoDB, Express, React, Node.js). It uses these frameworks:
+
+- [Remix](https://remix.run/)
+- [Prisma](https://www.prisma.io/)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+You can set up and run Central yourself. It requires these third-party services:
 
 - [Google Cloud Run](https://cloud.google.com/run)
 - [Google Sheets API](https://developers.google.com/sheets/api)
 - [MongoDB](https://www.mongodb.com/) (we use [Atlas](https://www.mongodb.com/atlas/database))
 - [Google Cloud Storage](https://cloud.google.com/storage)
+- [SendGrid](https://sendgrid.com/)
 - Google Geocoding API (coming soon)
 - Google TimeZone API (coming soon)
-- SendGrid (coming soon)
+- Mapbox (coming soon)
 - Sentry (coming soon)
 
 ## Run locally
-
-Interested in making your own copy of this service, or adapting it to your needs? Get started by cloning this repo locally.
 
 Create a `.env` file that looks like this, and replace
 
@@ -41,18 +46,13 @@ USER_EMAIL="<your.email@address.com>"
 
 # Email
 SENDGRID_API_KEY="<your.sendgrid.api.key>"
-SENDGRID_SENDER="<your.email@address.com>"
+SENDGRID_SENDER="<your.sender@address.com>"
 SENDGRID_TEMPLATE="<your.sendgrid.template.id>"
 ```
 
 You may wish to seed your database with an existing Meeting Guide JSON feed. Coming soon.
 
 To run locally, run `npm i` once, then run `npm run dev`. Your site will be running at [http://localhost:3000/](http://localhost:3000/)
-
-## Set up Cloud Run
-
-1. Add this repository (or a clone of it) to Cloud Run
-1. Set your environment variables
 
 ## Set up Cloud Storage
 
@@ -75,6 +75,9 @@ gsutil cors set cors.json gs://<bucket_name>
 1. Get API key and sender email, add to `.env` or environment variables
 1. Create email template (see below), add template to `.env` or environment variables
 
+<details>
+
+<summary>Sample email template</summary>
 ```html
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -595,6 +598,7 @@ gsutil cors set cors.json gs://<bucket_name>
         border-left-style: solid;
       }
     </style>
+
   </head>
   <body>
     <!--[if mso
@@ -849,3 +853,9 @@ gsutil cors set cors.json gs://<bucket_name>
   </body>
 </html>
 ```
+</details>
+
+## Deploy to Cloud Run
+
+1. Add this repository (or a clone of it) to Cloud Run
+1. Set your environment variables

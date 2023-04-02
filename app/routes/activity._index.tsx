@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async () => {
       meetingName: activity.meeting.name,
       link: `/meetings/${activity.meeting.id}`,
       createdAt: formatUpdated(activity.createdAt.toISOString()),
-      type: formatString(strings.activity_update, {
+      type: formatString(strings.activity.update, {
         properties: activity.changes.map(({ field }) => field).join(","),
       }),
     })),
@@ -30,18 +30,18 @@ export const loader: LoaderFunction = async () => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.activity,
+  title: strings.activity.title,
 });
 
 export default function Activity() {
   const { activities } = useLoaderData();
   return (
     <Template
-      title={strings.activity}
-      description={strings.activity_description}
+      title={strings.activity.title}
+      description={strings.activity.description}
     >
       {!activities.length && (
-        <Alert message={strings.activity_none} type="warning" />
+        <Alert message={strings.activity.empty} type="warning" />
       )}
       <Table
         columns={{

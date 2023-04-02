@@ -8,7 +8,7 @@ export function formatDayTime(
   timezone: string | null
 ) {
   if (day === null || !time || !timezone) {
-    return strings.ongoing;
+    return strings.meetings.ongoing;
   }
 
   const weekday = day === 0 ? 7 : day;

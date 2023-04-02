@@ -1,46 +1,36 @@
-import { formatClasses as cx } from "~/helpers";
 import { strings } from "~/i18n";
-import { DefaultAccountLogo } from "~/icons";
 import { Fields } from "~/types";
 
 export const accountFields = ({
-  currentAccountID,
-  accountName,
-  accountUrl,
-  themeName,
-  text,
+  name,
+  url,
+  theme,
+  id,
 }: {
-  currentAccountID?: string;
-  accountName?: string;
-  accountUrl?: string;
-  themeName?: string;
-  text?: string;
+  name?: string;
+  url?: string;
+  theme?: string;
+  id?: string;
 }): Fields => ({
-  accountID: {
+  id: {
     type: "hidden",
-    value: currentAccountID,
+    value: id,
   },
   name: {
-    label: strings.settings_account_entity,
+    label: strings.account.entity,
     type: "text",
-    value: accountName,
+    value: name,
   },
   url: {
-    label: strings.settings_account_url,
-    placeholder: strings.settings_account_url_placeholder,
+    label: strings.account.url,
+    placeholder: strings.account.url_placeholder,
     span: 8,
     type: "url",
-    value: accountUrl,
-  },
-  logo: {
-    defaultImage: <DefaultAccountLogo className={cx("w-12 h-12", text)} />,
-    helpText: strings.settings_account_logo_help,
-    label: strings.settings_account_logo,
-    type: "image",
+    value: url,
   },
   theme: {
-    label: strings.settings_account_theme,
+    label: strings.account.theme,
     type: "colors",
-    value: themeName,
+    value: theme,
   },
 });

@@ -104,7 +104,7 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meeting_edit,
+  title: strings.meetings.edit,
 });
 
 export default function EditMeeting() {
@@ -136,11 +136,14 @@ export default function EditMeeting() {
   };
 
   return (
-    <Template title={strings.meeting_edit}>
+    <Template
+      title={strings.meetings.edit}
+      breadcrumbs={[["/meetings", strings.meetings.title]]}
+    >
       {actionData && <Alerts data={actionData} />}
       <Form
-        title={strings.meeting_details}
-        description={strings.meeting_details_description}
+        title={strings.meetings.details}
+        description={strings.meetings.details_description}
         fields={fields}
       />
     </Template>

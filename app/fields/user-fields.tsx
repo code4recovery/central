@@ -6,33 +6,29 @@ export const userFields = ({
   name,
   email,
   text,
-  userID,
+  id,
 }: {
   name?: string;
   email?: string;
   text?: string;
-  userID?: string;
+  id?: string;
 }): Fields => ({
-  userID: {
+  id: {
     type: "hidden",
-    value: userID,
+    value: id,
   },
   name: {
-    label: strings.settings_user_name,
-    placeholder: strings.settings_user_name_placeholder,
+    label: strings.users.name,
+    placeholder: strings.users.name_placeholder,
+    helpText: strings.users.name_description,
     span: 6,
     type: "text",
     value: name,
   },
   email: {
-    label: strings.settings_user_email,
+    label: strings.users.email,
     span: 6,
     type: "email",
     value: email,
-  },
-  avatar: {
-    defaultImage: <DefaultUserIcon className={text} />,
-    label: strings.settings_user_avatar,
-    type: "image",
   },
 });

@@ -55,11 +55,11 @@ export const action: ActionFunction = async ({ request }) => {
       }
     }
   }
-  return json({ info: strings.sign_in_email_sent });
+  return json({ info: strings.auth.email_sent });
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.sign_in_title,
+  title: strings.auth.title,
 });
 
 export default function Index() {
@@ -71,7 +71,7 @@ export default function Index() {
   const [searchParams] = useSearchParams();
   const actionData = useActionData() ?? {};
   if (searchParams.get("msg") === "expired") {
-    actionData.warning = strings.sign_in_expired;
+    actionData.warning = strings.auth.expired;
   }
   return (
     <>
@@ -79,7 +79,7 @@ export default function Index() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <DefaultAccountLogo className={cx("h-12 w-auto mx-auto", text)} />
           <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            {strings.sign_in_title}
+            {strings.auth.title}
           </h1>
         </div>
         <div className=" mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
@@ -94,11 +94,11 @@ export default function Index() {
                 type="hidden"
                 value={searchParams.get("go") ?? undefined}
               />
-              <Label htmlFor="email">{strings.settings_user_email}</Label>
+              <Label htmlFor="email">{strings.users.email}</Label>
               <Input autoFocus name="email" required type="email" />
               <Button
                 className="mt-4 w-full"
-                label={!idle ? strings.loading : strings.sign_in_submit}
+                label={!idle ? strings.loading : strings.auth.submit}
               />
             </fieldset>
           </Form>

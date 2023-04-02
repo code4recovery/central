@@ -9,13 +9,6 @@ export type Field = {
   placeholder?: string;
   required?: boolean;
   span?: number;
-  type:
-    | "checkboxes"
-    | "colors"
-    | "hidden"
-    | "image"
-    | "select"
-    | "textarea"
-    | InputType;
+  type: "checkboxes" | "colors" | "hidden" | "select" | "textarea" | InputType;
   value?: string | string[];
 };

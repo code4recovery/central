@@ -52,7 +52,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings,
+  title: strings.meetings.title,
 });
 
 export default function Index() {
@@ -69,27 +69,27 @@ export default function Index() {
 
   return (
     <Template
-      title={strings.meetings}
-      description={formatString(strings.meetings_description, {
+      title={strings.meetings.title}
+      description={formatString(strings.meetings.description, {
         meetings_count: user.meetingCount,
       })}
-      cta={<Button url="/meetings/add" label={strings.meeting_add} />}
+      cta={<Button url="/meetings/add" label={strings.meetings.add} />}
     >
       {!meetings.length && (
         <Alert
           message={
             search
-              ? formatString(strings.meetings_none_search, { search })
-              : strings.meetings_none
+              ? formatString(strings.meetings.empty_search, { search })
+              : strings.meetings.empty
           }
           type="warning"
         />
       )}
       <Table
         columns={{
-          name: { label: strings.meeting_name },
-          when: { label: strings.meeting_when },
-          types: { label: strings.meeting_types },
+          name: { label: strings.meetings.name },
+          when: { label: strings.meetings.when },
+          types: { label: strings.meetings.types },
           updatedAt: { label: strings.updated, align: "right" },
         }}
         rows={meetings.map((meeting: Meeting) => ({

@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { json } from "@remix-run/node";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, Link } from "@remix-run/react";
 import { Button, Table, Template } from "~/components";
 import { formatUpdated } from "~/helpers";
 import { strings } from "~/i18n";
@@ -13,21 +13,21 @@ export const loader: LoaderFunction = async () => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.users,
+  title: strings.users.title,
 });
 
 export default function Users() {
   const { users } = useLoaderData();
   return (
     <Template
-      title={strings.users}
-      cta={<Button label={strings.user_add} url="/users/add" />}
+      title={strings.users.title}
+      cta={<Button label={strings.users.add} url="/users/add" />}
     >
       <Table
         columns={{
-          name: { label: strings.users_name },
-          role: { label: strings.users_role },
-          lastSeen: { label: strings.users_last_seen, align: "right" },
+          name: { label: strings.users.name },
+          role: { label: strings.users.role },
+          lastSeen: { label: strings.users.last_seen, align: "right" },
         }}
         rows={users.map((user: User) => ({
           ...user,
@@ -35,7 +35,7 @@ export default function Users() {
           link: `/users/${user.id}`,
           lastSeen: user.lastSeen
             ? formatUpdated(user.lastSeen.toString())
-            : strings.users_last_seen_never,
+            : strings.users.last_seen_never,
         }))}
       />
     </Template>

@@ -9,15 +9,18 @@ export const action: ActionFunction = async ({ params }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings,
+  title: strings.meetings.title,
 });
 
 export default function CreateMeeting() {
   return (
-    <Template title={strings.meeting_add}>
+    <Template
+      title={strings.meetings.add}
+      breadcrumbs={[["/meetings", strings.meetings.title]]}
+    >
       <Form
-        title={strings.meeting_details}
-        description={strings.meeting_details_description}
+        title={strings.meetings.details}
+        description={strings.meetings.details_description}
         fields={meetingFields()}
       />
     </Template>

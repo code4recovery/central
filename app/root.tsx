@@ -17,7 +17,7 @@ import { getUserOrRedirect } from "~/utils";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
-  { rel: "icon", href: "/central-logo.svg", type: "image/svg+xml" },
+  { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
 ];
 
 export async function loader({ request }: LoaderArgs) {
