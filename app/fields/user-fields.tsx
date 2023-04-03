@@ -3,29 +3,31 @@ import { DefaultUserIcon } from "~/icons";
 import { Fields } from "~/types";
 
 export const userFields = ({
-  name,
+  currentAccountID,
   email,
-  text,
   id,
+  name,
 }: {
-  name?: string;
+  currentAccountID?: string;
   email?: string;
-  text?: string;
   id?: string;
-}): Fields => ({
+  name?: string;
+} = {}): Fields => ({
   id: {
     type: "hidden",
     value: id,
   },
+  currentAccountID: { type: "hidden", value: currentAccountID },
   name: {
+    helpText: strings.users.name_description,
     label: strings.users.name,
     placeholder: strings.users.name_placeholder,
-    helpText: strings.users.name_description,
     span: 6,
     type: "text",
     value: name,
   },
   email: {
+    helpText: strings.users.email_description,
     label: strings.users.email,
     span: 6,
     type: "email",

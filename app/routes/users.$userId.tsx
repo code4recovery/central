@@ -7,13 +7,13 @@ import {
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 
 import { Alerts, Form, Template } from "~/components";
-import { strings } from "~/i18n";
 import { userFields } from "~/fields";
-import { db } from "~/utils";
 import { validFormData, validObjectId } from "~/helpers";
+import { strings } from "~/i18n";
+import { db } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { id, name, email } = await validFormData(request, userFields({}));
+  const { id, name, email } = await validFormData(request, userFields());
   await db.user.update({ where: { id }, data: { name, email } });
   return json({ success: strings.users.updated });
 };

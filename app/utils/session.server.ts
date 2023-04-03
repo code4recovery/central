@@ -59,13 +59,14 @@ export async function getUserOrRedirect(request: Request) {
         where: { id },
         include: {
           accounts: true,
+          adminAccounts: true,
         },
       })
     : undefined;
 
   if (user) {
     await db.user.update({
-      data: { lastSeen: new Date(), admin: true },
+      data: { lastSeen: new Date() },
       where: { id },
     });
     if (!routeIsSecure) {
@@ -80,15 +81,16 @@ export async function getUserOrRedirect(request: Request) {
     ({ id }) => id === user?.currentAccountID
   );
 
+  const isAdmin = user?.adminAccounts.find(
+    ({ id }) => id === user?.currentAccountID
+  );
+
   const theme = account?.theme ?? config.defaultTheme;
 
   return {
     ...user,
-    accountID: account?.id ?? "",
-    accountName: account?.name ?? "",
-    accountUrl: account?.url ?? "",
+    isAdmin,
     meetingCount: account?.meetingCount ?? 0,
     theme: config.themes[theme as keyof typeof config.themes],
-    themeName: theme,
   };
 }

@@ -15,7 +15,7 @@ import { db, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const accountID = formData.get("accountID")?.toString() || "";
+  const currentAccountID = formData.get("currentAccountID")?.toString() || "";
   const meetingID = formData.get("meetingID")?.toString() || "";
   const userID = formData.get("userID")?.toString() || "";
 
@@ -78,7 +78,7 @@ export const action: ActionFunction = async ({ request }) => {
   });
 
   try {
-    await saveFeedToStorage(accountID);
+    await saveFeedToStorage(currentAccountID);
     return json({ success: "JSON updated." });
   } catch (e) {
     if (e instanceof Error) {
@@ -109,7 +109,7 @@ export const meta: MetaFunction = () => ({
 
 export default function EditMeeting() {
   const { meeting } = useLoaderData();
-  const { accountID, id } = useUser();
+  const { currentAccountID, id } = useUser();
   const actionData = useActionData<typeof action>();
 
   const fields = meetingFields();
@@ -122,9 +122,9 @@ export default function EditMeeting() {
           : meeting[name],
     };
   });
-  fields["accountID"] = {
+  fields["currentAccountID"] = {
     type: "hidden",
-    value: accountID,
+    value: currentAccountID,
   };
   fields["meetingID"] = {
     type: "hidden",

@@ -39,12 +39,19 @@ export const strings = {
     disclaimer:
       "If you didn’t request this email, there’s nothing to worry about — you can safely ignore it.",
     footer: "This email was sent by %app% on behalf of %accountName%.",
+    invite: {
+      buttonText: "Accept invitation",
+      headline:
+        "You have been invited to help administer the listings on our website at %accountUrl%.",
+      instructions: "Tap the button below to accept:",
+      subject: "Welcome to %accountName%",
+    },
     login: {
-      subject: "Confirm your email address to log in",
+      buttonText: "Confirm email",
       headline:
         "Once you’ve confirmed that %email% is your email address, you’ll be logged in to the site.",
       instructions: "Tap the button below to confirm:",
-      buttonText: "Confirm email",
+      subject: "Confirm your email address to log in",
     },
   },
   languages: {
@@ -81,7 +88,7 @@ export const strings = {
     conference_url: "Conference URL",
     conference_url_notes: "Conference URL notes",
     day: "Day",
-    description: "You have %meetings_count% meetings in your account.",
+    description: "You have %meetingCount% meetings in your account.",
     details: "Meeting details",
     details_description: "These values apply only to this meeting.",
     duration: "Duration",
@@ -160,6 +167,7 @@ export const strings = {
   updated: "Updated",
   users: {
     add: "Add User",
+    added: "User has been added",
     admin: "Admin",
     admin_description:
       "Admins may add, edit, and remove other users, and adjust account settings.",
@@ -167,6 +175,7 @@ export const strings = {
     description: "User photos can be updated at Gravatar.com",
     edit: "Edit User",
     email: "Email address",
+    email_description: "This will be kept private",
     last_seen: "Last Seen",
     last_seen_never: "Never",
     menu_option: "Users",

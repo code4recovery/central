@@ -13,11 +13,16 @@ import { strings } from "~/i18n";
 import { DefaultAccountLogo as Logo } from "~/icons";
 
 export function Header() {
-  const { accountID } = useUser();
+  const {
+    currentAccountID,
+    email,
+    emailHash,
+    name,
+    theme: { text, focusRing, border },
+  } = useUser();
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search") || undefined;
 
-  const user = useUser();
   const navItems = {
     primary: [
       ["/meetings", strings.meetings.title],
@@ -26,17 +31,14 @@ export function Header() {
     ],
     secondary: [
       [
-        [`/accounts/${accountID}`, strings.account.title],
+        [`/accounts/${currentAccountID}`, strings.account.title],
         ["/users", strings.users.title],
       ],
       [["/auth/out", strings.auth.out]],
     ],
   };
-  const {
-    theme: { text, focusRing, border },
-  } = useUser();
 
-  const avatarUrl = `https://gravatar.com/avatar/${user.emailHash}`;
+  const avatarUrl = `https://gravatar.com/avatar/${emailHash}`;
 
   return (
     <header>
@@ -146,7 +148,7 @@ export function Header() {
                       <img
                         className="h-8 w-8 rounded-full"
                         src={avatarUrl}
-                        alt={user.name}
+                        alt={name}
                       />
                     </Menu.Button>
                     <Transition
@@ -215,15 +217,15 @@ export function Header() {
                     <img
                       className="h-10 w-10 rounded-full"
                       src={avatarUrl}
-                      alt={user.name}
+                      alt={name}
                     />
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium text-gray-800">
-                      {user.name}
+                      {name}
                     </div>
                     <div className="text-sm font-medium text-gray-500">
-                      {user.email}
+                      {email}
                     </div>
                   </div>
                 </div>

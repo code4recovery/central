@@ -52,6 +52,7 @@ async function seed() {
         name: process.env.USER_NAME ?? "Joe Q.",
         email,
         emailHash: md5(email),
+        admin: true, // todo
         accounts: { connect: { id: account.id } },
         currentAccountID: account.id,
       },
@@ -137,9 +138,9 @@ const convertLanguages = (languages: string) =>
         .split(",")
         .map((e) => e.trim())
         .map((e) => {
-          const index = Object.values(strings.language_types).indexOf(e);
+          const index = Object.values(strings.languages).indexOf(e);
           if (index !== -1) {
-            return Object.keys(strings.language_types)[index];
+            return Object.keys(strings.languages)[index];
           }
           if (
             !languagesNotFound.includes(e) &&
@@ -166,7 +167,7 @@ const convertTypes = (types: string) =>
           }
           if (
             !typesNotFound.includes(e) &&
-            !Object.values(strings.language_types).includes(e)
+            !Object.values(strings.languages).includes(e)
           ) {
             typesNotFound.push(e);
           }

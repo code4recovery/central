@@ -40,15 +40,18 @@ export const action: ActionFunction = async ({ request }) => {
       },
       where: { id: user.id },
     });
-    const account = user?.accounts.find(
-      ({ id }) => id === user?.currentAccountID
-    );
 
     try {
       const buttonLink = `/auth/${user.emailHash}/${loginToken}${
         go ? `?go=${go}` : ""
       }`;
-      await sendMail(email, "login", request, buttonLink, account?.name ?? "");
+      await sendMail(
+        email,
+        "login",
+        request,
+        buttonLink,
+        user?.currentAccountID
+      );
     } catch (e) {
       if (e instanceof Error) {
         return json({ error: e.message });

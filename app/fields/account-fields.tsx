@@ -11,7 +11,7 @@ export const accountFields = ({
   url?: string;
   theme?: string;
   id?: string;
-}): Fields => ({
+} = {}): Fields => ({
   id: {
     type: "hidden",
     value: id,

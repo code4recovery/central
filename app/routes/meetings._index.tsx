@@ -59,7 +59,7 @@ export default function Index() {
   const { meetings: loadedMeetings, search } = useLoaderData();
   const [meetings, setMeetings] = useState(loadedMeetings);
   const actionData = useActionData();
-  const user = useUser();
+  const { meetingCount } = useUser();
 
   useEffect(() => {
     if (actionData) {
@@ -71,7 +71,7 @@ export default function Index() {
     <Template
       title={strings.meetings.title}
       description={formatString(strings.meetings.description, {
-        meetings_count: user.meetingCount,
+        meetingCount,
       })}
       cta={<Button url="/meetings/add" label={strings.meetings.add} />}
     >
@@ -99,11 +99,8 @@ export default function Index() {
           when: formatDayTime(meeting.day, meeting.time, meeting.timezone),
         }))}
       />
-      {!search && meetings.length < user.meetingCount && (
-        <LoadMore
-          loadedCount={meetings.length}
-          totalCount={user.meetingCount}
-        />
+      {!search && meetings.length < meetingCount && (
+        <LoadMore loadedCount={meetings.length} totalCount={meetingCount} />
       )}
     </Template>
   );

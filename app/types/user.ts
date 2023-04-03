@@ -1,11 +1,9 @@
 export type User = {
-  accountID: string;
-  accountName: string;
-  accountUrl: string;
   currentAccountID: string;
   email: string;
   emailHash: string;
   id: string;
+  isAdmin: boolean;
   meetingCount: number;
   name?: string;
   theme: {
@@ -17,5 +15,4 @@ export type User = {
     label: string;
     text: string;
   };
-  themeName: string;
 };

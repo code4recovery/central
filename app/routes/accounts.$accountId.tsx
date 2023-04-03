@@ -15,7 +15,7 @@ import { db } from "~/utils";
 export const action: ActionFunction = async ({ request }) => {
   const { id, name, url, theme } = await validFormData(
     request,
-    accountFields({})
+    accountFields()
   );
 
   await db.account.update({

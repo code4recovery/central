@@ -40,12 +40,13 @@ model User {
   email            String     @unique
   emailHash        String
   lastSeen         DateTime?
-  admin            Boolean
   loginToken       String?
   name             String?
   currentAccountID String
   accountIDs       String[]   @db.ObjectId
-  accounts         Account[]  @relation(fields: [accountIDs], references: [id])
+  accounts         Account[]  @relation("AccountUsers", fields: [accountIDs], references: [id])
+  adminAccountIds  String[]   @db.ObjectId
+  adminAccounts    Account[]  @relation("AccountAdmins", fields: [adminAccountIds], references: [id])
   activityIDs      String[]   @db.ObjectId
   activities       Activity[] @relation()
 }
@@ -59,7 +60,9 @@ model Account {
   theme        String
   meetingCount Int
   userIDs      String[] @db.ObjectId
-  users        User[]   @relation(fields: [userIDs], references: [id])
+  users        User[]   @relation("AccountUsers", fields: [userIDs], references: [id])
+  adminIDs     String[] @db.ObjectId
+  admins       User[]   @relation("AccountAdmins", fields: [adminIDs], references: [id])
 }
 
 model Activity {
