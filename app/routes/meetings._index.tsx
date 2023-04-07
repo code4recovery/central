@@ -37,6 +37,7 @@ export const action: ActionFunction = async ({ request }) => {
     take: config.batchSize,
     skip: Number(skip),
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    where: { accounts: { some: { id: "6420819aaf0b496f73cfa828" } } }, // todo dynamic
   });
   return json(meetings);
 };
@@ -51,11 +52,13 @@ export const loader: LoaderFunction = async ({ request }) => {
           id: {
             in: meetingIDs,
           },
+          accounts: { some: { id: "6420819aaf0b496f73cfa828" } }, // todo dynamic
         },
       })
     : await db.meeting.findMany({
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         take: config.batchSize,
+        where: { accounts: { some: { id: "6420819aaf0b496f73cfa828" } } }, // todo dynamic
       });
   return json({ meetings, search });
 };

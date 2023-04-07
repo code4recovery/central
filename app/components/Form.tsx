@@ -154,7 +154,9 @@ export function Form({
                                 className
                               )}
                               defaultValue={
-                                values?.[name] ? `${values?.[name]}` : undefined
+                                values?.[name] !== null
+                                  ? `${values?.[name]}`
+                                  : undefined
                               }
                             >
                               {!required && <option></option>}

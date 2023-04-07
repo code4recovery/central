@@ -86,7 +86,7 @@ export async function getUserOrRedirect(request: Request) {
   return {
     ...user,
     isAdmin,
-    meetingCount: account?.meetingCount ?? 0,
+    meetingCount: account?.meetingIDs.length ?? 0,
     theme: config.themes[theme as keyof typeof config.themes],
   };
 }

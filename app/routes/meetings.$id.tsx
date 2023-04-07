@@ -18,8 +18,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return redirect("/meetings"); // todo flash invalid id message to this page
   }
 
-  // get meeting
-  const meeting = await db.meeting.findUnique({ where: { id } });
+  const meeting = await getMeeting(id);
 
   if (!meeting) {
     return redirect("/meetings"); // todo flash invalid id message to this page
@@ -31,11 +30,16 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
-  console.log(data);
-
   // get changed fields
   const changes = Object.keys(fields.meeting)
-    .filter((name) => data[name] !== meeting[name as keyof typeof meeting])
+    .filter((name) => name in meeting)
+    .filter((name) =>
+      fields.meeting[name].type === "checkboxes"
+        ? JSON.stringify(data[name]) !==
+          JSON.stringify(meeting[name as keyof typeof meeting])
+        : data[name] !== meeting[name as keyof typeof meeting]
+    )
+    .filter((name) => data[name] || meeting[name as keyof typeof meeting])
     .map((name) => [[name], data[name]]);
 
   // exit if no changes
@@ -82,17 +86,30 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   return null;
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
-  if (!validObjectId(params.id)) {
+async function getMeeting(id: string) {
+  const meeting = await db.meeting.findUnique({
+    where: { id },
+    include: {
+      languages: true,
+      types: true,
+    },
+  });
+  return {
+    ...meeting,
+    languages: meeting?.languages.map(({ code }) => code),
+    types: meeting?.types.map(({ code }) => code),
+  };
+}
+
+export const loader: LoaderFunction = async ({ params: { id } }) => {
+  if (!validObjectId(id)) {
     return redirect("/meetings"); // todo flash message
   }
-  const meeting = await db.meeting.findFirst({
-    where: { id: params.id },
-  });
+  const meeting = await getMeeting(id);
   if (!meeting) {
     return redirect("/meetings"); // todo flash message
   }
-  return json({ ...meeting, day: meeting?.day?.toString() });
+  return json(meeting);
 };
 
 export const meta: MetaFunction = () => ({

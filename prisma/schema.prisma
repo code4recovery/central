@@ -31,6 +31,8 @@ model Meeting {
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
   activity               Activity[]
+  accounts               Account[]  @relation(fields: [accountIDs], references: [id])
+  accountIDs             String[]   @db.ObjectId
 
   @@fulltext([name, slug, notes])
 }
@@ -68,17 +70,18 @@ model User {
 }
 
 model Account {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  name         String
-  url          String
-  theme        String
-  meetingCount Int
-  userIDs      String[] @db.ObjectId
-  users        User[]   @relation("AccountUsers", fields: [userIDs], references: [id])
-  adminIDs     String[] @db.ObjectId
-  admins       User[]   @relation("AccountAdmins", fields: [adminIDs], references: [id])
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  name       String
+  url        String
+  theme      String
+  meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
+  meetingIDs String[]  @db.ObjectId
+  userIDs    String[]  @db.ObjectId
+  users      User[]    @relation("AccountUsers", fields: [userIDs], references: [id])
+  adminIDs   String[]  @db.ObjectId
+  admins     User[]    @relation("AccountAdmins", fields: [adminIDs], references: [id])
 }
 
 model Activity {

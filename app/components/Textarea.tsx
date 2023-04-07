@@ -27,7 +27,7 @@ export function Textarea({
         name={name}
         placeholder={placeholder}
         required={required}
-        rows={4}
+        rows={5}
       />
       <HelpText error={error} helpText={helpText} />
     </>

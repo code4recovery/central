@@ -1,5 +1,5 @@
 import { withZod } from "@remix-validated-form/with-zod";
-import { ZodEffects, ZodString, z } from "zod";
+import { z, ZodAny, ZodEffects } from "zod";
 
 import { fields } from "./fields";
 
@@ -11,11 +11,7 @@ export const formatValidator = (form: keyof typeof fields) =>
           .filter((name) => fields[form][name].validation)
           .map((name) => [
             name,
-            fields[form][name].validation as ZodEffects<
-              ZodString,
-              string,
-              string
-            >,
+            fields[form][name].validation as ZodEffects<ZodAny, any, any>,
           ])
       )
     )
