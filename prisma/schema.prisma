@@ -37,14 +37,14 @@ model Meeting {
 
 model Language {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  code       String
+  code       String    @unique
   meetingIDs String[]  @db.ObjectId
   meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
 }
 
 model Type {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  code       String
+  code       String    @unique
   meetingIDs String[]  @db.ObjectId
   meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
 }

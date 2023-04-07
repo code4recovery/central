@@ -24,8 +24,11 @@ async function seed() {
   await db.change.deleteMany();
   await db.activity.deleteMany();
   await db.meeting.deleteMany();
+
   const meetings = await getMeetings();
-  await Promise.all(meetings.map((data) => db.meeting.create({ data })));
+  for (const data of meetings) {
+    await db.meeting.create({ data });
+  }
 
   const url = "https://aa-intergroup.org/meetings";
   let account = await db.account.findFirst();
@@ -84,10 +87,15 @@ async function getMeetings(): Promise<Meeting[]> {
       name: row.name,
       timezone: row.timezone,
       notes: row.notes,
-      types: convertTypes(row.types),
-      languages: convertLanguages(
-        [...row.types.split(","), ...row.languages.split(",")].join(",")
-      ),
+      //types: convertTypes(row.types),
+      languages: {
+        connectOrCreate: {
+          where: { code: "EN" },
+          create: {
+            code: "EN",
+          },
+        },
+      },
       conference_url: row.url,
       conference_url_notes: row.access_code,
     };
@@ -131,28 +139,27 @@ const convertDayTime = (dayTime: string, timezone: string) => {
   };
 };
 
-const convertLanguages = (languages: string) =>
-  [
-    ...new Set(
-      languages
-        .split(",")
-        .map((e) => e.trim())
-        .map((e) => {
-          const index = Object.values(strings.languages).indexOf(e);
-          if (index !== -1) {
-            return Object.keys(strings.languages)[index];
-          }
-          if (
-            !languagesNotFound.includes(e) &&
-            !Object.values(strings.types).includes(e)
-          ) {
-            languagesNotFound.push(e);
-          }
-        })
-        .filter((e) => e)
-        .sort()
-    ),
-  ].join();
+const convertLanguages = (languages: string) => [
+  ...new Set(
+    languages
+      .split(",")
+      .map((e) => e.trim())
+      .map((e) => {
+        const index = Object.values(strings.languages).indexOf(e);
+        if (index !== -1) {
+          return Object.keys(strings.languages)[index];
+        }
+        if (
+          !languagesNotFound.includes(e) &&
+          !Object.values(strings.types).includes(e)
+        ) {
+          languagesNotFound.push(e);
+        }
+      })
+      .filter((e) => e)
+      .sort()
+  ),
+];
 
 const convertTypes = (types: string) =>
   [
