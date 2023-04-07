@@ -10,7 +10,7 @@ export function Chiclet({ children }: { children: ReactNode }) {
   return (
     <span
       className={cx(
-        "px-2 rounded text-sm bg-opacity-20 border border-opacity-20",
+        "px-2 rounded text-sm bg-opacity-20 dark:bg-opacity-20 border border-opacity-20",
         background,
         border
       )}

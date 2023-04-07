@@ -8,7 +8,7 @@ export function Checkbox({
   defaultChecked,
 }: Partial<Field> & { name: string; defaultChecked?: string | string[] }) {
   return (
-    <label className="flex gap-2 text-sm text-gray-500">
+    <label className="flex gap-2 text-sm text-neutral-500">
       <input
         type="checkbox"
         className={cx(className, config.checkboxClassNames)}

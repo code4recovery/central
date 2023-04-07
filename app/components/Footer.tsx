@@ -6,7 +6,7 @@ export function Footer() {
     <footer>
       <div className="mx-auto max-w-7xl pb-16 px-6 lg:px-8 text-center">
         <a
-          className="text-sm leading-5 text-gray-500 underline"
+          className="text-sm leading-5 text-neutral-500 underline"
           href={config.aboutUrl}
           rel="noreferrer"
           target="_blank"

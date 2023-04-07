@@ -46,7 +46,7 @@ export function Header() {
 
   return (
     <header>
-      <Disclosure as="nav" className="bg-white shadow">
+      <Disclosure as="nav" className="bg-white dark:bg-black shadow">
         {({ open }) => (
           <>
             <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
@@ -72,7 +72,7 @@ export function Header() {
                         className={({ isActive }) =>
                           cx(
                             {
-                              "text-gray-900": isActive,
+                              "text-black dark:text-white": isActive,
                               [border]: isActive,
                               "border-transparent": !isActive,
                             },
@@ -108,13 +108,14 @@ export function Header() {
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                         <MagnifyingGlassIcon
                           aria-hidden="true"
-                          className="h-5 w-5 text-gray-400"
+                          className="h-5 w-5 text-neutral-400 dark:text-neutral-600"
                         />
                       </div>
                       <input
                         autoComplete="off"
                         className={cx(
-                          "block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
+                          "block w-full rounded-md border-0 py-1.5 pl-10 pr-3 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
+                          "bg-white dark:bg-black ring-neutral-300 dark:ring-neutral-700 placeholder:text-neutral-400 dark:placeholder:text-neutral-600",
                           focusRing
                         )}
                         defaultValue={search}
@@ -129,7 +130,8 @@ export function Header() {
                 <div className="flex items-center lg:hidden">
                   <Disclosure.Button
                     className={cx(
-                      "inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset",
+                      "inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset",
+                      "text-neutral-400 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-500",
                       focusRing
                     )}
                   >
@@ -145,7 +147,7 @@ export function Header() {
                   <Menu as="div" className="relative flex-shrink-0">
                     <Menu.Button
                       className={cx(
-                        "flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
+                        "flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
                         focusRing
                       )}
                     >
@@ -164,7 +166,7 @@ export function Header() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none divide-gray-200 divide-y">
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-black py-1 shadow-lg focus:outline-none divide-neutral-200 dark:divide-neutral-800 divide-y">
                         {navItems.secondary.map((group, index) => (
                           <div key={index} className="py-1">
                             {group.map(([url, label]) => (
@@ -174,9 +176,10 @@ export function Header() {
                                     to={url}
                                     className={cx(
                                       {
-                                        "bg-gray-100": active,
+                                        "bg-neutral-100 dark:bg-neutral-900":
+                                          active,
                                       },
-                                      "block px-4 py-2 text-sm text-gray-700"
+                                      "block px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300"
                                     )}
                                   >
                                     {label}
@@ -203,7 +206,7 @@ export function Header() {
                       cx(
                         {
                           [border]: isActive,
-                          "border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800":
+                          "border-transparent text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-950 hover:border-neutral-300 dark:hover:border-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200":
                             !isActive,
                         },
                         "block border-l-4 py-2 pl-3 pr-4 text-base font-medium",
@@ -215,7 +218,7 @@ export function Header() {
                   </NavLink>
                 ))}
               </div>
-              <div className="border-t border-gray-200 pt-4 pb-3">
+              <div className="border-t border-neutral-200 dark:border-neutral-200 pt-4 pb-3">
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
                     <img
@@ -225,22 +228,22 @@ export function Header() {
                     />
                   </div>
                   <div className="ml-3">
-                    <div className="text-base font-medium text-gray-800">
+                    <div className="text-base font-medium text-neutral-800 dark:text-neutral-200">
                       {name}
                     </div>
-                    <div className="text-sm font-medium text-gray-500">
+                    <div className="text-sm font-medium text-neutral-500">
                       {email}
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 space-y-1 divide-gray-200 divide-y">
+                <div className="mt-3 space-y-1 divide-neutral-200 dark:divide-neutral-800 divide-y">
                   {navItems.secondary.map((group, index) => (
                     <div key={index} className="py-1">
                       {group.map(([url, label]) => (
                         <NavLink
                           key={url}
                           to={url}
-                          className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                          className="block px-4 py-2 text-base font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-800 dark:hover:text-neutral-200"
                         >
                           {label}
                         </NavLink>

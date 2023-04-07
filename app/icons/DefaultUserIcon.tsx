@@ -1,6 +1,6 @@
 export function DefaultUserIcon({ className }: { className?: string }) {
   return (
-    <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-gray-100">
+    <span className="inline-block h-12 w-12 overflow-hidden rounded-full bg-neutral-100">
       <svg
         aria-hidden={true}
         className={className}

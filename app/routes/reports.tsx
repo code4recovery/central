@@ -55,7 +55,7 @@ export default function Reports() {
           <Link
             to={`/reports/${report}`}
             key={report}
-            className="bg-white hover:bg-gray-100 shadow rounded text-center px-5 py-10 space-y-2"
+            className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 shadow rounded text-center px-5 py-10 space-y-2"
           >
             {reports[report as keyof typeof reports].icon}
             <div>{reports[report as keyof typeof reports].title}</div>

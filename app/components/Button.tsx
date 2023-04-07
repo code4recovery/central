@@ -19,8 +19,9 @@ export function Button({
   } = useUser();
 
   const buttonClass = cx(
-    "disabled:text-gray-500 disabled:bg-gray-300 flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
-    "gap-2 group items-center justify-center px-4 py-2 rounded-md shadow-sm text-center text-sm text-white",
+    "flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
+    "gap-2 group items-center justify-center px-4 py-2 rounded-md shadow-sm text-center text-sm",
+    "disabled:text-neutral-500 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white dark:text-black",
     background,
     backgroundHover,
     className,
@@ -31,7 +32,7 @@ export function Button({
     <div role="status" className="hidden group-disabled:block">
       <svg
         aria-hidden="true"
-        className="w-6 h-6 text-gray-200 animate-spin dark:text-gray-400 fill-gray-500"
+        className="w-6 h-6 text-neutral-200 dark:text-neutral-800 animate-spin fill-neutral-500"
         viewBox="0 0 100 101"
         fill="none"
       >

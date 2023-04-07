@@ -19,10 +19,14 @@ export function Alert({
       className={cx(
         "border-l-4 flex gap-3 p-4 rounded-none md:rounded shadow",
         {
-          "bg-red-50 border-red-400 text-red-700": type === "error",
-          "bg-blue-50 border-blue-400 text-blue-700": type === "info",
-          "bg-green-50 border-green-400 text-green-700": type === "success",
-          "bg-yellow-50 border-yellow-400 text-yellow-700": type === "warning",
+          "bg-red-50 dark:bg-red-950 border-red-400 dark:border-red-600 text-red-700 dark:text-red-300":
+            type === "error",
+          "bg-blue-50 dark:bg-blue-950 border-blue-400 dark:border-blue-600 text-blue-700 dark:text-blue-300":
+            type === "info",
+          "bg-green-50 dark:bg-green-950 border-green-400 dark:border-green-600 text-green-700 dark:text-green-300":
+            type === "success",
+          "bg-yellow-50 dark:bg-yellow-950 border-yellow-400 dark:border-yellow-600 text-yellow-700 dark:text-yellow-300":
+            type === "warning",
         }
       )}
     >

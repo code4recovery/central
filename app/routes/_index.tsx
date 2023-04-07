@@ -81,14 +81,14 @@ export default function Index() {
       <div className="flex flex-grow flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <DefaultAccountLogo className={cx("h-12 w-auto mx-auto", text)} />
-          <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="mt-6 text-center text-3xl font-bold tracking-tight">
             {strings.auth.title}
           </h1>
         </div>
-        <div className=" mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
           {actionData && <Alerts data={actionData} />}
           <ValidatedForm
-            className="bg-white py-8 px-4 shadow sm:rounded sm:px-10"
+            className="bg-white dark:bg-black py-8 px-4 shadow sm:rounded sm:px-10"
             method="post"
             validator={formatValidator("login")}
           >

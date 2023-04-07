@@ -29,21 +29,23 @@ export function Template({
         {title && (
           <div className="sm:flex">
             <div className="sm:flex-auto sm:pt-2">
-              <h1 className="font-semibold leading-6 text-gray-900 text-2xl">
+              <h1 className="font-semibold leading-6 text-2xl">
                 <div className="flex gap-2 items-center">
                   {breadcrumbs?.map(([url, label]) => (
                     <Fragment key={url}>
                       <Link to={url} className={cx("underline", text)}>
                         {label}
                       </Link>
-                      <ChevronRightIcon className="text-gray-400 h-6 w-6" />
+                      <ChevronRightIcon className="text-neutral-500 h-6 w-6" />
                     </Fragment>
                   ))}
                   <span>{title}</span>
                 </div>
               </h1>
               {description && (
-                <p className="mt-2 text-sm text-gray-700">{description}</p>
+                <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
+                  {description}
+                </p>
               )}
             </div>
             {cta && (

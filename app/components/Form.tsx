@@ -34,12 +34,10 @@ export function Form({
       <div className="md:col-span-1">
         <div className="px-4 sm:px-0">
           {title && (
-            <h3 className="text-base font-semibold leading-6 text-gray-900">
-              {title}
-            </h3>
+            <h3 className="text-base font-semibold leading-6">{title}</h3>
           )}
           {description && (
-            <p className="mt-1 text-sm text-gray-600">{description}</p>
+            <p className="mt-1 text-sm text-neutral-500">{description}</p>
           )}
         </div>
       </div>
@@ -51,7 +49,7 @@ export function Form({
         >
           <fieldset disabled={submitting}>
             <div className="shadow sm:overflow-hidden sm:rounded-md">
-              <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
+              <div className="space-y-6 bg-white dark:bg-black px-4 py-5 sm:p-6">
                 <div className="grid grid-cols-12 gap-5">
                   {Object.keys(fields[form])
                     .filter((name) => !fields[form][name].adminOnly || isAdmin)
@@ -60,7 +58,6 @@ export function Form({
                         className,
                         label,
                         options,
-                        placeholder,
                         required,
                         span,
                         type,
@@ -129,6 +126,7 @@ export function Form({
                                     type="radio"
                                     name={name}
                                     value={color}
+                                    title={color}
                                     defaultChecked={color === values?.[name]}
                                     className={cx(
                                       "relative h-10 flex cursor-pointer justify-center rounded w-full border-0 checked:ring-2 checked:ring-offset-1",
@@ -216,7 +214,7 @@ export function Form({
                     })}
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 flex justify-end sm:px-6">
+              <div className="bg-neutral-50 dark:bg-neutral-950 px-4 py-3 flex justify-end sm:px-6">
                 <Button
                   label={submitting ? strings.form.saving : strings.form.save}
                 />

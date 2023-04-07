@@ -50,14 +50,14 @@ export function Table({
   };
 
   return (
-    <table className="min-w-full divide-y divide-gray-400 text-left text-sm table-fixed">
+    <table className="min-w-full divide-y divide-neutral-500 text-left text-sm table-fixed">
       <thead>
         <tr>
           {keys.slice(0, 4).map((key, index) => (
             <th
               key={key}
               scope="col"
-              className={cx("p-3 font-semibold text-gray-900", {
+              className={cx("p-3 font-semibold", {
                 "hidden lg:table-cell": index === 1,
                 "hidden sm:table-cell": index === 2,
                 "text-center": columns[key].align === "center",
@@ -69,7 +69,7 @@ export function Table({
           ))}
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-300 text-gray-700">
+      <tbody className="divide-y divide-neutral-300 dark:divide-neutral-700 text-neutral-700 dark:text-neutral-300">
         {rows.map((row) => {
           const stack = (
             <dl className="font-normal lg:hidden">
@@ -94,7 +94,7 @@ export function Table({
             <tr
               key={row.id}
               className={cx({
-                "hover:bg-gray-100 hover:bg-opacity-50 cursor-pointer":
+                "hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:bg-opacity-50 cursor-pointer":
                   !!row.link,
               })}
             >
