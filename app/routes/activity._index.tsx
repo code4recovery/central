@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async () => {
       link: `/meetings/${activity.meeting.id}`,
       createdAt: formatUpdated(activity.createdAt.toISOString()),
       type: formatString(strings.activity.update, {
-        properties: activity.changes.map(({ field }) => field).join(","),
+        properties: activity.changes.map(({ field }) => field).join(", "),
       }),
     })),
   });

@@ -64,7 +64,7 @@ export default function User() {
         form="user"
         values={{
           ...loaderData,
-          admin: loaderData.adminAccountIds.includes(currentAccountID),
+          admin: loaderData.adminAccountIDs.includes(currentAccountID),
         }}
       />
     </Template>

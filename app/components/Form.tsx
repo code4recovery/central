@@ -176,7 +176,7 @@ export function Form({
                             />
                           )}
                           {type === "checkboxes" && (
-                            <div className="items-start gap-x-5 gap-y-3 grid grid-cols-4">
+                            <div className="items-start gap-x-5 gap-y-3 grid grid-cols-3 sm:grid-cols-4">
                               {options?.map(({ value: optionValue, label }) => (
                                 <div
                                   className="flex items-top gap-2 m-0"

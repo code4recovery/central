@@ -6,6 +6,7 @@ import { Template } from "~/components";
 import {
   ClockIcon,
   ComputerDesktopIcon,
+  GlobeAsiaAustraliaIcon,
   LanguageIcon,
   TagIcon,
   UserCircleIcon,
@@ -29,6 +30,10 @@ export default function Reports() {
     languages: {
       icon: <LanguageIcon className={iconClass} />,
       title: "Languages",
+    },
+    timezones: {
+      icon: <GlobeAsiaAustraliaIcon className={iconClass} />,
+      title: "Timezones",
     },
     unrepresented: {
       icon: <UserCircleIcon className={iconClass} />,

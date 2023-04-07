@@ -18,8 +18,10 @@ model Meeting {
   timezone               String?
   day                    Int?
   time                   String?
-  types                  String?
-  languages              String?
+  languages              Language[] @relation(fields: [languageIDs], references: [id])
+  languageIDs            String[]   @db.ObjectId
+  types                  Type[]     @relation(fields: [typeIDs], references: [id])
+  typeIDs                String[]   @db.ObjectId
   duration               Int?
   notes                  String?
   conference_url         String?
@@ -33,22 +35,36 @@ model Meeting {
   @@fulltext([name, slug, notes])
 }
 
+model Language {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  code       String
+  meetingIDs String[]  @db.ObjectId
+  meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
+}
+
+model Type {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  code       String
+  meetingIDs String[]  @db.ObjectId
+  meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
+}
+
 model User {
   id               String     @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  name             String?
   email            String     @unique
   emailHash        String
   lastSeen         DateTime?
   loginToken       String?
-  name             String?
   currentAccountID String
   accountIDs       String[]   @db.ObjectId
   accounts         Account[]  @relation("AccountUsers", fields: [accountIDs], references: [id])
-  adminAccountIds  String[]   @db.ObjectId
-  adminAccounts    Account[]  @relation("AccountAdmins", fields: [adminAccountIds], references: [id])
+  adminAccountIDs  String[]   @db.ObjectId
+  adminAccounts    Account[]  @relation("AccountAdmins", fields: [adminAccountIDs], references: [id])
   activityIDs      String[]   @db.ObjectId
   activities       Activity[] @relation()
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 }
 
 model Account {

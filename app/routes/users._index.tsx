@@ -33,7 +33,7 @@ export default function Users() {
         }}
         rows={users.map((user: User) => ({
           ...user,
-          role: user.adminAccountIds.includes(currentAccountID) && (
+          role: user.adminAccountIDs.includes(currentAccountID) && (
             <Chiclet>{strings.users.admin}</Chiclet>
           ),
           link: `/users/${user.id}`,
