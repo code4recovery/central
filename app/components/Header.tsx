@@ -17,6 +17,8 @@ export function Header() {
     currentAccountID,
     email,
     emailHash,
+    id,
+    isAdmin,
     name,
     theme: { text, focusRing, border },
   } = useUser();
@@ -30,10 +32,12 @@ export function Header() {
       ["/reports", strings.reports.title],
     ],
     secondary: [
-      [
-        [`/accounts/${currentAccountID}`, strings.account.title],
-        ["/users", strings.users.title],
-      ],
+      isAdmin
+        ? [
+            [`/accounts/${currentAccountID}`, strings.account.title],
+            ["/users", strings.users.title],
+          ]
+        : [[`/users/${id}`, strings.users.edit_profile]],
       [["/auth/out", strings.auth.out]],
     ],
   };

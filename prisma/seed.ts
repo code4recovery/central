@@ -52,8 +52,8 @@ async function seed() {
         name: process.env.USER_NAME ?? "Joe Q.",
         email,
         emailHash: md5(email),
-        admin: true, // todo
         accounts: { connect: { id: account.id } },
+        adminAccounts: { connect: { id: account.id } },
         currentAccountID: account.id,
       },
     });

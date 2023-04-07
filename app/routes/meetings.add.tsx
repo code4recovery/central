@@ -3,8 +3,8 @@ import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { Form, Template } from "~/components";
 import { strings } from "~/i18n";
 
-export const action: ActionFunction = async ({ params }) => {
-  console.log(params.meetingId);
+export const action: ActionFunction = async ({ params: { id } }) => {
+  console.log(id);
 };
 
 export const meta: MetaFunction = () => ({

@@ -9,11 +9,12 @@ import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
-export const action: ActionFunction = async ({ params, request }) => {
-  if (!validObjectId(params.id)) {
+export const action: ActionFunction = async ({ params: { id }, request }) => {
+  if (!validObjectId(id)) {
     return redirect("/users"); // todo flash invalid id message to this page
   }
   const validator = formatValidator("user");
@@ -21,16 +22,26 @@ export const action: ActionFunction = async ({ params, request }) => {
   if (error) {
     return validationError(error);
   }
-  const { name, email } = data;
-  await db.user.update({ where: { id: params.id }, data: { name, email } });
+  const { name, email, admin, currentAccountID } = data;
+
+  await db.user.update({
+    where: { id },
+    data: {
+      name,
+      email,
+      adminAccounts: admin
+        ? { connect: { id: currentAccountID } }
+        : { disconnect: { id: currentAccountID } },
+    },
+  });
   return json({ success: strings.users.updated });
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
-  if (!validObjectId(params.id)) {
+export const loader: LoaderFunction = async ({ params: { id } }) => {
+  if (!validObjectId(id)) {
     return redirect("/users"); // todo flash invalid id message to this page
   }
-  const user = await db.user.findFirst({ where: { id: params.id } });
+  const user = await db.user.findFirst({ where: { id } });
   return json(user);
 };
 
@@ -39,17 +50,22 @@ export default function User() {
   const { state } = useNavigation();
   const actionData = useActionData();
   const submitting = state !== "idle";
+  const { currentAccountID, isAdmin } = useUser();
   return (
     <Template
-      title={strings.users.edit}
-      breadcrumbs={[["/users", strings.users.title]]}
+      title={isAdmin ? strings.users.edit : strings.users.edit_profile}
+      breadcrumbs={isAdmin ? [["/users", strings.users.title]] : undefined}
     >
       {!submitting && actionData && <Alerts data={actionData} />}
       <Form
         title={strings.users.title}
         description={strings.users.description}
+        isAdmin={isAdmin}
         form="user"
-        values={loaderData}
+        values={{
+          ...loaderData,
+          admin: loaderData.adminAccountIds.includes(currentAccountID),
+        }}
       />
     </Template>
   );

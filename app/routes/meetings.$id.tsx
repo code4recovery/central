@@ -5,43 +5,38 @@ import type {
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
+import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
-import { fields, validObjectId } from "~/helpers";
+import { fields, formatValidator, validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, saveFeedToStorage } from "~/utils";
 
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const currentAccountID = formData.get("currentAccountID")?.toString() || "";
-  const meetingID = formData.get("meetingID")?.toString() || "";
-  const userID = formData.get("userID")?.toString() || "";
-
-  const meeting = await db.meeting.findUnique({ where: { id: meetingID } });
-
-  if (!meeting) {
-    return json({ error: "Meeting not found." });
+export const action: ActionFunction = async ({ params: { id }, request }) => {
+  if (!validObjectId(id)) {
+    return redirect("/meetings"); // todo flash invalid id message to this page
   }
 
-  // todo refactor
-  const formatValue = (name: string) => {
-    if (["day", "duration"].includes(name)) {
-      const value = formData.get(name)?.toString();
-      return value ? parseInt(value) : null;
-    }
-    if (["languages", "types"].includes(name)) {
-      return formData.getAll(name).join(",");
-    }
-    return formData.get(name)?.toString();
-  };
+  // get meeting
+  const meeting = await db.meeting.findUnique({ where: { id } });
+
+  if (!meeting) {
+    return redirect("/meetings"); // todo flash invalid id message to this page
+  }
+
+  const validator = formatValidator("meeting");
+  const { data, error } = await validator.validate(await request.formData());
+  if (error) {
+    return validationError(error);
+  }
+
+  console.log(data);
 
   // get changed fields
   const changes = Object.keys(fields.meeting)
-    .filter(
-      (name) => formatValue(name) !== meeting[name as keyof typeof meeting]
-    )
-    .map((name) => [[name], formatValue(name)]);
+    .filter((name) => data[name] !== meeting[name as keyof typeof meeting])
+    .map((name) => [[name], data[name]]);
 
   // exit if no changes
   if (!changes.length) {
@@ -52,8 +47,8 @@ export const action: ActionFunction = async ({ request }) => {
   const activity = await db.activity.create({
     data: {
       type: "update",
-      meetingID,
-      userID,
+      meetingID: id,
+      userID: data.userID,
     },
   });
 
@@ -73,11 +68,11 @@ export const action: ActionFunction = async ({ request }) => {
   // update meeting
   await db.meeting.update({
     data: Object.fromEntries(changes),
-    where: { id: meetingID },
+    where: { id },
   });
 
   try {
-    await saveFeedToStorage(currentAccountID);
+    await saveFeedToStorage(data.currentAccountID);
     return json({ success: "JSON updated." });
   } catch (e) {
     if (e instanceof Error) {
@@ -119,7 +114,7 @@ export default function EditMeeting() {
         title={strings.meetings.details}
         description={strings.meetings.details_description}
         form="meeting"
-        values={loaderData}
+        values={{ ...loaderData, currentAccountID, userID: id }}
       />
     </Template>
   );

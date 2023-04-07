@@ -77,13 +77,9 @@ export async function getUserOrRedirect(request: Request) {
     throw redirect(`/?${searchParams}`);
   }
 
-  const account = user?.accounts.find(
-    ({ id }) => id === user?.currentAccountID
-  );
+  const account = user?.accounts.find(({ id }) => id === user.currentAccountID);
 
-  const isAdmin = user?.adminAccounts.find(
-    ({ id }) => id === user?.currentAccountID
-  );
+  const isAdmin = user?.adminAccountIds.includes(user.currentAccountID);
 
   const theme = account?.theme ?? config.defaultTheme;
 
