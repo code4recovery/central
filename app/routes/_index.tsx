@@ -1,29 +1,29 @@
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
-  Form,
   useActionData,
   useNavigation,
   useSearchParams,
 } from "@remix-run/react";
+import { validationError, ValidatedForm } from "remix-validated-form";
 
 import { Alerts, Button, Footer, Input, Label } from "~/components";
-import { formatClasses as cx, formatToken, validFormData } from "~/helpers";
+import { formatClasses as cx, formatToken, formatValidator } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
 import { db, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { email, go } = await validFormData(request, {
-    email: {
-      type: "email",
-      required: true,
-    },
-    go: {
-      type: "hidden",
-    },
-  });
+  const validator = formatValidator("login");
+
+  const { data, error } = await validator.validate(await request.formData());
+
+  if (error) {
+    return validationError(error);
+  }
+
+  const { email, go } = data;
 
   const user = await db.user.findFirst({
     where: { email },
@@ -87,9 +87,10 @@ export default function Index() {
         </div>
         <div className=" mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
           {actionData && <Alerts data={actionData} />}
-          <Form
+          <ValidatedForm
             className="bg-white py-8 px-4 shadow sm:rounded sm:px-10"
             method="post"
+            validator={formatValidator("login")}
           >
             <fieldset disabled={!idle}>
               <input
@@ -104,7 +105,7 @@ export default function Index() {
                 label={!idle ? strings.loading : strings.auth.submit}
               />
             </fieldset>
-          </Form>
+          </ValidatedForm>
         </div>
       </div>
       <Footer />

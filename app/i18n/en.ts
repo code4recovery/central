@@ -35,6 +35,12 @@ export const strings = {
     tuesday: "Tuesday",
     wednesday: "Wednesday",
   },
+  form: {
+    invalidEmail: "Invalid email",
+    required: "Required",
+    save: "Save",
+    saving: "Saving",
+  },
   email: {
     disclaimer:
       "If you didn’t request this email, there’s nothing to worry about — you can safely ignore it.",
@@ -109,8 +115,6 @@ export const strings = {
     description: "A list of all the reports in your account",
     title: "Reports",
   },
-  save: "Save",
-  saving: "Saving",
   types: {
     "11": "11th Step Meditation",
     "12x12": "12 Steps & 12 Traditions",

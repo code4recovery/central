@@ -3,27 +3,32 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
-import { accountFields } from "~/fields";
-import { validFormData } from "~/helpers";
+import { formatValidator, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
-export const action: ActionFunction = async ({ request }) => {
-  const { id, name, url, theme } = await validFormData(
-    request,
-    accountFields()
-  );
+export const action: ActionFunction = async ({ params, request }) => {
+  if (!validObjectId(params.id)) {
+    return redirect("/accounts"); // todo flash invalid id message to this page
+  }
+  const validator = formatValidator("account");
+  const { data, error } = await validator.validate(await request.formData());
+  if (error) {
+    return validationError(error);
+  }
+  const { name, url, theme } = data;
 
   await db.account.update({
-    where: { id },
+    where: { id: params.id },
     data: {
-      name: name as string,
-      url: url as string,
-      theme: theme as string,
+      name,
+      url,
+      theme,
     },
   });
 
@@ -31,8 +36,12 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
+  if (!validObjectId(params.id)) {
+    return redirect("/accounts"); // todo flash invalid id message to this page
+  }
+
   const account = await db.account.findFirst({
-    where: { id: params.accountId },
+    where: { id: params.id },
   });
   return json(account);
 };
@@ -42,7 +51,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Settings() {
-  const { id, name, url, theme } = useLoaderData();
+  const loaderData = useLoaderData();
   const actionData = useActionData();
   const { state } = useNavigation();
   return (
@@ -51,12 +60,8 @@ export default function Settings() {
       <Form
         title={strings.account.title}
         description={strings.account.description}
-        fields={accountFields({
-          id,
-          name,
-          url,
-          theme,
-        })}
+        form="account"
+        values={loaderData}
       />
     </Template>
   );

@@ -1,8 +1,9 @@
-import { InputType } from "./input-type";
+import type { ZodEffects } from "zod";
+
+import type { InputType } from "./input-type";
 
 export type Field = {
   className?: string;
-  defaultImage?: React.ReactNode;
   helpText?: string;
   label?: string;
   options?: { value: string; label: string }[];
@@ -10,5 +11,5 @@ export type Field = {
   required?: boolean;
   span?: number;
   type: "checkboxes" | "colors" | "hidden" | "select" | "textarea" | InputType;
-  value?: string | string[];
+  validation?: ZodEffects<any, string | undefined, string | undefined>;
 };

@@ -1,23 +1,25 @@
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import md5 from "blueimp-md5";
+import type { ActionFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { useActionData } from "@remix-run/react";
+import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
-import { formatToken, validFormData } from "~/helpers";
-import { userFields } from "~/fields";
+import { formatToken, formatValidator } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, sendMail } from "~/utils";
-import md5 from "blueimp-md5";
-import { useUser } from "~/hooks";
-import { useActionData } from "@remix-run/react";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { currentAccountID, email, name } = await validFormData(
-    request,
-    userFields()
-  );
+  const validator = formatValidator("user");
+  const { data, error } = await validator.validate(await request.formData());
+  if (error) {
+    return validationError(error);
+  }
+  const { name, email, currentAccountID } = data;
+
   const emailHash = md5(email);
   const loginToken = formatToken();
-  console.log(currentAccountID);
   await db.user.create({
     data: {
       name,
@@ -50,7 +52,8 @@ export default function User() {
       <Form
         title={strings.users.title}
         description={strings.users.description}
-        fields={userFields({ currentAccountID })}
+        form="user"
+        values={{ currentAccountID }}
       />
     </Template>
   );

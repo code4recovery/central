@@ -1,26 +1,32 @@
-import { Form as RemixForm, useNavigation } from "@remix-run/react";
+import { useNavigation } from "@remix-run/react";
+import { ValidatedForm } from "remix-validated-form";
 
 import { Button, Input, Label } from "~/components";
-import { config, formatClasses as cx } from "~/helpers";
+import {
+  config,
+  fields,
+  formatClasses as cx,
+  formatValidator,
+} from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import type { Fields, InputType } from "~/types";
 
 export function Form({
   title,
   description,
-  fields,
+  form,
+  values,
 }: {
   title?: string;
   description?: string;
-  fields: Fields;
+  form: keyof typeof fields;
+  values?: { [key: string]: string | string[] };
 }) {
   const {
     theme: { focusRing, text },
   } = useUser();
   const { state } = useNavigation();
   const submitting = state !== "idle";
-
   return (
     <div className="md:grid md:grid-cols-3 md:gap-6">
       <div className="md:col-span-1">
@@ -36,15 +42,18 @@ export function Form({
         </div>
       </div>
       <div className="mt-5 md:col-span-2 md:mt-0">
-        <RemixForm method="post">
+        <ValidatedForm
+          autoComplete="off"
+          method="post"
+          validator={formatValidator(form)}
+        >
           <fieldset disabled={submitting}>
             <div className="shadow sm:overflow-hidden sm:rounded-md">
               <div className="space-y-6 bg-white px-4 py-5 sm:p-6">
                 <div className="grid grid-cols-12 gap-5">
-                  {Object.keys(fields).map((name) => {
+                  {Object.keys(fields[form]).map((name) => {
                     const {
                       className,
-                      defaultImage: DefaultImage,
                       helpText,
                       label,
                       options,
@@ -52,14 +61,13 @@ export function Form({
                       required,
                       span,
                       type,
-                      value,
-                    } = fields[name];
+                    } = fields[form][name];
                     return type === "hidden" ? (
                       <input
                         type="hidden"
                         name={name}
                         key={name}
-                        value={value}
+                        value={values?.[name]}
                       />
                     ) : (
                       <div
@@ -88,12 +96,11 @@ export function Form({
                           "url",
                         ].includes(type) && (
                           <Input
-                            className={className}
-                            name={name}
-                            placeholder={placeholder}
-                            required={required}
-                            type={type as InputType}
-                            value={value as string}
+                            {...{
+                              ...fields[form][name],
+                              name,
+                              value: values?.[name],
+                            }}
                           />
                         )}
                         {type === "textarea" && (
@@ -103,7 +110,9 @@ export function Form({
                               config.fieldClassNames,
                               className
                             )}
-                            defaultValue={value ? `${value}` : undefined}
+                            defaultValue={
+                              values?.[name] ? `${values[name]}` : undefined
+                            }
                             id={name}
                             name={name}
                             placeholder={placeholder}
@@ -130,7 +139,7 @@ export function Form({
                                   type="radio"
                                   name={name}
                                   value={color}
-                                  defaultChecked={color === value}
+                                  defaultChecked={color === values?.[name]}
                                   className={cx(
                                     "relative h-10 flex cursor-pointer justify-center rounded w-full border-0 checked:ring-2 checked:ring-offset-1",
                                     background,
@@ -154,7 +163,9 @@ export function Form({
                               focusRing,
                               className
                             )}
-                            defaultValue={value ? `${value}` : undefined}
+                            defaultValue={
+                              values?.[name] ? `${values?.[name]}` : undefined
+                            }
                           >
                             {!required && <option></option>}
                             {options?.map(({ value: optionValue, label }) => (
@@ -182,8 +193,8 @@ export function Form({
                                     className
                                   )}
                                   defaultChecked={
-                                    Array.isArray(value) &&
-                                    value?.includes(optionValue)
+                                    Array.isArray(values?.[name]) &&
+                                    values?.[name]?.includes(optionValue)
                                   }
                                   id={`${optionValue}`}
                                   name={name}
@@ -212,11 +223,13 @@ export function Form({
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 flex justify-end sm:px-6">
-                <Button label={submitting ? strings.saving : strings.save} />
+                <Button
+                  label={submitting ? strings.form.saving : strings.form.save}
+                />
               </div>
             </div>
           </fieldset>
-        </RemixForm>
+        </ValidatedForm>
       </div>
     </div>
   );

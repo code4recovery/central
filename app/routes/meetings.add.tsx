@@ -1,7 +1,6 @@
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
 
 import { Form, Template } from "~/components";
-import { meetingFields } from "~/fields";
 import { strings } from "~/i18n";
 
 export const action: ActionFunction = async ({ params }) => {
@@ -21,7 +20,7 @@ export default function CreateMeeting() {
       <Form
         title={strings.meetings.details}
         description={strings.meetings.details_description}
-        fields={meetingFields()}
+        form="meeting"
       />
     </Template>
   );

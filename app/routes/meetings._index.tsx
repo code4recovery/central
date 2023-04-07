@@ -9,21 +9,30 @@ import type {
 import { Meeting } from "@prisma/client";
 
 import { Alert, Button, LoadMore, Table, Template } from "~/components";
-import {
-  config,
-  formatDayTime,
-  formatString,
-  formatUpdated,
-  validFormData,
-} from "~/helpers";
+import { config, formatDayTime, formatString, formatUpdated } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, searchMeetings } from "~/utils";
+import { withZod } from "@remix-validated-form/with-zod";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
+import { validationError } from "remix-validated-form";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { skip } = await validFormData(request, {
-    skip: { type: "number" },
-  });
+  const validator = withZod(
+    z.object({
+      skip: zfd.numeric(),
+    })
+  );
+
+  const { data, error } = await validator.validate(await request.formData());
+
+  if (error) {
+    return validationError(error);
+  }
+
+  const { skip } = data;
+
   const meetings = await db.meeting.findMany({
     take: config.batchSize,
     skip: Number(skip),

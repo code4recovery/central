@@ -7,9 +7,8 @@ import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
 import { Alerts, Form, Template } from "~/components";
-import { validObjectId } from "~/helpers";
+import { fields, validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
-import { meetingFields } from "~/fields";
 import { strings } from "~/i18n";
 import { db, saveFeedToStorage } from "~/utils";
 
@@ -38,7 +37,7 @@ export const action: ActionFunction = async ({ request }) => {
   };
 
   // get changed fields
-  const changes = Object.keys(meetingFields())
+  const changes = Object.keys(fields.meeting)
     .filter(
       (name) => formatValue(name) !== meeting[name as keyof typeof meeting]
     )
@@ -89,18 +88,16 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
-  if (!validObjectId(params.meetingId)) {
-    return redirect("/meetings");
+  if (!validObjectId(params.id)) {
+    return redirect("/meetings"); // todo flash message
   }
   const meeting = await db.meeting.findFirst({
-    where: { id: params.meetingId },
+    where: { id: params.id },
   });
   if (!meeting) {
-    return redirect("/meetings");
+    return redirect("/meetings"); // todo flash message
   }
-  return json({
-    meeting: { ...meeting, day: meeting?.day?.toString() },
-  });
+  return json({ ...meeting, day: meeting?.day?.toString() });
 };
 
 export const meta: MetaFunction = () => ({
@@ -108,32 +105,9 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const { meeting } = useLoaderData();
+  const loaderData = useLoaderData();
   const { currentAccountID, id } = useUser();
   const actionData = useActionData<typeof action>();
-
-  const fields = meetingFields();
-  Object.keys(fields).forEach((name) => {
-    fields[name] = {
-      ...fields[name],
-      value:
-        fields[name].type === "checkboxes"
-          ? meeting[name].split(",")
-          : meeting[name],
-    };
-  });
-  fields["currentAccountID"] = {
-    type: "hidden",
-    value: currentAccountID,
-  };
-  fields["meetingID"] = {
-    type: "hidden",
-    value: meeting.id,
-  };
-  fields["userID"] = {
-    type: "hidden",
-    value: id,
-  };
 
   return (
     <Template
@@ -144,7 +118,8 @@ export default function EditMeeting() {
       <Form
         title={strings.meetings.details}
         description={strings.meetings.details_description}
-        fields={fields}
+        form="meeting"
+        values={loaderData}
       />
     </Template>
   );
