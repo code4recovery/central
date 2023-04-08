@@ -8,14 +8,24 @@ import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
-import { formatValidator, validObjectId } from "~/helpers";
+import { config, formatValidator, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
-import { db } from "~/utils";
+import { db, getUserID } from "~/utils";
 
 export const action: ActionFunction = async ({ params, request }) => {
   if (!validObjectId(params.id)) {
-    return redirect("/accounts"); // todo flash invalid id message to this page
+    return redirect(config.home); // todo flash invalid id message to this page
   }
+
+  // security
+  const id = await getUserID(request);
+  const account = db.account.findFirst({
+    where: { id: params.id, adminIDs: { has: id } },
+  });
+  if (!account) {
+    return redirect(config.home); // todo flash invalid id message to this page
+  }
+
   const validator = formatValidator("account");
   const { data, error } = await validator.validate(await request.formData());
   if (error) {
@@ -35,14 +45,19 @@ export const action: ActionFunction = async ({ params, request }) => {
   return json({ success: strings.account.updated });
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
   if (!validObjectId(params.id)) {
-    return redirect("/accounts"); // todo flash invalid id message to this page
+    return redirect(config.home); // todo flash invalid id message to this page
   }
 
+  const id = await getUserID(request);
   const account = await db.account.findFirst({
-    where: { id: params.id },
+    where: { id: params.id, adminIDs: { has: id } },
   });
+  if (!account) {
+    return redirect(config.home); // todo flash invalid id message to this page
+  }
+
   return json(account);
 };
 

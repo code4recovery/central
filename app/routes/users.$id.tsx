@@ -11,7 +11,7 @@ import { Alerts, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db } from "~/utils";
+import { db, getUser } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -22,7 +22,10 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (error) {
     return validationError(error);
   }
-  const { name, email, admin, currentAccountID } = data;
+
+  const { currentAccountID } = await getUser(request);
+
+  const { name, email, admin } = data;
 
   await db.user.update({
     where: { id },

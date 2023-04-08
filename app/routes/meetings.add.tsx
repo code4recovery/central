@@ -5,9 +5,8 @@ import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
 import { formatValidator } from "~/helpers";
-import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, saveFeedToStorage } from "~/utils";
+import { db, getUser, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = formatValidator("meeting");
@@ -17,8 +16,6 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const {
-    currentAccountID,
-    userID,
     name,
     day,
     time,
@@ -32,6 +29,8 @@ export const action: ActionFunction = async ({ request }) => {
     languages,
     types,
   } = data;
+
+  const { id: userID, currentAccountID } = await getUser(request);
 
   // update meeting
   const meeting = await db.meeting.create({
@@ -71,12 +70,12 @@ export const action: ActionFunction = async ({ request }) => {
     data: {
       type: "create",
       meetingID: meeting.id,
-      userID: userID,
+      userID,
     },
   });
 
   try {
-    await saveFeedToStorage(data.currentAccountID);
+    await saveFeedToStorage(currentAccountID);
     return json({ success: "JSON updated." });
   } catch (e) {
     if (e instanceof Error) {
@@ -92,7 +91,6 @@ export const meta: MetaFunction = () => ({
 
 export default function CreateMeeting() {
   const actionData = useActionData();
-  const { currentAccountID, id } = useUser();
   return (
     <Template
       title={strings.meetings.add}
@@ -103,10 +101,6 @@ export default function CreateMeeting() {
         title={strings.meetings.details}
         description={strings.meetings.details_description}
         form="meeting"
-        values={{
-          currentAccountID,
-          userID: id,
-        }}
       />
     </Template>
   );

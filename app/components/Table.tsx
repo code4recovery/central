@@ -33,11 +33,11 @@ export function Table({
   if (!rows.length) return null;
 
   const showValue = (key: keyof Row, row: Row) => {
-    const value = row[key] as string;
-    if (key === "types" && value) {
+    const value = row[key];
+    if (Array.isArray(value)) {
       return (
         <div className="flex gap-1 flex-wrap">
-          {value.split(",").map((type) => (
+          {value.map((type) => (
             <Chiclet key={type}>
               {strings.types[type as keyof typeof strings.types] ??
                 strings.languages[type as keyof typeof strings.languages]}
@@ -94,7 +94,7 @@ export function Table({
             <tr
               key={row.id}
               className={cx({
-                "hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:bg-opacity-50 cursor-pointer":
+                "hover:bg-neutral-100 dark:hover:bg-neutral-950 hover:bg-opacity-50 cursor-pointer":
                   !!row.link,
               })}
             >

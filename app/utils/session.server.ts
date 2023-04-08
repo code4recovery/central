@@ -1,4 +1,6 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import type { User } from "@prisma/client";
+
 import { config } from "~/helpers";
 import { db } from "./db.server";
 
@@ -28,17 +30,18 @@ export async function createUserSession(userId: string, redirectTo: string) {
   });
 }
 
-function getUserSession(request: Request) {
-  return storage.getSession(request.headers.get("Cookie"));
+export async function getUser(request: Request): Promise<User> {
+  const id = await getUserID(request);
+  const user = await db.user.findUnique({ where: { id } });
+  if (!user) {
+    throw unauthorized(request);
+  }
+  return user;
 }
 
-export async function logout(request: Request) {
+export async function getUserID(request: Request) {
   const session = await getUserSession(request);
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await storage.destroySession(session),
-    },
-  });
+  return session.get("userId");
 }
 
 export async function getUserOrRedirect(request: Request) {
@@ -51,8 +54,7 @@ export async function getUserOrRedirect(request: Request) {
     return;
   }
 
-  const session = await getUserSession(request);
-  const id = session.get("userId");
+  const id = await getUserID(request);
 
   const user = id
     ? await db.user.findFirst({
@@ -73,8 +75,7 @@ export async function getUserOrRedirect(request: Request) {
       throw redirect(config.home);
     }
   } else if (routeIsSecure) {
-    const searchParams = new URLSearchParams({ go: pathname });
-    throw redirect(`/?${searchParams}`);
+    throw unauthorized(request);
   }
 
   const account = user?.accounts.find(({ id }) => id === user.currentAccountID);
@@ -89,4 +90,23 @@ export async function getUserOrRedirect(request: Request) {
     meetingCount: account?.meetingIDs.length ?? 0,
     theme: config.themes[theme as keyof typeof config.themes],
   };
+}
+
+function getUserSession(request: Request) {
+  return storage.getSession(request.headers.get("Cookie"));
+}
+
+export async function logout(request: Request) {
+  const session = await getUserSession(request);
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await storage.destroySession(session),
+    },
+  });
+}
+
+function unauthorized(request: Request) {
+  const { pathname } = new URL(request.url);
+  const searchParams = new URLSearchParams({ go: pathname });
+  return redirect(`/?${searchParams}`);
 }

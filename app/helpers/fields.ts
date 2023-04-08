@@ -61,14 +61,6 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     },
   },
   meeting: {
-    currentAccountID: {
-      type: "hidden",
-      validation: required.string,
-    },
-    userID: {
-      type: "hidden",
-      validation: required.string,
-    },
     name: {
       className: "text-xl font-semibold py-2",
       label: strings.meetings.name,
@@ -165,10 +157,6 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     },
   },
   user: {
-    currentAccountID: {
-      type: "hidden",
-      validation: required.string,
-    },
     name: {
       helpText: strings.users.name_description,
       label: strings.users.name,

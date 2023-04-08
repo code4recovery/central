@@ -9,9 +9,8 @@ import { validationError } from "remix-validated-form";
 
 import { Alerts, Form, Template } from "~/components";
 import { fields, formatValidator, validObjectId } from "~/helpers";
-import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, saveFeedToStorage } from "~/utils";
+import { db, getUser, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -47,12 +46,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return json({ info: "Nothing was updated." });
   }
 
+  const { id: userID, currentAccountID } = await getUser(request);
+
   // create an activity record
   const activity = await db.activity.create({
     data: {
       type: "update",
       meetingID: id,
-      userID: data.userID,
+      userID,
     },
   });
 
@@ -76,7 +77,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   });
 
   try {
-    await saveFeedToStorage(data.currentAccountID);
+    await saveFeedToStorage(currentAccountID);
     return json({ success: "JSON updated." });
   } catch (e) {
     if (e instanceof Error) {
@@ -118,7 +119,6 @@ export const meta: MetaFunction = () => ({
 
 export default function EditMeeting() {
   const loaderData = useLoaderData();
-  const { currentAccountID, id } = useUser();
   const actionData = useActionData<typeof action>();
 
   return (
@@ -131,7 +131,7 @@ export default function EditMeeting() {
         title={strings.meetings.details}
         description={strings.meetings.details_description}
         form="meeting"
-        values={{ ...loaderData, currentAccountID, userID: id }}
+        values={loaderData}
       />
     </Template>
   );

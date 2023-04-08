@@ -6,13 +6,13 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import { Meeting } from "@prisma/client";
+import { Language, Meeting, Type } from "@prisma/client";
 
 import { Alert, Button, LoadMore, Table, Template } from "~/components";
 import { config, formatDayTime, formatString, formatUpdated } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, searchMeetings } from "~/utils";
+import { db, getUser, searchMeetings } from "~/utils";
 import { withZod } from "@remix-validated-form/with-zod";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
@@ -33,11 +33,14 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
+  const { currentAccountID } = await getUser(request);
+
   const meetings = await db.meeting.findMany({
-    take: config.batchSize,
-    skip: Number(skip),
+    include: { types: true, languages: true },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    where: { accounts: { some: { id: "6420819aaf0b496f73cfa828" } } }, // todo dynamic
+    skip: Number(skip),
+    take: config.batchSize,
+    where: { accounts: { some: { id: currentAccountID } } }, // todo dynamic
   });
   return json(meetings);
 };
@@ -45,22 +48,25 @@ export const action: ActionFunction = async ({ request }) => {
 export const loader: LoaderFunction = async ({ request }) => {
   const search = new URL(request.url).searchParams.get("search");
   const meetingIDs = await searchMeetings(search);
-  const meetings = search
+  const { currentAccountID } = await getUser(request);
+  const loadedMeetings = search
     ? await db.meeting.findMany({
+        include: { types: true, languages: true },
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         where: {
           id: {
             in: meetingIDs,
           },
-          accounts: { some: { id: "6420819aaf0b496f73cfa828" } }, // todo dynamic
+          accounts: { some: { id: currentAccountID } }, // todo dynamic
         },
       })
     : await db.meeting.findMany({
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         take: config.batchSize,
-        where: { accounts: { some: { id: "6420819aaf0b496f73cfa828" } } }, // todo dynamic
+        include: { types: true, languages: true },
+        where: { accounts: { some: { id: currentAccountID } } }, // todo dynamic
       });
-  return json({ meetings, search });
+  return json({ loadedMeetings, search });
 };
 
 export const meta: MetaFunction = () => ({
@@ -68,8 +74,11 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
-  const { meetings: loadedMeetings, search } = useLoaderData();
-  const [meetings, setMeetings] = useState(loadedMeetings);
+  const { loadedMeetings, search } = useLoaderData<typeof loader>();
+  const [meetings, setMeetings] =
+    useState<Array<Meeting & { types: Type[]; languages: Language[] }>>(
+      loadedMeetings
+    );
   const actionData = useActionData();
   const { meetingCount } = useUser();
 
@@ -104,12 +113,16 @@ export default function Index() {
           types: { label: strings.meetings.types },
           updatedAt: { label: strings.updated, align: "right" },
         }}
-        rows={meetings.map((meeting: Meeting) => ({
-          ...meeting,
-          link: `/meetings/${meeting.id}`,
-          updatedAt: formatUpdated(meeting.updatedAt.toString()),
-          when: formatDayTime(meeting.day, meeting.time, meeting.timezone),
-        }))}
+        rows={meetings.map(
+          ({ name, id, updatedAt, day, languages, time, timezone, types }) => ({
+            name,
+            id,
+            link: `/meetings/${id}`,
+            types: [...languages, ...types].map(({ code }) => code),
+            updatedAt: formatUpdated(updatedAt.toString()),
+            when: formatDayTime(day, time, timezone),
+          })
+        )}
       />
       {!search && meetings.length < meetingCount && (
         <LoadMore loadedCount={meetings.length} totalCount={meetingCount} />

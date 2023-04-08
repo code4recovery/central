@@ -46,7 +46,7 @@ export function Header() {
 
   return (
     <header>
-      <Disclosure as="nav" className="bg-white dark:bg-black shadow">
+      <Disclosure as="nav" className="bg-white dark:bg-neutral-950 shadow">
         {({ open }) => (
           <>
             <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
@@ -74,7 +74,8 @@ export function Header() {
                             {
                               "text-black dark:text-white": isActive,
                               [border]: isActive,
-                              "border-transparent": !isActive,
+                              "border-transparent hover:border-neutral-300 dark:hover:border-neutral-800":
+                                !isActive,
                             },
                             "border-b-2 focus-visible:ring-2 font-medium inline-flex items-center outline-none pt-1 px-1 text-sm",
                             focusRing
@@ -114,8 +115,8 @@ export function Header() {
                       <input
                         autoComplete="off"
                         className={cx(
-                          "block w-full rounded-md border-0 py-1.5 pl-10 pr-3 ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6",
-                          "bg-white dark:bg-black ring-neutral-300 dark:ring-neutral-700 placeholder:text-neutral-400 dark:placeholder:text-neutral-600",
+                          "block w-full rounded-md border-0 py-1.5 pl-10 pr-3 ring-1 ring-inset focus:ring-inset sm:text-sm sm:leading-6",
+                          "bg-transparent ring-neutral-300 dark:ring-neutral-700 placeholder:text-neutral-400 dark:placeholder:text-neutral-600 dark:hover:bg-black",
                           focusRing
                         )}
                         defaultValue={search}

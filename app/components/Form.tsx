@@ -49,7 +49,7 @@ export function Form({
         >
           <fieldset disabled={submitting}>
             <div className="shadow sm:overflow-hidden sm:rounded-md">
-              <div className="space-y-6 bg-white dark:bg-black px-4 py-5 sm:p-6">
+              <div className="space-y-6 bg-white dark:bg-neutral-950 px-4 py-5 sm:p-6">
                 <div className="grid grid-cols-12 gap-5">
                   {Object.keys(fields[form])
                     .filter((name) => !fields[form][name].adminOnly || isAdmin)
@@ -214,7 +214,7 @@ export function Form({
                     })}
                 </div>
               </div>
-              <div className="bg-neutral-50 dark:bg-neutral-950 px-4 py-3 flex justify-end sm:px-6">
+              <div className="bg-neutral-50 dark:bg-neutral-950 dark:border-t dark:border-neutral-900 px-4 py-3 flex justify-end sm:px-6">
                 <Button
                   label={submitting ? strings.form.saving : strings.form.save}
                 />

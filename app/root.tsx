@@ -40,7 +40,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 flex flex-col h-full">
+      <body className="bg-neutral-200 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 flex flex-col h-full">
         <UserContext.Provider value={user}>
           <Outlet />
         </UserContext.Provider>
