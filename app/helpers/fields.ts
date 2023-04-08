@@ -85,7 +85,11 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     },
     timezone: {
       label: strings.meetings.timezone,
-      options: config.timezones.map((tz) => ({ value: tz, label: tz })),
+      options: config.timezones.map((value) => {
+        const [group, ...rest] = value.split("/");
+        const label = rest.join(" • ").split("_").join(" ");
+        return { value, label, group };
+      }),
       span: 3,
       type: "select",
       validation: optional.string,

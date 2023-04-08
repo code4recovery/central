@@ -10,7 +10,6 @@ const typesNotFound: string[] = [];
 const languagesNotFound: string[] = [];
 
 type Meeting = {
-  accounts: { connect: { id: string } };
   day?: number;
   duration?: number;
   name: string;
@@ -21,6 +20,15 @@ type Meeting = {
   timezone?: string;
   languages?: { connect: { code?: string }[] };
   types?: { connect: { code?: string }[] };
+
+  // group info
+  recordID: string;
+  phone?: string;
+  email?: string;
+  primary_contact_name?: string;
+  primary_contact_email?: string;
+  alt_contact_name?: string;
+  alt_contact_email?: string;
 };
 
 async function seed() {
@@ -43,8 +51,46 @@ async function seed() {
   const meetings = await getMeetings(account.id);
 
   for (const data of meetings) {
+    const {
+      recordID,
+      notes,
+      phone,
+      email,
+      primary_contact_name,
+      primary_contact_email,
+      alt_contact_name,
+      alt_contact_email,
+      ...meetingInfo
+    } = data;
+
     await db.meeting.create({
-      data,
+      data: {
+        ...meetingInfo,
+        account: { connect: { id: account.id } },
+        group: {
+          connectOrCreate: {
+            where: {
+              accountID_name_recordID: {
+                accountID: account.id,
+                name: data.name,
+                recordID,
+              },
+            },
+            create: {
+              name: data.name,
+              notes,
+              account: { connect: { id: account.id } },
+              recordID,
+              phone,
+              email,
+              primary_contact_name,
+              primary_contact_email,
+              alt_contact_name,
+              alt_contact_email,
+            },
+          },
+        },
+      },
     });
   }
 
@@ -98,7 +144,15 @@ async function getMeetings(accountID: string): Promise<Meeting[]> {
       languages: connectLanguages(row.languages, row.types),
       conference_url: row.url,
       conference_url_notes: row.access_code,
-      accounts: { connect: { id: accountID } },
+
+      // group info
+      recordID: row.meeting_id,
+      phone: row.phone,
+      email: row.email,
+      primary_contact_name: row.primary_contact_name,
+      primary_contact_email: row.primary_contact_email,
+      alt_contact_name: row.alt_contact_name,
+      alt_contact_email: row.alt_contact_email,
     };
     if (!row.times.length) {
       meetings.push(meeting);

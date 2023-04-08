@@ -41,7 +41,7 @@ export default function Activity() {
       description={strings.activity.description}
     >
       {!activities.length && (
-        <Alert message={strings.activity.empty} type="warning" />
+        <Alert message={strings.activity.empty} type="info" />
       )}
       <Table
         columns={{

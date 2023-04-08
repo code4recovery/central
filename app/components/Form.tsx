@@ -1,7 +1,15 @@
 import { useNavigation } from "@remix-run/react";
 import { ValidatedForm } from "remix-validated-form";
 
-import { Button, Checkbox, Input, Label, Textarea } from "~/components";
+import {
+  Button,
+  Checkbox,
+  ComboBox,
+  Input,
+  Label,
+  Select,
+  Textarea,
+} from "~/components";
 import {
   config,
   fields,
@@ -142,31 +150,17 @@ export function Form({
                               })}
                             </div>
                           )}
-                          {type === "select" && (
-                            <select
+                          {type === "combobox" && options && (
+                            <ComboBox options={options} />
+                          )}
+                          {type === "select" && options && (
+                            <Select
+                              className={className}
                               name={name}
-                              id={name}
-                              className={cx(
-                                config.fieldClassNames,
-                                focusRing,
-                                className
-                              )}
-                              defaultValue={
-                                values?.[name] !== null
-                                  ? `${values?.[name]}`
-                                  : undefined
-                              }
-                            >
-                              {!required && <option></option>}
-                              {options?.map(({ value: optionValue, label }) => (
-                                <option
-                                  key={optionValue}
-                                  value={`${optionValue}`}
-                                >
-                                  {label}
-                                </option>
-                              ))}
-                            </select>
+                              options={options}
+                              required={required}
+                              values={values}
+                            />
                           )}
                           {type === "checkbox" && (
                             <Checkbox

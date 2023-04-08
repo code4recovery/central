@@ -40,7 +40,7 @@ export const action: ActionFunction = async ({ request }) => {
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     skip: Number(skip),
     take: config.batchSize,
-    where: { accounts: { some: { id: currentAccountID } } }, // todo dynamic
+    where: { accountID: currentAccountID },
   });
   return json(meetings);
 };
@@ -57,14 +57,14 @@ export const loader: LoaderFunction = async ({ request }) => {
           id: {
             in: meetingIDs,
           },
-          accounts: { some: { id: currentAccountID } }, // todo dynamic
+          accountID: currentAccountID,
         },
       })
     : await db.meeting.findMany({
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         take: config.batchSize,
         include: { types: true, languages: true },
-        where: { accounts: { some: { id: currentAccountID } } }, // todo dynamic
+        where: { accountID: currentAccountID },
       });
   return json({ loadedMeetings, search });
 };
@@ -103,7 +103,7 @@ export default function Index() {
               ? formatString(strings.meetings.empty_search, { search })
               : strings.meetings.empty
           }
-          type="warning"
+          type="info"
         />
       )}
       <Table

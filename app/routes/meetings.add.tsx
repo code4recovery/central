@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ request }) => {
             ],
           }
         : undefined,
-      accounts: { connect: { id: currentAccountID } },
+      account: { connect: { id: currentAccountID } },
     },
   });
 
