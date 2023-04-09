@@ -9,18 +9,23 @@ export async function saveFeedToStorage(accountID: string) {
   const storage = new Storage({
     projectId: bucket,
     credentials: {
-      private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY,
+      private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY?.split(
+        String.raw`\n`
+      ).join("\n"),
       client_email: `${bucket}@${bucket}.iam.gserviceaccount.com`,
     },
   });
 
-  const meetings = (await db.meeting.findMany()).map(
+  const meetings = (
+    await db.meeting.findMany({ include: { types: true, languages: true } })
+  ).map(
     ({
       slug,
       id,
       name,
       timezone,
       notes,
+      languages,
       types,
       day,
       time,
@@ -34,7 +39,10 @@ export async function saveFeedToStorage(accountID: string) {
       name,
       timezone,
       notes,
-      types: types?.split(",") ?? [],
+      types: [
+        ...languages.map(({ code }) => code),
+        ...types.map(({ code }) => code),
+      ],
       day,
       time,
       conference_url,
