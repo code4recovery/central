@@ -4,7 +4,6 @@ export type User = {
   emailHash: string;
   id: string;
   isAdmin: boolean;
-  meetingCount: number;
   name?: string;
   theme: {
     background: string;

@@ -150,16 +150,22 @@ export function Form({
                               })}
                             </div>
                           )}
-                          {type === "combobox" && options && (
-                            <ComboBox options={options} />
-                          )}
-                          {type === "select" && options && (
-                            <Select
+                          {type === "combobox" && (
+                            <ComboBox
                               className={className}
+                              defaultValue={values?.[name] as string | number}
                               name={name}
                               options={options}
                               required={required}
-                              values={values}
+                            />
+                          )}
+                          {type === "select" && (
+                            <Select
+                              className={className}
+                              defaultValue={values?.[name] as string | number}
+                              name={name}
+                              options={options}
+                              required={required}
                             />
                           )}
                           {type === "checkbox" && (

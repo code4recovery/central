@@ -4,16 +4,16 @@ import { Option } from "~/types";
 
 export function Select({
   className,
+  defaultValue,
   name,
-  options,
+  options = [],
   required,
-  values,
 }: {
   className?: string;
+  defaultValue?: string | number;
   name: string;
-  options: Option[];
+  options?: Option[];
   required?: boolean;
-  values?: { [key: string]: string | string[] };
 }) {
   const {
     theme: { focusRing },
@@ -26,7 +26,7 @@ export function Select({
       name={name}
       id={name}
       className={cx(config.fieldClassNames, focusRing, className)}
-      defaultValue={values?.[name] !== null ? `${values?.[name]}` : undefined}
+      defaultValue={defaultValue}
     >
       {!required && <option></option>}
       {groups.map((groupName) => {

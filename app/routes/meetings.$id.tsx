@@ -1,3 +1,4 @@
+import { Activity } from "@prisma/client";
 import type {
   ActionFunction,
   LoaderFunction,
@@ -29,17 +30,24 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
+  const arrayEquals = (array1: string[], array2: string[]) =>
+    array1.length === array2.length &&
+    array1.every((value) => array2.includes(value));
+
   // get changed fields
   const changes = Object.keys(fields.meeting)
-    .filter((name) => name in meeting)
-    .filter((name) =>
-      fields.meeting[name].type === "checkboxes"
-        ? JSON.stringify(data[name]) !==
-          JSON.stringify(meeting[name as keyof typeof meeting])
-        : data[name] !== meeting[name as keyof typeof meeting]
+    .map((field) => ({
+      field,
+      type: fields.meeting[field].type,
+      before: meeting[field as keyof typeof meeting],
+      after: data[field],
+    }))
+    .filter(({ type, before, after }) =>
+      type === "checkboxes"
+        ? !arrayEquals(before as string[], after)
+        : before !== after
     )
-    .filter((name) => data[name] || meeting[name as keyof typeof meeting])
-    .map((name) => [[name], data[name]]);
+    .filter(({ before, after }) => before || after);
 
   // exit if no changes
   if (!changes.length) {
@@ -49,30 +57,58 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   const { id: userID, currentAccountID } = await getUser(request);
 
   // create an activity record
-  const activity = await db.activity.create({
+  const activity = (await db.activity.create({
     data: {
       type: "update",
       meetingID: id,
       userID,
     },
-  });
+  })) as Activity;
 
   // save individual changes
   changes.forEach(
-    async ([field, value]) =>
+    async ({ field, before, after }) =>
       await db.change.create({
         data: {
-          activityID: activity.id ?? "",
-          before: `${meeting[field as keyof typeof meeting]}`,
-          after: `${value}`,
-          field: `${field}`,
+          activityID: activity.id,
+          before: Array.isArray(before) ? before.join(", ") : `${before}`,
+          after: Array.isArray(after) ? after.join(", ") : `${after}`,
+          field,
         },
       })
   );
 
+  // prepare checkbox updates
+  const changedCheckboxFields: {
+    [key: string]: {
+      connect: { code: string }[];
+      disconnect: { code: string }[];
+    };
+  } = {};
+
+  changes
+    .filter(({ type }) => type === "checkboxes")
+    .forEach(({ field, before, after }) => {
+      if (Array.isArray(before) && Array.isArray(after)) {
+        const connect = after
+          .filter((value) => !before.includes(value))
+          .map((code: string) => ({ code }));
+        const disconnect = before
+          .filter((value) => !after.includes(value))
+          .map((code: string) => ({ code }));
+        changedCheckboxFields[field] = { connect, disconnect };
+      }
+    });
+
   // update meeting
+  const changed = Object.fromEntries(
+    changes
+      .filter(({ type }) => type !== "checkboxes")
+      .map(({ field, after }) => [field, after])
+  );
+
   await db.meeting.update({
-    data: Object.fromEntries(changes),
+    data: { ...changed, ...changedCheckboxFields, updatedAt: new Date() },
     where: { id },
   });
 

@@ -60,6 +60,17 @@ export const strings = {
       subject: "Confirm your email address to log in",
     },
   },
+  group: {
+    email: "Email",
+    name: "Group",
+    notes: "Group notes",
+    paypal: "PayPal",
+    phone: "Phone",
+    record: "Record ID",
+    square: "Square",
+    venmo: "Venmo",
+    website: "Website",
+  },
   languages: {
     AM: "Amharic",
     DA: "Danish",

@@ -8,7 +8,6 @@ export const UserContext = createContext<User>({
   emailHash: "",
   id: "",
   isAdmin: false,
-  meetingCount: 0,
   name: "",
   theme: config.themes[config.defaultTheme as keyof typeof config.themes],
 });
