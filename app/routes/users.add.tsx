@@ -4,7 +4,7 @@ import { json } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Form, Template } from "~/components";
+import { Alerts, Columns, Form, Template } from "~/components";
 import { formatToken, formatValidator } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
@@ -51,12 +51,9 @@ export default function User() {
       breadcrumbs={[["/users", strings.users.title]]}
     >
       {actionData && <Alerts data={actionData} />}
-      <Form
-        title={strings.users.title}
-        description={strings.users.description}
-        form="user"
-        values={{ currentAccountID }}
-      />
+      <Columns primary={<Form form="user" values={{ currentAccountID }} />}>
+        <p>{strings.users.add_description}</p>
+      </Columns>
     </Template>
   );
 }

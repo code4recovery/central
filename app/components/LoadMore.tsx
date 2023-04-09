@@ -18,15 +18,13 @@ export function LoadMore({
     <Form method="post" className="flex justify-center">
       <fieldset disabled={!idle}>
         <input type="hidden" name="skip" value={loadedCount} />
-        <Button
-          label={
-            !idle
-              ? strings.loading
-              : formatString(strings.load_more, {
-                  count: Math.min(config.batchSize, totalCount - loadedCount),
-                })
-          }
-        />
+        <Button>
+          {idle
+            ? formatString(strings.load_more, {
+                count: Math.min(config.batchSize, totalCount - loadedCount),
+              })
+            : strings.loading}
+        </Button>
       </fieldset>
     </Form>
   );

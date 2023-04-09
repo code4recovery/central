@@ -7,7 +7,7 @@ import {
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Form, Template } from "~/components";
+import { Alerts, Button, Columns, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
@@ -60,16 +60,25 @@ export default function User() {
       breadcrumbs={isAdmin ? [["/users", strings.users.title]] : undefined}
     >
       {!submitting && actionData && <Alerts data={actionData} />}
-      <Form
-        title={strings.users.title}
-        description={strings.users.description}
-        isAdmin={isAdmin}
-        form="user"
-        values={{
-          ...loaderData,
-          admin: loaderData.adminAccountIDs.includes(currentAccountID),
-        }}
-      />
+      <Columns
+        primary={
+          <Form
+            form="user"
+            isAdmin={isAdmin}
+            values={{
+              ...loaderData,
+              admin: loaderData.adminAccountIDs.includes(currentAccountID),
+            }}
+          />
+        }
+      >
+        <p>{strings.users.edit_description}</p>
+        <p>
+          <Button url="https://gravatar.com/" className="inline-flex mt-3">
+            Gravatar
+          </Button>
+        </p>
+      </Columns>
     </Template>
   );
 }

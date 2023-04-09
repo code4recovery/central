@@ -25,7 +25,7 @@ export function Template({
   return (
     <>
       <Header />
-      <main className="mt-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex-grow w-full">
+      <main className="mt-8 px-4 sm:px-6 xl:px-12 flex-grow w-full">
         {title && (
           <div className="sm:flex">
             <div className="sm:flex-auto sm:pt-2">

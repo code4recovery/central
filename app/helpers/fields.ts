@@ -125,6 +125,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: optional.string,
     },
     notes: {
+      helpText: strings.meetings.notes_notes,
       label: "Notes",
       type: "textarea",
       validation: optional.string,

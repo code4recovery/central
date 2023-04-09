@@ -23,7 +23,7 @@ export default function Users() {
   return (
     <Template
       title={strings.users.title}
-      cta={isAdmin && <Button label={strings.users.add} url="/users/add" />}
+      cta={isAdmin && <Button url="/users/add">{strings.users.add}</Button>}
     >
       <Table
         columns={{

@@ -87,6 +87,7 @@ export async function getUserOrRedirect(request: Request) {
   return {
     ...user,
     isAdmin,
+    accountUrl: account?.url,
     theme: config.themes[theme as keyof typeof config.themes],
   };
 }

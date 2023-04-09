@@ -1,4 +1,5 @@
 export type User = {
+  accountUrl: string;
   currentAccountID: string;
   email: string;
   emailHash: string;

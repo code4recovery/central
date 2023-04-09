@@ -8,8 +8,9 @@ import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Form, Template } from "~/components";
+import { Alerts, Button, Columns, Form, Panel, Template } from "~/components";
 import { fields, formatValidator, validObjectId } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, getUser, saveFeedToStorage } from "~/utils";
 
@@ -146,7 +147,7 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
   if (!meeting) {
     return redirect("/meetings"); // todo flash message
   }
-  return json(meeting);
+  return json({ meeting });
 };
 
 export const meta: MetaFunction = () => ({
@@ -154,8 +155,9 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const loaderData = useLoaderData();
+  const { meeting } = useLoaderData();
   const actionData = useActionData<typeof action>();
+  const { accountUrl } = useUser();
 
   return (
     <Template
@@ -163,12 +165,20 @@ export default function EditMeeting() {
       breadcrumbs={[["/meetings", strings.meetings.title]]}
     >
       {actionData && <Alerts data={actionData} />}
-      <Form
-        title={strings.meetings.details}
-        description={strings.meetings.details_description}
-        form="meeting"
-        values={loaderData}
-      />
+      <Columns primary={<Form form="meeting" values={meeting} />}>
+        <div className="grid gap-5">
+          <div className="flex gap-3">
+            <Button secondary url={`${accountUrl}?id=${meeting.id}`}>
+              View listing
+            </Button>
+            <Button onClick={() => alert("not implemented yet")} secondary>
+              Deactivate
+            </Button>
+          </div>
+          <Panel title="History" emptyText="No edits yet" />
+          <Panel title="Reports" emptyText="No reports yet" />
+        </div>
+      </Columns>
     </Template>
   );
 }

@@ -1,32 +1,42 @@
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
 
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
+import { strings } from "~/i18n";
 
 export function Button({
+  children,
   className,
-  label,
   onClick,
+  secondary = false,
   url,
 }: {
+  children: React.ReactNode;
   className?: string;
-  label: string;
   onClick?: () => void;
+  secondary?: boolean;
   url?: string;
 }) {
   const {
-    theme: { background, backgroundHover, focusOutline },
+    theme: { background, backgroundHover, border, focusOutline, text },
   } = useUser();
 
   const buttonClass = cx(
     "flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
     "gap-2 group items-center justify-center px-4 py-2 rounded-md shadow-sm text-center text-sm",
-    "disabled:text-neutral-500 disabled:bg-neutral-300 dark:disabled:bg-neutral-700 text-white dark:text-black",
-    background,
-    backgroundHover,
-    className,
-    focusOutline
+    "disabled:text-neutral-500 disabled:bg-neutral-300 dark:disabled:bg-neutral-700",
+    { "text-white dark:text-black": !secondary },
+    { "opacity-80 hover:opacity-100 border": secondary },
+    { [background]: !secondary },
+    { [text]: secondary },
+    { [border]: secondary },
+    { [backgroundHover]: !secondary },
+    focusOutline,
+    className
   );
+
+  const offSite = url?.startsWith("https://");
 
   const status = (
     <div role="status" className="hidden group-disabled:block">
@@ -45,22 +55,27 @@ export function Button({
           fill="currentFill"
         />
       </svg>
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{strings.loading}</span>
     </div>
   );
 
   return onClick ? (
     <button className={buttonClass} onClick={onClick}>
-      {label}
+      {children}
     </button>
   ) : url ? (
-    <Link className={buttonClass} to={url}>
-      {label}
+    <Link
+      className={buttonClass}
+      target={offSite ? "_blank" : undefined}
+      to={url}
+    >
+      {offSite && <ArrowTopRightOnSquareIcon className="w-5 h-5" />}
+      {children}
     </Link>
   ) : (
     <button className={buttonClass} type="submit">
       {status}
-      {label}
+      {children}
     </button>
   );
 }

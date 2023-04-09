@@ -96,7 +96,7 @@ export default function Index() {
       description={formatString(strings.meetings.description, {
         meetingCount,
       })}
-      cta={<Button url="/meetings/add" label={strings.meetings.add} />}
+      cta={<Button url="/meetings/add">{strings.meetings.add}</Button>}
     >
       {!meetings.length && (
         <Alert

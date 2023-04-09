@@ -49,7 +49,7 @@ export function Header() {
       <Disclosure as="nav" className="bg-white dark:bg-neutral-950 shadow">
         {({ open }) => (
           <>
-            <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
+            <div className="px-2 sm:px-6 xl:px-12">
               <div className="flex h-16 justify-between">
                 <div className="flex px-2 lg:px-0">
                   <div className="flex flex-shrink-0 items-center">
