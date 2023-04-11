@@ -65,7 +65,10 @@ async function getGroup(id: string) {
 export default function GroupEdit() {
   const { group } = useLoaderData();
   return (
-    <Template breadcrumbs={[["/groups", "Groups"]]} title="Edit group">
+    <Template
+      breadcrumbs={[["/groups", strings.group.title]]}
+      title={strings.group.edit}
+    >
       <Columns
         primary={
           <>
@@ -100,7 +103,10 @@ export default function GroupEdit() {
           </>
         }
       >
-        <Panel title="Representatives" emptyText="No representatives yet" />
+        <Panel
+          title={strings.representatives.title}
+          emptyText={strings.representatives.empty}
+        />
       </Columns>
     </Template>
   );

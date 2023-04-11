@@ -3,8 +3,6 @@ export const strings = {
   account: {
     description: "These settings affect all account users.",
     entity: "Service Entity Name",
-    logo: "Logo",
-    logo_help: "Ideally SVG or 256px square transparent PNG",
     theme: "Color Theme",
     title: "Account Settings",
     updated: "Account updated.",
@@ -13,7 +11,7 @@ export const strings = {
   },
   activity: {
     description: "A log of recent site activity",
-    empty: "No activity yet. Edit a meeting to add some activity here.",
+    empty: "No activity yet",
     title: "Activity",
     update: "Updated %properties%",
   },
@@ -35,12 +33,6 @@ export const strings = {
     tuesday: "Tuesday",
     wednesday: "Wednesday",
   },
-  form: {
-    invalidEmail: "Invalid email",
-    required: "Required",
-    save: "Save",
-    saving: "Saving",
-  },
   email: {
     disclaimer:
       "If you didn’t request this email, there’s nothing to worry about — you can safely ignore it.",
@@ -60,9 +52,16 @@ export const strings = {
       subject: "Confirm your email address to log in",
     },
   },
+  form: {
+    invalidEmail: "Invalid email",
+    required: "Required",
+    save: "Save",
+    saving: "Saving",
+  },
   group: {
     add: "Add group",
     description: "There are %groupCount% groups in your account.",
+    edit: "Edit group",
     email: "Email",
     empty: "No groups added yet",
     empty_search: "No groups matched “%search%”",
@@ -70,7 +69,7 @@ export const strings = {
     notes: "Group notes",
     paypal: "PayPal",
     phone: "Phone",
-    record: "Record ID",
+    recordID: "Record ID",
     square: "Square",
     title: "Groups",
     venmo: "Venmo",
@@ -114,12 +113,14 @@ export const strings = {
   loading: "Loading…",
   meetings: {
     add: "Add meeting",
+    archive: "Archive",
     conference_phone: "Conference phone",
     conference_phone_notes: "Conference phone notes",
     conference_url: "Conference URL",
     conference_url_notes: "Conference URL notes",
     day: "Day",
     description: "There are %meetingCount% meetings in your account.",
+    duplicate: "Duplicate",
     duration: "Duration",
     edit: "Edit meeting",
     empty: "No meetings added yet",
@@ -133,11 +134,17 @@ export const strings = {
     timezone: "Timezone",
     title: "Meetings",
     types: "Types",
+    view: "View",
     when: "When",
   },
   reports: {
     description: "A list of all the reports in your account",
+    empty: "No reports yet",
     title: "Reports",
+  },
+  representatives: {
+    empty: "No representatives yet",
+    title: "Representatives",
   },
   types: {
     "11": "11th Step Meditation",

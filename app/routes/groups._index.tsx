@@ -52,6 +52,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   });
   const loadedGroups = search
     ? await db.group.findMany({
+        include: {
+          meetings: true,
+        },
         orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
         where: {
           id: {
@@ -61,6 +64,9 @@ export const loader: LoaderFunction = async ({ request }) => {
         },
       })
     : await db.group.findMany({
+        include: {
+          meetings: true,
+        },
         orderBy: [{ updatedAt: "desc" }],
         take: config.batchSize,
         where: { accountID: currentAccountID },
@@ -74,7 +80,8 @@ export const meta: MetaFunction = () => ({
 
 export default function Index() {
   const { loadedGroups, search, groupCount } = useLoaderData<typeof loader>();
-  const [groups, setGroups] = useState<Array<Group>>(loadedGroups);
+  const [groups, setGroups] =
+    useState<Array<Group & { meetings: Meeting[] }>>(loadedGroups);
   const actionData = useActionData();
 
   useEffect(() => {
@@ -104,12 +111,14 @@ export default function Index() {
       <Table
         columns={{
           name: { label: strings.group.name },
+          meetings: { label: strings.meetings.title },
           updatedAt: { label: strings.updated, align: "right" },
         }}
-        rows={groups.map(({ name, id, updatedAt }) => ({
-          name,
+        rows={groups.map(({ id, meetings, name, updatedAt }) => ({
           id,
           link: `/groups/${id}`,
+          meetings: meetings.length,
+          name,
           updatedAt: formatUpdated(updatedAt.toString()),
         }))}
       />

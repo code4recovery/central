@@ -166,20 +166,37 @@ export default function EditMeeting() {
     >
       {actionData && <Alerts data={actionData} />}
       <Columns primary={<Form form="meeting" values={meeting} />}>
-        <div className="flex gap-5">
-          <Button secondary url={`${accountUrl}?id=${meeting.id}`}>
-            View listing
+        <div className="flex gap-5 flex-wrap">
+          <Button
+            icon="external"
+            secondary
+            url={`${accountUrl}?id=${meeting.id}`}
+          >
+            {strings.meetings.view}
           </Button>
           <Button
+            icon="duplicate"
             onClick={() => alert("not implemented yet")}
-            icon="archive"
             secondary
           >
-            Archive
+            {strings.meetings.duplicate}
+          </Button>
+          <Button
+            icon="archive"
+            onClick={() => alert("not implemented yet")}
+            secondary
+          >
+            {strings.meetings.archive}
           </Button>
         </div>
-        <Panel title="History" emptyText="No edits yet" />
-        <Panel title="Reports" emptyText="No reports yet" />
+        <Panel
+          title={strings.activity.title}
+          emptyText={strings.activity.empty}
+        />
+        <Panel
+          title={strings.reports.title}
+          emptyText={strings.reports.empty}
+        />
       </Columns>
     </Template>
   );

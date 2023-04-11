@@ -1,6 +1,7 @@
 import {
   ArchiveBoxXMarkIcon,
   ArrowTopRightOnSquareIcon,
+  DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
 
@@ -8,7 +9,7 @@ import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 
-type Icon = "archive";
+type Icon = "archive" | "duplicate" | "external";
 
 export function Button({
   children,
@@ -33,6 +34,10 @@ export function Button({
     switch (icon) {
       case "archive":
         return <ArchiveBoxXMarkIcon className={iconClass} />;
+      case "duplicate":
+        return <DocumentDuplicateIcon className={iconClass} />;
+      case "external":
+        return <ArrowTopRightOnSquareIcon className={iconClass} />;
     }
     return null;
   }
@@ -59,7 +64,10 @@ export function Button({
     <div role="status" className="hidden group-disabled:block">
       <svg
         aria-hidden="true"
-        className="w-6 h-6 text-neutral-200 dark:text-neutral-800 animate-spin fill-neutral-500"
+        className={cx(
+          "text-neutral-200 dark:text-neutral-800 animate-spin fill-neutral-500",
+          iconClass
+        )}
         viewBox="0 0 100 101"
         fill="none"
       >
@@ -87,7 +95,7 @@ export function Button({
       target={external ? "_blank" : undefined}
       to={url}
     >
-      {external && <ArrowTopRightOnSquareIcon className={iconClass} />}
+      {renderIcon(icon)}
       {children}
     </Link>
   ) : (

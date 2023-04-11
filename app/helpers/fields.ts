@@ -59,7 +59,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       span: 10,
     },
     recordID: {
-      label: strings.group.record,
+      label: strings.group.recordID,
       type: "text",
       validation: optional.string,
       span: 2,
