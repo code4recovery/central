@@ -50,6 +50,62 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: required.string,
     },
   },
+  group: {
+    name: {
+      className: "text-xl font-semibold py-2",
+      label: strings.meetings.name,
+      type: "text",
+      validation: required.string,
+      span: 10,
+    },
+    recordID: {
+      label: strings.group.record,
+      type: "text",
+      validation: optional.string,
+      span: 2,
+    },
+    notes: {
+      label: strings.group.notes,
+      type: "textarea",
+      validation: optional.string,
+    },
+    email: {
+      label: strings.group.email,
+      type: "text",
+      validation: optional.string,
+      span: 4,
+    },
+    phone: {
+      label: strings.group.phone,
+      type: "text",
+      validation: optional.string,
+      span: 4,
+    },
+    website: {
+      label: strings.group.website,
+      type: "text",
+      validation: optional.string,
+      span: 4,
+    },
+    venmo: {
+      label: strings.group.venmo,
+      type: "text",
+      validation: optional.string,
+      span: 4,
+    },
+    paypal: {
+      label: strings.group.paypal,
+      type: "text",
+      validation: optional.string,
+      span: 4,
+    },
+    square: {
+      label: strings.group.square,
+      type: "text",
+      validation: optional.string,
+      span: 4,
+    },
+  },
   login: {
     email: {
       type: "email",
@@ -159,59 +215,6 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
         })),
       type: "checkboxes",
       validation: optional.array,
-    },
-    group: {
-      label: strings.group.name,
-      type: "combobox",
-      validation: optional.string,
-      span: 10,
-    },
-    record: {
-      label: strings.group.record,
-      type: "text",
-      validation: optional.string,
-      span: 2,
-    },
-    groupNotes: {
-      label: strings.group.notes,
-      type: "textarea",
-      validation: optional.string,
-    },
-    email: {
-      label: strings.group.email,
-      type: "text",
-      validation: optional.string,
-      span: 4,
-    },
-    phone: {
-      label: strings.group.phone,
-      type: "text",
-      validation: optional.string,
-      span: 4,
-    },
-    website: {
-      label: strings.group.website,
-      type: "text",
-      validation: optional.string,
-      span: 4,
-    },
-    venmo: {
-      label: strings.group.venmo,
-      type: "text",
-      validation: optional.string,
-      span: 4,
-    },
-    paypal: {
-      label: strings.group.paypal,
-      type: "text",
-      validation: optional.string,
-      span: 4,
-    },
-    square: {
-      label: strings.group.square,
-      type: "text",
-      validation: optional.string,
-      span: 4,
     },
   },
   user: {

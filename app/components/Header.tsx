@@ -27,7 +27,7 @@ export function Header() {
 
   const navItems = {
     primary: [
-      ["/meetings", strings.meetings.title],
+      ["/groups", strings.group.title],
       ["/activity", strings.activity.title],
       ["/reports", strings.reports.title],
     ],

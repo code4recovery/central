@@ -1,19 +1,26 @@
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
+import {
+  ArchiveBoxXMarkIcon,
+  ArrowTopRightOnSquareIcon,
+} from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
 
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 
+type Icon = "archive";
+
 export function Button({
   children,
   className,
+  icon,
   onClick,
   secondary = false,
   url,
 }: {
   children: React.ReactNode;
   className?: string;
+  icon?: Icon;
   onClick?: () => void;
   secondary?: boolean;
   url?: string;
@@ -21,6 +28,14 @@ export function Button({
   const {
     theme: { background, backgroundHover, border, focusOutline, text },
   } = useUser();
+
+  function renderIcon(icon?: Icon) {
+    switch (icon) {
+      case "archive":
+        return <ArchiveBoxXMarkIcon className={iconClass} />;
+    }
+    return null;
+  }
 
   const buttonClass = cx(
     "flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
@@ -36,7 +51,9 @@ export function Button({
     className
   );
 
-  const offSite = url?.startsWith("https://");
+  const iconClass = "w-5 h-5";
+
+  const external = url?.startsWith("https://");
 
   const status = (
     <div role="status" className="hidden group-disabled:block">
@@ -61,15 +78,16 @@ export function Button({
 
   return onClick ? (
     <button className={buttonClass} onClick={onClick}>
+      {renderIcon(icon)}
       {children}
     </button>
   ) : url ? (
     <Link
       className={buttonClass}
-      target={offSite ? "_blank" : undefined}
+      target={external ? "_blank" : undefined}
       to={url}
     >
-      {offSite && <ArrowTopRightOnSquareIcon className="w-5 h-5" />}
+      {external && <ArrowTopRightOnSquareIcon className={iconClass} />}
       {children}
     </Link>
   ) : (

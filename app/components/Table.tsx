@@ -14,9 +14,11 @@ type Row = {
 };
 
 export function Table({
+  className,
   columns,
   rows,
 }: {
+  className?: string;
   columns: {
     [index: string]: {
       label: string;
@@ -50,7 +52,12 @@ export function Table({
   };
 
   return (
-    <table className="min-w-full divide-y divide-neutral-500 text-left text-sm table-fixed">
+    <table
+      className={cx(
+        "min-w-full divide-y divide-neutral-500 text-left text-sm table-fixed",
+        className
+      )}
+    >
       <thead>
         <tr>
           {keys.slice(0, 4).map((key, index) => (

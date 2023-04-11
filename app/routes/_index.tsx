@@ -100,10 +100,9 @@ export default function Index() {
               />
               <Label htmlFor="email">{strings.users.email}</Label>
               <Input autoFocus name="email" required type="email" />
-              <Button
-                className="mt-4 w-full"
-                label={!idle ? strings.loading : strings.auth.submit}
-              />
+              <Button className="mt-4 w-full">
+                {!idle ? strings.loading : strings.auth.submit}
+              </Button>
             </fieldset>
           </ValidatedForm>
         </div>

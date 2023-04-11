@@ -1,6 +1,6 @@
 import { db } from "./db.server";
 
-export async function searchMeetings(search: string | null) {
+export async function searchGroups(search: string | null) {
   if (!search) {
     return [];
   }
@@ -11,7 +11,7 @@ export async function searchMeetings(search: string | null) {
     .filter((e) => e)
     .map((e) => `"${e}"`)
     .join(" ");
-  const result = await db.meeting.findRaw({
+  const result = await db.group.findRaw({
     filter: {
       $text: {
         $search: searchString,

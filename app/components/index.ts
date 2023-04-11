@@ -14,7 +14,6 @@ export * from "./Label";
 export * from "./LoadMore";
 export * from "./Panel";
 export * from "./Select";
-export * from "./Separator";
 export * from "./Table";
 export * from "./Template";
 export * from "./Textarea";

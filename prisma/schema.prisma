@@ -71,6 +71,7 @@ model Group {
   updatedAt             DateTime  @updatedAt
 
   @@unique([accountID, name, recordID])
+  @@fulltext([name, notes, website, recordID])
 }
 
 model Meeting {
@@ -94,7 +95,7 @@ model Meeting {
   accountID              String     @db.ObjectId
   account                Account    @relation(fields: [accountID], references: [id])
   groupID                String     @db.ObjectId
-  group                  Group?     @relation(fields: [groupID], references: [id])
+  group                  Group      @relation(fields: [groupID], references: [id])
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
 

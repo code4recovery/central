@@ -38,6 +38,7 @@ export function Form({
       autoComplete="off"
       method="post"
       validator={formatValidator(form)}
+      onSubmit={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
       <fieldset disabled={submitting}>
         <div className="shadow sm:overflow-hidden sm:rounded-md">
