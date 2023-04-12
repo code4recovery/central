@@ -128,6 +128,7 @@ async function getMeeting(id: string) {
   const meeting = await db.meeting.findUnique({
     where: { id },
     include: {
+      group: true,
       languages: true,
       types: true,
     },
@@ -162,10 +163,19 @@ export default function EditMeeting() {
   return (
     <Template
       title={strings.meetings.edit}
-      breadcrumbs={[["/meetings", strings.meetings.title]]}
+      breadcrumbs={[
+        ["/groups", strings.group.title],
+        [`/groups/${meeting.group.id}`, meeting.group.name],
+      ]}
     >
-      {actionData && <Alerts data={actionData} />}
-      <Columns primary={<Form form="meeting" values={meeting} />}>
+      <Columns
+        primary={
+          <>
+            {actionData && <Alerts data={actionData} />}
+            <Form form="meeting" values={meeting} />
+          </>
+        }
+      >
         <div className="flex gap-5 flex-wrap">
           <Button
             icon="external"

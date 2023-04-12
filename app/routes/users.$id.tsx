@@ -59,17 +59,19 @@ export default function User() {
       title={isAdmin ? strings.users.edit : strings.users.edit_profile}
       breadcrumbs={isAdmin ? [["/users", strings.users.title]] : undefined}
     >
-      {!submitting && actionData && <Alerts data={actionData} />}
       <Columns
         primary={
-          <Form
-            form="user"
-            isAdmin={isAdmin}
-            values={{
-              ...loaderData,
-              admin: loaderData.adminAccountIDs.includes(currentAccountID),
-            }}
-          />
+          <>
+            {!submitting && actionData && <Alerts data={actionData} />}
+            <Form
+              form="user"
+              isAdmin={isAdmin}
+              values={{
+                ...loaderData,
+                admin: loaderData.adminAccountIDs.includes(currentAccountID),
+              }}
+            />
+          </>
         }
       >
         <p>{strings.users.edit_description}</p>

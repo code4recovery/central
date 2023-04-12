@@ -1,12 +1,14 @@
 export const strings = {
   about: "About this software",
   account: {
-    description: "These settings affect all account users.",
-    entity: "Service Entity Name",
-    theme: "Color Theme",
+    description: "Settings apply to all account users.",
+    name: "Service entity name",
+    name_description: "Used in emails",
+    theme: "Color theme",
     title: "Account Settings",
     updated: "Account updated.",
-    url: "Meeting Finder URL",
+    url: "Meeting finder URL",
+    url_description: "Used to generate meeting view links",
     url_placeholder: "https://example.org/meetings",
   },
   activity: {
@@ -60,6 +62,7 @@ export const strings = {
   },
   group: {
     add: "Add group",
+    added: "Group has been added",
     description: "There are %groupCount% groups in your account.",
     edit: "Edit group",
     email: "Email",
@@ -72,6 +75,7 @@ export const strings = {
     recordID: "Record ID",
     square: "Square",
     title: "Groups",
+    updated: "Group has been updated",
     venmo: "Venmo",
     website: "Website",
   },
@@ -127,9 +131,8 @@ export const strings = {
     empty_search: "No meetings matched “%search%”",
     languages: "Languages",
     name: "Name",
-    notes_notes: "Don’t put information here that could go in other fields",
+    notes_notes: "Don’t put information here that should go in other fields",
     ongoing: "Ongoing",
-    search: "Search for meetings",
     time: "Time",
     timezone: "Timezone",
     title: "Meetings",
@@ -137,6 +140,7 @@ export const strings = {
     view: "View",
     when: "When",
   },
+  search: "Search",
   reports: {
     description: "A list of all the reports in your account",
     empty: "No reports yet",

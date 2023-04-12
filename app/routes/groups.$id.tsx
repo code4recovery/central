@@ -1,7 +1,7 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { validationError } from "remix-validated-form";
-import { useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { Language, Meeting, Type } from "@prisma/client";
 
 import {
@@ -11,19 +11,19 @@ import {
   formatValidator,
   validObjectId,
 } from "~/helpers";
-import { Columns, Form, Panel, Table, Template } from "~/components";
+import { Alerts, Columns, Form, Panel, Table, Template } from "~/components";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
-    return redirect("/meetings"); // todo flash invalid id message to this page
+    return redirect("/groups"); // todo flash invalid id message to this page
   }
 
   const group = await getGroup(id);
 
   if (!group) {
-    return redirect("/meetings"); // todo flash invalid id message to this page
+    return redirect("/groups"); // todo flash invalid id message to this page
   }
 
   const validator = formatValidator("group");
@@ -31,18 +31,24 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (error) {
     return validationError(error);
   }
-  return null;
+
+  await db.group.update({
+    data,
+    where: { id },
+  });
+
+  return json({ info: strings.group.updated });
 };
 
-export const loader: LoaderFunction = async ({ params: { id }, request }) => {
+export const loader: LoaderFunction = async ({ params: { id } }) => {
   if (!validObjectId(id)) {
-    return redirect("/meetings"); // todo flash invalid id message to this page
+    return redirect("/groups"); // todo flash invalid id message to this page
   }
 
   const group = await getGroup(id);
 
   if (!group) {
-    return redirect("/meetings"); // todo flash invalid id message to this page
+    return redirect("/groups"); // todo flash invalid id message to this page
   }
 
   return json({ group });
@@ -64,6 +70,7 @@ async function getGroup(id: string) {
 
 export default function GroupEdit() {
   const { group } = useLoaderData();
+  const actionData = useActionData();
   return (
     <Template
       breadcrumbs={[["/groups", strings.group.title]]}
@@ -72,6 +79,7 @@ export default function GroupEdit() {
       <Columns
         primary={
           <>
+            {actionData && <Alerts data={actionData} />}
             <Form form="group" values={group} />
             <Table
               columns={{

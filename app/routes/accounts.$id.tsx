@@ -7,7 +7,7 @@ import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Form, Template } from "~/components";
+import { Alerts, Columns, Form, Template } from "~/components";
 import { config, formatValidator, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getUserID } from "~/utils";
@@ -71,13 +71,16 @@ export default function Settings() {
   const { state } = useNavigation();
   return (
     <Template title={strings.account.title}>
-      {actionData && state === "idle" && <Alerts data={actionData} />}
-      <Form
-        title={strings.account.title}
-        description={strings.account.description}
-        form="account"
-        values={loaderData}
-      />
+      <Columns
+        primary={
+          <>
+            {actionData && state === "idle" && <Alerts data={actionData} />}
+            <Form form="account" values={loaderData} />
+          </>
+        }
+      >
+        <p>{strings.account.description}</p>
+      </Columns>
     </Template>
   );
 }

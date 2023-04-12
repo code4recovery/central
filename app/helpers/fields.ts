@@ -33,11 +33,13 @@ const required = {
 export const fields: { [index: string]: { [index: string]: Field } } = {
   account: {
     name: {
-      label: strings.account.entity,
+      helpText: strings.account.name_description,
+      label: strings.account.name,
       type: "text",
       validation: required.string,
     },
     url: {
+      helpText: strings.account.url_description,
       label: strings.account.url,
       placeholder: strings.account.url_placeholder,
       span: 8,
@@ -53,7 +55,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
   group: {
     name: {
       className: "text-xl font-semibold py-2",
-      label: strings.meetings.name,
+      label: strings.group.name,
       type: "text",
       validation: required.string,
       span: 10,
@@ -72,37 +74,37 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     email: {
       label: strings.group.email,
       type: "text",
-      validation: optional.string,
+      validation: optional.email,
       span: 4,
     },
     phone: {
       label: strings.group.phone,
       type: "text",
-      validation: optional.string,
+      validation: optional.string, // todo phone validator
       span: 4,
     },
     website: {
       label: strings.group.website,
       type: "text",
-      validation: optional.string,
+      validation: optional.url,
       span: 4,
     },
     venmo: {
       label: strings.group.venmo,
       type: "text",
-      validation: optional.string,
+      validation: optional.string, // todo venmo validator
       span: 4,
     },
     paypal: {
       label: strings.group.paypal,
       type: "text",
-      validation: optional.string,
+      validation: optional.string, // todo paypal validator
       span: 4,
     },
     square: {
       label: strings.group.square,
       type: "text",
-      validation: optional.string,
+      validation: optional.string, // todo square validator
       span: 4,
     },
   },
@@ -172,7 +174,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       label: strings.meetings.conference_phone,
       type: "tel",
       span: 6,
-      validation: optional.string,
+      validation: optional.string, // todo phone validator
     },
     conference_phone_notes: {
       label: strings.meetings.conference_phone_notes,

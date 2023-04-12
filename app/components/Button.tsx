@@ -14,6 +14,7 @@ type Icon = "archive" | "duplicate" | "external";
 export function Button({
   children,
   className,
+  disabled,
   icon,
   onClick,
   secondary = false,
@@ -21,6 +22,7 @@ export function Button({
 }: {
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
   icon?: Icon;
   onClick?: () => void;
   secondary?: boolean;
@@ -99,7 +101,7 @@ export function Button({
       {children}
     </Link>
   ) : (
-    <button className={buttonClass} type="submit">
+    <button className={buttonClass} disabled={disabled}>
       {status}
       {children}
     </button>

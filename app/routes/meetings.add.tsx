@@ -1,9 +1,9 @@
 import type { ActionFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData } from "@remix-run/react";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Form, Template } from "~/components";
+import { Alerts, Columns, Form, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getUser, saveFeedToStorage } from "~/utils";
@@ -32,6 +32,8 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { id: userID, currentAccountID } = await getUser(request);
 
+  const groupID = "todo"; // todo
+
   // update meeting
   const meeting = await db.meeting.create({
     data: {
@@ -45,6 +47,9 @@ export const action: ActionFunction = async ({ request }) => {
       conference_phone,
       conference_phone_notes,
       notes,
+      group: {
+        connect: { id: groupID },
+      },
       languages: {
         connect: [
           ...languages.map((code: string) => ({
@@ -91,17 +96,22 @@ export const meta: MetaFunction = () => ({
 
 export default function CreateMeeting() {
   const actionData = useActionData();
+  const loaderData = useLoaderData();
   return (
     <Template
       title={strings.meetings.add}
       breadcrumbs={[["/meetings", strings.meetings.title]]}
     >
-      {actionData && <Alerts data={actionData} />}
-      <Form
-        title={strings.meetings.details}
-        description={strings.meetings.details_description}
-        form="meeting"
-      />
+      <Columns
+        primary={
+          <>
+            {actionData && <Alerts data={actionData} />}
+            <Form form="meeting" values={loaderData} />
+          </>
+        }
+      >
+        Add meeting description
+      </Columns>
     </Template>
   );
 }

@@ -68,7 +68,6 @@ export function Header() {
                       <NavLink
                         key={url}
                         to={url}
-                        reloadDocument={url === "/meetings" && !!search}
                         className={({ isActive }) =>
                           cx(
                             {
@@ -89,21 +88,19 @@ export function Header() {
                 </div>
                 <div className="flex flex-1 items-center justify-center px-2 lg:px-0 lg:ml-6 lg:justify-end">
                   <form
-                    action="/meetings"
+                    action="/search"
                     className="w-full max-w-lg lg:max-w-xs"
                     onSubmit={(e) => {
                       e.preventDefault();
                       const form = e.target as HTMLFormElement;
                       const formData = new FormData(form);
                       if (!formData.get("search")?.toString()) {
-                        location.assign("/meetings");
-                      } else {
                         form.submit();
                       }
                     }}
                   >
                     <label htmlFor="search" className="sr-only">
-                      {strings.meetings.search}
+                      {strings.search}
                     </label>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -120,9 +117,8 @@ export function Header() {
                           focusRing
                         )}
                         defaultValue={search}
-                        id="search"
                         name="search"
-                        placeholder={strings.meetings.search}
+                        placeholder={strings.search}
                         type="search"
                       />
                     </div>

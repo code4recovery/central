@@ -1,5 +1,4 @@
-import { useNavigation } from "@remix-run/react";
-import { ValidatedForm } from "remix-validated-form";
+import { useIsSubmitting, ValidatedForm } from "remix-validated-form";
 
 import {
   Button,
@@ -31,16 +30,13 @@ export function Form({
   const {
     theme: { focusRing, text },
   } = useUser();
-  const { state } = useNavigation();
-  const submitting = state !== "idle";
   return (
     <ValidatedForm
       autoComplete="off"
       method="post"
       validator={formatValidator(form)}
-      onSubmit={() => window.scrollTo({ top: 0, behavior: "smooth" })}
     >
-      <fieldset disabled={submitting}>
+      <fieldset>
         <div className="shadow sm:overflow-hidden sm:rounded-md">
           <div className="space-y-6 bg-white dark:bg-neutral-950 px-4 py-5 sm:p-6">
             <div className="grid grid-cols-12 gap-5">
@@ -195,12 +191,26 @@ export function Form({
             </div>
           </div>
           <div className="bg-neutral-50 dark:bg-neutral-950 dark:border-t dark:border-neutral-900 px-4 py-3 flex justify-end sm:px-6">
-            <Button>
-              {submitting ? strings.form.saving : strings.form.save}
-            </Button>
+            <Submit />
           </div>
         </div>
       </fieldset>
     </ValidatedForm>
+  );
+}
+
+function Submit() {
+  const isSubmitting = useIsSubmitting();
+  return (
+    <Button
+      className={
+        isSubmitting
+          ? "text-neutral-500 bg-neutral-300 dark:bg-neutral-700"
+          : undefined
+      }
+      disabled={isSubmitting}
+    >
+      {isSubmitting ? strings.form.saving : strings.form.save}
+    </Button>
   );
 }

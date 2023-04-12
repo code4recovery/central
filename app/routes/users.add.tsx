@@ -43,7 +43,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export default function User() {
-  const { currentAccountID } = useUser();
+  const { currentAccountID, isAdmin } = useUser();
   const actionData = useActionData();
   return (
     <Template
@@ -51,7 +51,11 @@ export default function User() {
       breadcrumbs={[["/users", strings.users.title]]}
     >
       {actionData && <Alerts data={actionData} />}
-      <Columns primary={<Form form="user" values={{ currentAccountID }} />}>
+      <Columns
+        primary={
+          <Form form="user" isAdmin={isAdmin} values={{ currentAccountID }} />
+        }
+      >
         <p>{strings.users.add_description}</p>
       </Columns>
     </Template>
