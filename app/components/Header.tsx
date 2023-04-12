@@ -11,6 +11,7 @@ import { config, formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo as Logo } from "~/icons";
+import { Avatar } from "./Avatar";
 
 export function Header() {
   const {
@@ -41,8 +42,6 @@ export function Header() {
       [["/auth/out", strings.auth.out]],
     ],
   };
-
-  const avatarUrl = `https://gravatar.com/avatar/${emailHash}`;
 
   return (
     <header>
@@ -148,11 +147,7 @@ export function Header() {
                         focusRing
                       )}
                     >
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src={avatarUrl}
-                        alt={name}
-                      />
+                      <Avatar emailHash={emailHash} name={name} size="md" />
                     </Menu.Button>
                     <Transition
                       as={Fragment}
@@ -218,11 +213,7 @@ export function Header() {
               <div className="border-t border-neutral-200 dark:border-neutral-200 pt-4 pb-3">
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
-                    <img
-                      className="h-10 w-10 rounded-full"
-                      src={avatarUrl}
-                      alt={name}
-                    />
+                    <Avatar emailHash={emailHash} name={name} size="lg" />
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium text-neutral-800 dark:text-neutral-200">

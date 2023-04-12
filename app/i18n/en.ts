@@ -14,8 +14,12 @@ export const strings = {
   activity: {
     description: "A log of recent site activity",
     empty: "No activity yet",
+    name: "Name",
     title: "Activity",
     update: "Updated %properties%",
+    what: "What",
+    when: "When",
+    who: "Who",
   },
   app_name: "Central",
   auth: {

@@ -1,32 +1,38 @@
+import { Activity, Change, Meeting, User } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import { Alert, Table, Template } from "~/components";
+import { Alert, Avatar, Table, Template } from "~/components";
 import { formatUpdated, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
 export const loader: LoaderFunction = async () => {
   const activities = await db.activity.findMany({
-    take: 25,
-    include: { meeting: true, user: true, changes: true },
     orderBy: [{ createdAt: "desc" }],
+    select: {
+      id: true,
+      createdAt: true,
+      changes: {
+        select: { field: true },
+      },
+      meeting: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      user: {
+        select: {
+          name: true,
+          emailHash: true,
+        },
+      },
+    },
+    take: 25,
   });
-  return json({
-    activities: activities.map((activity) => ({
-      ...activity,
-      user: undefined,
-      userName: activity.user.name,
-      meeting: undefined,
-      meetingName: activity.meeting.name,
-      link: `/meetings/${activity.meeting.id}`,
-      createdAt: formatUpdated(activity.createdAt.toISOString()),
-      type: formatString(strings.activity.update, {
-        properties: activity.changes.map(({ field }) => field).join(", "),
-      }),
-    })),
-  });
+  return json({ activities });
 };
 
 export const meta: MetaFunction = () => ({
@@ -45,12 +51,37 @@ export default function Activity() {
       )}
       <Table
         columns={{
-          meetingName: { label: "Meeting" },
-          userName: { label: "User" },
-          type: { label: "Type" },
-          createdAt: { label: "Time", align: "right" },
+          name: { label: strings.activity.name },
+          user: { label: strings.activity.who },
+          what: { label: strings.activity.what },
+          when: { label: strings.activity.when, align: "right" },
         }}
-        rows={activities}
+        rows={activities.map(
+          (
+            activity: Activity & {
+              user: User;
+              meeting: Meeting;
+              changes: Change[];
+            }
+          ) => ({
+            ...activity,
+            name: activity.meeting.name,
+            link: `/meetings/${activity.meeting.id}`,
+            when: formatUpdated(activity.createdAt.toString()),
+            what: formatString(strings.activity.update, {
+              properties: activity.changes.map(({ field }) => field).join(", "),
+            }),
+            user: (
+              <div className="flex gap-2 items-center">
+                <Avatar
+                  emailHash={activity.user.emailHash}
+                  name={activity.user.name}
+                />
+                {activity.user.name}
+              </div>
+            ),
+          })
+        )}
       />
     </Template>
   );

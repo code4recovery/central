@@ -1,5 +1,6 @@
 export * from "./Alert";
 export * from "./Alerts";
+export * from "./Avatar";
 export * from "./Button";
 export * from "./Checkbox";
 export * from "./Chiclet";

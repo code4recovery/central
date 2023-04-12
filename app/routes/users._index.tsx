@@ -2,14 +2,25 @@ import { User } from "@prisma/client";
 import { json } from "@remix-run/node";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { Button, Chiclet, Table, Template } from "~/components";
+import { Avatar, Button, Chiclet, Table, Template } from "~/components";
 import { formatUpdated } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db } from "~/utils";
+import { db, getUser } from "~/utils";
 
-export const loader: LoaderFunction = async () => {
-  const users = await db.user.findMany();
+export const loader: LoaderFunction = async ({ request }) => {
+  const { currentAccountID } = await getUser(request);
+  const users = await db.user.findMany({
+    orderBy: { lastSeen: "desc" },
+    select: {
+      id: true,
+      adminAccountIDs: true,
+      name: true,
+      emailHash: true,
+      lastSeen: true,
+    },
+    where: { accountIDs: { has: currentAccountID } },
+  });
   return json({ users });
 };
 
@@ -33,6 +44,12 @@ export default function Users() {
         }}
         rows={users.map((user: User) => ({
           ...user,
+          name: (
+            <div className="flex gap-3 items-center">
+              <Avatar emailHash={user.emailHash} name={user.name} size="md" />
+              {user.name}
+            </div>
+          ),
           role: user.adminAccountIDs.includes(currentAccountID) && (
             <Chiclet>{strings.users.admin}</Chiclet>
           ),

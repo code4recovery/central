@@ -44,34 +44,26 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const search = new URL(request.url).searchParams.get("search");
-  const groupIDs = await searchGroups(search);
   const { currentAccountID } = await getUser(request);
   const groupCount = await db.group.count({
     where: { accountID: currentAccountID },
   });
-  const loadedGroups = search
-    ? await db.group.findMany({
-        include: {
-          meetings: true,
+  const loadedGroups = await db.group.findMany({
+    select: {
+      id: true,
+      name: true,
+      updatedAt: true,
+      meetings: {
+        select: {
+          id: true,
         },
-        orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-        where: {
-          id: {
-            in: groupIDs,
-          },
-          accountID: currentAccountID,
-        },
-      })
-    : await db.group.findMany({
-        include: {
-          meetings: true,
-        },
-        orderBy: [{ updatedAt: "desc" }],
-        take: config.batchSize,
-        where: { accountID: currentAccountID },
-      });
-  return json({ loadedGroups, search, groupCount });
+      },
+    },
+    orderBy: [{ updatedAt: "desc" }],
+    take: config.batchSize,
+    where: { accountID: currentAccountID },
+  });
+  return json({ loadedGroups, groupCount });
 };
 
 export const meta: MetaFunction = () => ({
@@ -79,7 +71,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
-  const { loadedGroups, search, groupCount } = useLoaderData<typeof loader>();
+  const { loadedGroups, groupCount } = useLoaderData<typeof loader>();
   const [groups, setGroups] =
     useState<Array<Group & { meetings: Meeting[] }>>(loadedGroups);
   const actionData = useActionData();
@@ -98,16 +90,7 @@ export default function Index() {
       })}
       cta={<Button url="/groups/add">{strings.group.add}</Button>}
     >
-      {!groups.length && (
-        <Alert
-          message={
-            search
-              ? formatString(strings.group.empty_search, { search })
-              : strings.group.empty
-          }
-          type="info"
-        />
-      )}
+      {!groups.length && <Alert message={strings.group.empty} type="info" />}
       <Table
         columns={{
           name: { label: strings.group.name },
@@ -122,7 +105,7 @@ export default function Index() {
           updatedAt: formatUpdated(updatedAt.toString()),
         }))}
       />
-      {!search && groups.length < groupCount && (
+      {groups.length < groupCount && (
         <LoadMore loadedCount={groups.length} totalCount={groupCount} />
       )}
     </Template>

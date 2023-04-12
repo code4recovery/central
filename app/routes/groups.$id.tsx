@@ -56,15 +56,24 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
 
 async function getGroup(id: string) {
   return await db.group.findUnique({
-    where: { id },
     select: {
       ...Object.fromEntries(
         Object.keys(fields.group).map((field) => [field, true])
       ),
       meetings: {
-        include: { languages: true, types: true },
+        select: {
+          day: true,
+          time: true,
+          timezone: true,
+          name: true,
+          updatedAt: true,
+          id: true,
+          languages: { select: { code: true } },
+          types: { select: { code: true } },
+        },
       },
     },
+    where: { id },
   });
 }
 
@@ -111,6 +120,10 @@ export default function GroupEdit() {
           </>
         }
       >
+        <Panel
+          title={strings.activity.title}
+          emptyText={strings.activity.empty}
+        />
         <Panel
           title={strings.representatives.title}
           emptyText={strings.representatives.empty}

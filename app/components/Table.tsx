@@ -7,10 +7,12 @@ import { strings } from "~/i18n";
 
 import { Chiclet } from "./Chiclet";
 
+type Value = React.ReactNode | string[] | undefined | null;
+
 type Row = {
   id: string;
   link?: string;
-  [index: string]: string | number | string[] | undefined | null;
+  [index: string]: Value;
 };
 
 export function Table({
@@ -34,22 +36,19 @@ export function Table({
 
   if (!rows.length) return null;
 
-  const showValue = (key: keyof Row, row: Row) => {
-    const value = row[key];
-    if (Array.isArray(value)) {
-      return (
-        <div className="flex gap-1 flex-wrap">
-          {value.map((type) => (
-            <Chiclet key={type}>
-              {strings.types[type as keyof typeof strings.types] ??
-                strings.languages[type as keyof typeof strings.languages]}
-            </Chiclet>
-          ))}
-        </div>
-      );
-    }
-    return row[key];
-  };
+  const showValue = (value: Value) =>
+    Array.isArray(value) ? (
+      <div className="flex gap-1 flex-wrap">
+        {value.map((type) => (
+          <Chiclet key={type}>
+            {strings.types[type as keyof typeof strings.types] ??
+              strings.languages[type as keyof typeof strings.languages]}
+          </Chiclet>
+        ))}
+      </div>
+    ) : (
+      value
+    );
 
   return (
     <table
@@ -90,7 +89,7 @@ export function Table({
                           "sm:hidden": index === 1,
                         })}
                       >
-                        {showValue(key, row)}
+                        {showValue(row[key])}
                       </dd>
                     </Fragment>
                   )
@@ -109,7 +108,7 @@ export function Table({
                 {row.link ? (
                   <Link to={row.link} className="block p-3">
                     <div className={cx(text, "underline")}>
-                      {showValue(keys[0], row)}
+                      {showValue(row[keys[0]])}
                     </div>
                     {stack}
                   </Link>
@@ -133,10 +132,10 @@ export function Table({
                 >
                   {!!row.link ? (
                     <Link to={row.link} className="block p-3">
-                      {showValue(key, row)}
+                      {showValue(row[key])}
                     </Link>
                   ) : (
-                    <div className="p-3">{showValue(key, row)}</div>
+                    <div className="p-3">{showValue(row[key])}</div>
                   )}
                 </td>
               ))}
