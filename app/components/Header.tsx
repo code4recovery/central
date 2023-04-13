@@ -89,17 +89,9 @@ export function Header() {
                   <form
                     action="/search"
                     className="w-full max-w-lg lg:max-w-xs"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const form = e.target as HTMLFormElement;
-                      const formData = new FormData(form);
-                      if (!formData.get("search")?.toString()) {
-                        form.submit();
-                      }
-                    }}
                   >
                     <label htmlFor="search" className="sr-only">
-                      {strings.search}
+                      {strings.search.placeholder}
                     </label>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -117,7 +109,8 @@ export function Header() {
                         )}
                         defaultValue={search}
                         name="search"
-                        placeholder={strings.search}
+                        placeholder={strings.search.placeholder}
+                        required
                         type="search"
                       />
                     </div>

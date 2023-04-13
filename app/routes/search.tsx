@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import { useActionData, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
 import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import { Language, Meeting, Type } from "@prisma/client";
-
-import { Alert, Button, LoadMore, Table, Template } from "~/components";
-import { config, formatDayTime, formatString, formatUpdated } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getUser, searchMeetings } from "~/utils";
+import type { Language, Meeting, Type } from "@prisma/client";
+import { useActionData, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
+import { useEffect, useState } from "react";
+import { validationError } from "remix-validated-form";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { validationError } from "remix-validated-form";
+
+import { Alert, LoadMore, Table, Template } from "~/components";
+import { config, formatDayTime, formatString, formatUpdated } from "~/helpers";
+import { strings } from "~/i18n";
+import { db, getUser, searchMeetings, searchGroups } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -46,33 +46,47 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const search = new URL(request.url).searchParams.get("search");
-  const meetingIDs = await searchMeetings(search);
   const { currentAccountID } = await getUser(request);
-  const meetingCount = await db.meeting.count({
-    where: { accountID: currentAccountID },
-  });
-  const loadedMeetings = search
-    ? await db.meeting.findMany({
-        include: { types: true, languages: true },
-        orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-        where: {
-          id: {
-            in: meetingIDs,
-          },
-          accountID: currentAccountID,
+
+  const where = {
+    OR: [
+      {
+        id: {
+          in: await searchMeetings(search || "", currentAccountID),
         },
-      })
-    : await db.meeting.findMany({
-        orderBy: [{ updatedAt: "desc" }],
-        take: config.batchSize,
-        include: { types: true, languages: true },
-        where: { accountID: currentAccountID },
-      });
+      },
+      {
+        groupID: {
+          in: await searchGroups(search || "", currentAccountID),
+        },
+      },
+    ],
+  };
+
+  const meetingCount = await db.meeting.count({
+    where,
+  });
+
+  const loadedMeetings = await db.meeting.findMany({
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: {
+      day: true,
+      time: true,
+      timezone: true,
+      name: true,
+      updatedAt: true,
+      id: true,
+      languages: { select: { code: true } },
+      types: { select: { code: true } },
+    },
+    where,
+  });
+
   return json({ loadedMeetings, search, meetingCount });
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings.title,
+  title: strings.search.title,
 });
 
 export default function Index() {
@@ -88,15 +102,21 @@ export default function Index() {
     if (actionData) {
       setMeetings([...meetings, ...actionData]);
     }
-  }, [actionData]);
+  }, [meetings, actionData]);
 
   return (
     <Template
-      title={strings.meetings.title}
-      description={formatString(strings.meetings.description, {
-        meetingCount,
-      })}
-      cta={<Button url="/meetings/add">{strings.meetings.add}</Button>}
+      title={strings.search.title}
+      description={
+        !meetingCount
+          ? formatString(strings.search.description_none, { search })
+          : meetingCount === 1
+          ? formatString(strings.search.description_one, { search })
+          : formatString(strings.search.description_many, {
+              meetingCount,
+              search,
+            })
+      }
     >
       {!meetings.length && (
         <Alert

@@ -1,4 +1,4 @@
-import { Activity } from "@prisma/client";
+import type { Activity } from "@prisma/client";
 import type {
   ActionFunction,
   LoaderFunction,

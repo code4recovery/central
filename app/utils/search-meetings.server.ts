@@ -1,6 +1,6 @@
 import { db } from "./db.server";
 
-export async function searchMeetings(search: string | null) {
+export async function searchMeetings(search: string, accountID: string) {
   if (!search) {
     return [];
   }
@@ -16,6 +16,7 @@ export async function searchMeetings(search: string | null) {
       $text: {
         $search: searchString,
       },
+      accountID: { $oid: accountID },
     },
   });
   if (!Array.isArray(result) || !result.length) {

@@ -1,8 +1,5 @@
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
-
-import { strings } from "~/i18n";
-import { Template } from "~/components";
 import {
   ClockIcon,
   ComputerDesktopIcon,
@@ -11,6 +8,9 @@ import {
   TagIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
+
+import { Template } from "~/components";
+import { strings } from "~/i18n";
 
 export const meta: MetaFunction = () => ({
   title: strings.reports.title,
@@ -53,9 +53,9 @@ export default function Reports() {
       <div className="grid grid-cols-3 gap-8">
         {Object.keys(reports).map((report) => (
           <Link
-            to={`/reports/${report}`}
-            key={report}
             className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 shadow rounded text-center px-5 py-10 space-y-2"
+            key={report}
+            to={`/reports/${report}`}
           >
             {reports[report as keyof typeof reports].icon}
             <div>{reports[report as keyof typeof reports].title}</div>

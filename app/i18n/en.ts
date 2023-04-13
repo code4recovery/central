@@ -144,7 +144,13 @@ export const strings = {
     view: "View",
     when: "When",
   },
-  search: "Search",
+  search: {
+    description_none: "No results match “%search%”",
+    description_one: "One result matches “%search%”",
+    description_many: "%meetingCount% results match “%search%”",
+    placeholder: "Search",
+    title: "Search Results",
+  },
   reports: {
     description: "A list of all the reports in your account",
     empty: "No reports yet",

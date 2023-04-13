@@ -1,8 +1,8 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { Language, Meeting, Type } from "@prisma/client";
 import { json, redirect } from "@remix-run/node";
 import { validationError } from "remix-validated-form";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { Language, Meeting, Type } from "@prisma/client";
 
 import {
   fields,

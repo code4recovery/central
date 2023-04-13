@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import { useActionData, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
 import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import { Group, Language, Meeting, Type } from "@prisma/client";
-
-import { Alert, Button, LoadMore, Table, Template } from "~/components";
-import { config, formatDayTime, formatString, formatUpdated } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getUser, searchGroups } from "~/utils";
+import type { Group, Meeting } from "@prisma/client";
+import { useEffect, useState } from "react";
+import { useActionData, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { validationError } from "remix-validated-form";
+
+import { Alert, Button, LoadMore, Table, Template } from "~/components";
+import { config, formatString, formatUpdated } from "~/helpers";
+import { strings } from "~/i18n";
+import { db, getUser } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -80,7 +80,7 @@ export default function Index() {
     if (actionData) {
       setGroups([...groups, ...actionData]);
     }
-  }, [actionData]);
+  }, [groups, actionData]);
 
   return (
     <Template

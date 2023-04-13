@@ -1,4 +1,4 @@
-import { Activity, Change, Meeting, User } from "@prisma/client";
+import type { Activity, Change, Meeting, User } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -39,7 +39,7 @@ export const meta: MetaFunction = () => ({
   title: strings.activity.title,
 });
 
-export default function Activity() {
+export default function ActivityScreen() {
   const { activities } = useLoaderData();
   return (
     <Template
