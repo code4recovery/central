@@ -1,4 +1,4 @@
-import type { Activity } from "@prisma/client";
+import type { Activity, Change } from "@prisma/client";
 import type {
   ActionFunction,
   LoaderFunction,
@@ -8,10 +8,27 @@ import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Button, Columns, Form, Panel, Template } from "~/components";
-import { fields, formatValidator, validObjectId } from "~/helpers";
+import {
+  Alerts,
+  Avatar,
+  Button,
+  Columns,
+  Form,
+  Panel,
+  Template,
+} from "~/components";
+import {
+  config,
+  fields,
+  formatChanges,
+  formatString,
+  formatUpdated,
+  formatValidator,
+  validObjectId,
+} from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
+import type { User } from "~/types";
 import { db, getUser, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -31,40 +48,23 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
-  const arrayEquals = (array1: string[], array2: string[]) =>
-    array1.length === array2.length &&
-    array1.every((value) => array2.includes(value));
-
-  // get changed fields
-  const changes = Object.keys(fields.meeting)
-    .map((field) => ({
-      field,
-      type: fields.meeting[field].type,
-      before: meeting[field as keyof typeof meeting],
-      after: data[field],
-    }))
-    .filter(({ type, before, after }) =>
-      type === "checkboxes"
-        ? !arrayEquals(before as string[], after)
-        : before !== after
-    )
-    .filter(({ before, after }) => before || after);
+  const changes = formatChanges(fields.meeting, meeting, data);
 
   // exit if no changes
   if (!changes.length) {
-    return json({ info: "Nothing was updated." });
+    return json({ info: strings.no_updates });
   }
 
   const { id: userID, currentAccountID } = await getUser(request);
 
   // create an activity record
-  const activity = (await db.activity.create({
+  const activity = await db.activity.create({
     data: {
       type: "update",
       meetingID: id,
       userID,
     },
-  })) as Activity;
+  });
 
   // save individual changes
   changes.forEach(
@@ -113,15 +113,15 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     where: { id },
   });
 
+  // save feed
   try {
     await saveFeedToStorage(currentAccountID);
-    return json({ success: "JSON updated." });
+    return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
       return json({ error: e.message });
     }
   }
-  return null;
 };
 
 async function getMeeting(id: string) {
@@ -142,13 +142,39 @@ async function getMeeting(id: string) {
 
 export const loader: LoaderFunction = async ({ params: { id } }) => {
   if (!validObjectId(id)) {
-    return redirect("/meetings"); // todo flash message
+    return redirect(config.home); // todo throw 404
   }
   const meeting = await getMeeting(id);
   if (!meeting) {
-    return redirect("/meetings"); // todo flash message
+    return redirect(config.home); // todo throw 404
   }
-  return json({ meeting });
+  const activities = await db.activity.findMany({
+    orderBy: [{ createdAt: "desc" }],
+    select: {
+      id: true,
+      createdAt: true,
+      changes: {
+        select: { field: true },
+      },
+      meeting: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      type: true,
+      user: {
+        select: {
+          name: true,
+          emailHash: true,
+        },
+      },
+    },
+    take: 5,
+    where: { meetingID: meeting.id },
+  });
+
+  return json({ activities, meeting });
 };
 
 export const meta: MetaFunction = () => ({
@@ -156,7 +182,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const { meeting } = useLoaderData();
+  const { activities, meeting } = useLoaderData();
   const actionData = useActionData<typeof action>();
   const { accountUrl } = useUser();
 
@@ -202,7 +228,34 @@ export default function EditMeeting() {
         <Panel
           title={strings.activity.title}
           emptyText={strings.activity.empty}
-        />
+        >
+          {activities.map(
+            ({
+              id,
+              changes,
+              type,
+              user,
+              createdAt,
+            }: Activity & { changes: Change[]; user: User }) => (
+              <div
+                className="flex justify-between gap-3 w-full px-4 py-3"
+                key={id}
+              >
+                <Avatar emailHash={user.emailHash} name={user.name} />
+                <span className="grow">
+                  {type === "create"
+                    ? strings.activity.create
+                    : formatString(strings.activity.update, {
+                        properties: changes
+                          .map(({ field }) => field)
+                          .join(", "),
+                      })}
+                </span>
+                <span>{formatUpdated(createdAt.toString())}</span>
+              </div>
+            )
+          )}
+        </Panel>
         <Panel
           title={strings.reports.title}
           emptyText={strings.reports.empty}

@@ -12,6 +12,7 @@ export const strings = {
     url_placeholder: "https://example.org/meetings",
   },
   activity: {
+    create: "Created",
     description: "A log of recent site activity",
     empty: "No activity yet",
     name: "Name",
@@ -83,6 +84,7 @@ export const strings = {
     venmo: "Venmo",
     website: "Website",
   },
+  json_updated: "JSON updated",
   languages: {
     AM: "Amharic",
     DA: "Danish",
@@ -144,6 +146,7 @@ export const strings = {
     view: "View",
     when: "When",
   },
+  no_updates: "Nothing was updated.",
   search: {
     description_none: "No results match “%search%”",
     description_one: "One result matches “%search%”",

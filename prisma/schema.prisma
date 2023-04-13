@@ -33,8 +33,10 @@ model Activity {
   userID    String   @db.ObjectId
   user      User     @relation(fields: [userID], references: [id])
   type      String
-  meetingID String   @db.ObjectId
-  meeting   Meeting  @relation(fields: [meetingID], references: [id])
+  groupID   String?  @db.ObjectId
+  group     Group?   @relation(fields: [groupID], references: [id])
+  meetingID String?  @db.ObjectId
+  meeting   Meeting? @relation(fields: [meetingID], references: [id])
   changes   Change[]
   createdAt DateTime @default(now())
 }
@@ -50,25 +52,22 @@ model Change {
 }
 
 model Group {
-  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
-  meetings              Meeting[]
-  name                  String
-  notes                 String?
-  recordID              String?
-  email                 String?
-  website               String?
-  phone                 String?
-  venmo                 String?
-  square                String?
-  paypal                String?
-  primary_contact_name  String?
-  primary_contact_email String?
-  alt_contact_name      String?
-  alt_contact_email     String?
-  accountID             String    @db.ObjectId
-  account               Account   @relation(fields: [accountID], references: [id])
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  meetings  Meeting[]
+  name      String
+  notes     String?
+  recordID  String?
+  email     String?
+  website   String?
+  phone     String?
+  venmo     String?
+  square    String?
+  paypal    String?
+  accountID String     @db.ObjectId
+  account   Account    @relation(fields: [accountID], references: [id])
+  activity  Activity[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@unique([accountID, name, recordID])
   @@fulltext([name, notes, website, recordID])

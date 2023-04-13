@@ -23,6 +23,7 @@ export const loader: LoaderFunction = async () => {
           name: true,
         },
       },
+      type: true,
       user: {
         select: {
           name: true,
@@ -68,9 +69,14 @@ export default function ActivityScreen() {
             name: activity.meeting.name,
             link: `/meetings/${activity.meeting.id}`,
             when: formatUpdated(activity.createdAt.toString()),
-            what: formatString(strings.activity.update, {
-              properties: activity.changes.map(({ field }) => field).join(", "),
-            }),
+            what:
+              activity.type === "create"
+                ? strings.activity.create
+                : formatString(strings.activity.update, {
+                    properties: activity.changes
+                      .map(({ field }) => field)
+                      .join(", "),
+                  }),
             user: (
               <div className="flex gap-2 items-center">
                 <Avatar

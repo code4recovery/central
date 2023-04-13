@@ -1,5 +1,6 @@
 export * from "./config";
 export * from "./fields";
+export * from "./format-changes";
 export * from "./format-classes";
 export * from "./format-day-time";
 export * from "./format-slug";

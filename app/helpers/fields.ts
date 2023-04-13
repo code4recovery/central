@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { strings } from "~/i18n";
-import { Field } from "~/types";
+import type { Field } from "~/types";
 
 import { config } from "./config";
 

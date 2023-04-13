@@ -79,15 +79,15 @@ export const action: ActionFunction = async ({ request }) => {
     },
   });
 
+  // save feed
   try {
     await saveFeedToStorage(currentAccountID);
-    return json({ success: "JSON updated." });
+    return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
       return json({ error: e.message });
     }
   }
-  return null;
 };
 
 export const meta: MetaFunction = () => ({
