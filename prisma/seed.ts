@@ -32,12 +32,29 @@ type Meeting = {
 };
 
 async function seed() {
+  const start = Date.now();
+
+  const name = process.env.USER_NAME;
+  const email = process.env.USER_EMAIL;
+  const url = "https://aa-intergroup.org/meetings";
+
+  if (!name || !email) {
+    console.error("USER_NAME or USER_EMAIL vars missing");
+    return;
+  }
+
+  const meetings = await getMeetings();
+
   await db.change.deleteMany();
   await db.activity.deleteMany();
   await db.meeting.deleteMany();
+  await db.group.deleteMany();
+  await db.user.deleteMany({ where: { NOT: { email } } });
+  await db.account.deleteMany({ where: { NOT: { url } } });
 
-  const url = "https://aa-intergroup.org/meetings";
-  let account = await db.account.findFirst();
+  let account = await db.account.findFirst({
+    where: { url },
+  });
   if (!account) {
     account = await db.account.create({
       data: {
@@ -48,7 +65,23 @@ async function seed() {
     });
   }
 
-  const meetings = await getMeetings(account.id);
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+  });
+  if (!user) {
+    await db.user.create({
+      data: {
+        name,
+        email,
+        emailHash: md5(email),
+        accounts: { connect: { id: account.id } },
+        adminAccounts: { connect: { id: account.id } },
+        currentAccountID: account.id,
+      },
+    });
+  }
 
   for (const data of meetings) {
     const {
@@ -62,6 +95,24 @@ async function seed() {
       alt_contact_email,
       ...meetingInfo
     } = data;
+
+    const users = [];
+    if (primary_contact_email) {
+      users.push({
+        currentAccountID: account.id,
+        email: primary_contact_email,
+        emailHash: md5(primary_contact_email),
+        name: primary_contact_name || primary_contact_email.split("@")[0],
+      });
+    }
+    if (alt_contact_email) {
+      users.push({
+        currentAccountID: account.id,
+        email: alt_contact_email,
+        emailHash: md5(alt_contact_email),
+        name: alt_contact_name || alt_contact_email.split("@")[0],
+      });
+    }
 
     await db.meeting.create({
       data: {
@@ -83,10 +134,14 @@ async function seed() {
               recordID,
               phone,
               email,
-              primary_contact_name,
-              primary_contact_email,
-              alt_contact_name,
-              alt_contact_email,
+              users: {
+                connectOrCreate: users.map((user) => ({
+                  where: {
+                    email: user.email,
+                  },
+                  create: user,
+                })),
+              },
             },
           },
         },
@@ -94,28 +149,9 @@ async function seed() {
     });
   }
 
-  const email = process.env.USER_EMAIL;
-  if (email) {
-    const user = await db.user.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (!user) {
-      await db.user.create({
-        data: {
-          name: process.env.USER_NAME ?? "Joe Q.",
-          email,
-          emailHash: md5(email),
-          accounts: { connect: { id: account.id } },
-          adminAccounts: { connect: { id: account.id } },
-          currentAccountID: account.id,
-        },
-      });
-    }
-  }
+  const seconds = Math.round((Date.now() - start) / 1000);
 
-  console.log(`${meetings.length} meetings imported`);
+  console.log(`${meetings.length} meetings imported in ${seconds} seconds`);
 
   if (typesNotFound.length) {
     console.log({ typesNotFound });
@@ -128,7 +164,7 @@ async function seed() {
 
 seed();
 
-async function getMeetings(accountID: string): Promise<Meeting[]> {
+async function getMeetings(): Promise<Meeting[]> {
   // fetch sheet
   const rows = await getGoogleSheet(
     "1tYV4wBZkY_3hp0tresN6iZBCwOyqkK-dz4UAWQPI1Vs"
@@ -152,7 +188,7 @@ async function getMeetings(accountID: string): Promise<Meeting[]> {
       primary_contact_name: row.primary_contact_name,
       primary_contact_email: row.primary_contact_email,
       alt_contact_name: row.alt_contact_name,
-      alt_contact_email: row.alt_contact_email,
+      alt_contact_email: row.alt_email, // yes
     };
     if (!row.times.length) {
       meetings.push(meeting);
@@ -211,6 +247,7 @@ const connectLanguages = (languages: string, types: string) => {
           ) {
             languagesNotFound.push(e);
           }
+          return undefined;
         })
         .filter((e) => e),
       ...types
@@ -221,6 +258,7 @@ const connectLanguages = (languages: string, types: string) => {
           if (index !== -1) {
             return Object.keys(strings.languages)[index];
           }
+          return undefined;
         })
         .filter((e) => e),
     ]),
@@ -252,6 +290,7 @@ const convertTypes = (types: string) => {
           ) {
             typesNotFound.push(e);
           }
+          return undefined;
         })
         .filter((e) => e)
         .sort()

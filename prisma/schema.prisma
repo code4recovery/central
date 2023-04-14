@@ -63,6 +63,8 @@ model Group {
   venmo     String?
   square    String?
   paypal    String?
+  userIDs   String[]   @db.ObjectId
+  users     User[]     @relation(fields: [userIDs], references: [id])
   accountID String     @db.ObjectId
   account   Account    @relation(fields: [accountID], references: [id])
   activity  Activity[]
@@ -117,12 +119,14 @@ model Type {
 
 model User {
   id               String     @id @default(auto()) @map("_id") @db.ObjectId
-  name             String?
+  name             String
   email            String     @unique
   emailHash        String
   lastSeen         DateTime?
   loginToken       String?
   currentAccountID String
+  groupIDs         String[]   @db.ObjectId
+  groups           Group[]    @relation(fields: [groupIDs], references: [id])
   accountIDs       String[]   @db.ObjectId
   accounts         Account[]  @relation("AccountUsers", fields: [accountIDs], references: [id])
   adminAccountIDs  String[]   @db.ObjectId

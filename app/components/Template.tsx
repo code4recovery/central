@@ -30,7 +30,7 @@ export function Template({
           <div className="sm:flex">
             <div className="sm:flex-auto sm:pt-2">
               <h1 className="font-semibold leading-6 text-2xl">
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-wrap gap-2 items-center">
                   {breadcrumbs?.map(([url, label]) => (
                     <Fragment key={url}>
                       <Link to={url} className={cx("underline", text)}>

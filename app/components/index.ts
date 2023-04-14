@@ -14,6 +14,7 @@ export * from "./Input";
 export * from "./Label";
 export * from "./LoadMore";
 export * from "./Panel";
+export * from "./PanelRow";
 export * from "./Select";
 export * from "./Table";
 export * from "./Template";

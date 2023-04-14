@@ -1,5 +1,6 @@
 import { withZod } from "@remix-validated-form/with-zod";
-import { z, ZodAny, ZodEffects } from "zod";
+import { z } from "zod";
+import type { ZodAny, ZodEffects } from "zod";
 
 import { fields } from "./fields";
 

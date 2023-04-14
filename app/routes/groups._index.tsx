@@ -3,7 +3,7 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import type { Group, Meeting } from "@prisma/client";
+import type { Group, Meeting, User } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
@@ -12,8 +12,8 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { validationError } from "remix-validated-form";
 
-import { Alert, Button, LoadMore, Table, Template } from "~/components";
-import { config, formatString, formatUpdated } from "~/helpers";
+import { Alert, Avatar, Button, LoadMore, Table, Template } from "~/components";
+import { config, formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getUser } from "~/utils";
 
@@ -58,6 +58,12 @@ export const loader: LoaderFunction = async ({ request }) => {
           id: true,
         },
       },
+      users: {
+        select: {
+          emailHash: true,
+          name: true,
+        },
+      },
     },
     orderBy: [{ updatedAt: "desc" }],
     take: config.batchSize,
@@ -73,7 +79,9 @@ export const meta: MetaFunction = () => ({
 export default function Index() {
   const { loadedGroups, groupCount } = useLoaderData<typeof loader>();
   const [groups, setGroups] =
-    useState<Array<Group & { meetings: Meeting[] }>>(loadedGroups);
+    useState<Array<Group & { meetings: Meeting[]; users: User[] }>>(
+      loadedGroups
+    );
   const actionData = useActionData();
 
   useEffect(() => {
@@ -95,14 +103,27 @@ export default function Index() {
         columns={{
           name: { label: strings.group.name },
           meetings: { label: strings.meetings.title },
+          reps: { label: "Representatives" },
           updatedAt: { label: strings.updated, align: "right" },
         }}
-        rows={groups.map(({ id, meetings, name, updatedAt }) => ({
+        rows={groups.map(({ id, meetings, name, updatedAt, users }) => ({
           id,
           link: `/groups/${id}`,
           meetings: meetings.length,
           name,
-          updatedAt: formatUpdated(updatedAt.toString()),
+          reps: (
+            <div className="pl-2 flex">
+              {users.map(({ id, emailHash, name }) => (
+                <Avatar
+                  key={id}
+                  emailHash={emailHash}
+                  name={name}
+                  className="-ml-2 shadow"
+                />
+              ))}
+            </div>
+          ),
+          updatedAt: formatDate(updatedAt.toString()),
         }))}
       />
       {groups.length < groupCount && (

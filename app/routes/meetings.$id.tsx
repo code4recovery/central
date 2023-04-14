@@ -1,4 +1,4 @@
-import type { Activity, Change } from "@prisma/client";
+import type { Activity, Change, User } from "@prisma/client";
 import type {
   ActionFunction,
   LoaderFunction,
@@ -10,11 +10,11 @@ import { validationError } from "remix-validated-form";
 
 import {
   Alerts,
-  Avatar,
   Button,
   Columns,
   Form,
   Panel,
+  PanelRow,
   Template,
 } from "~/components";
 import {
@@ -22,13 +22,11 @@ import {
   fields,
   formatChanges,
   formatString,
-  formatUpdated,
   formatValidator,
   validObjectId,
 } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import type { User } from "~/types";
 import { db, getUser, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -237,22 +235,20 @@ export default function EditMeeting() {
               user,
               createdAt,
             }: Activity & { changes: Change[]; user: User }) => (
-              <div
-                className="flex justify-between gap-3 w-full px-4 py-3"
+              <PanelRow
                 key={id}
-              >
-                <Avatar emailHash={user.emailHash} name={user.name} />
-                <span className="grow">
-                  {type === "create"
+                user={user}
+                date={createdAt.toString()}
+                text={
+                  type === "create"
                     ? strings.activity.create
                     : formatString(strings.activity.update, {
                         properties: changes
                           .map(({ field }) => field)
                           .join(", "),
-                      })}
-                </span>
-                <span>{formatUpdated(createdAt.toString())}</span>
-              </div>
+                      })
+                }
+              />
             )
           )}
         </Panel>

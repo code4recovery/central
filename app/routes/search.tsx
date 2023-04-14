@@ -13,7 +13,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { Alert, LoadMore, Table, Template } from "~/components";
-import { config, formatDayTime, formatString, formatUpdated } from "~/helpers";
+import { config, formatDate, formatDayTime, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getUser, searchMeetings, searchGroups } from "~/utils";
 
@@ -141,7 +141,7 @@ export default function Index() {
             id,
             link: `/meetings/${id}`,
             types: [...languages, ...types].map(({ code }) => code),
-            updatedAt: formatUpdated(updatedAt.toString()),
+            updatedAt: formatDate(updatedAt.toString()),
             when: formatDayTime(day, time, timezone),
           })
         )}

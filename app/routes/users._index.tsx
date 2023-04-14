@@ -4,7 +4,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { Avatar, Button, Chiclet, Table, Template } from "~/components";
-import { formatUpdated } from "~/helpers";
+import { formatDate } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, getUser } from "~/utils";
@@ -56,7 +56,7 @@ export default function Users() {
           ),
           link: `/users/${user.id}`,
           lastSeen: user.lastSeen
-            ? formatUpdated(user.lastSeen.toString())
+            ? formatDate(user.lastSeen.toString())
             : strings.users.last_seen_never,
         }))}
       />

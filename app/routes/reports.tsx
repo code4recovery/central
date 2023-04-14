@@ -53,7 +53,7 @@ export default function Reports() {
       <div className="grid grid-cols-3 gap-8">
         {Object.keys(reports).map((report) => (
           <Link
-            className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-900 shadow rounded text-center px-5 py-10 space-y-2"
+            className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-950 shadow rounded text-center px-5 py-10 space-y-2"
             key={report}
             to={`/reports/${report}`}
           >
