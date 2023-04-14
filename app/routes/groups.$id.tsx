@@ -19,6 +19,7 @@ import {
   validObjectId,
   formatChanges,
   formatString,
+  formatSelect,
 } from "~/helpers";
 import {
   Alerts,
@@ -111,9 +112,7 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
 
   const group = await db.group.findUnique({
     select: {
-      ...Object.fromEntries(
-        Object.keys(fields.group).map((field) => [field, true])
-      ),
+      ...formatSelect("group"),
       meetings: {
         select: {
           day: true,

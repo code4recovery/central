@@ -130,7 +130,7 @@ export function Table({
                     "text-right": columns[key].align === "right",
                   })}
                 >
-                  {!!row.link ? (
+                  {row.link ? (
                     <Link to={row.link} className="block p-3">
                       {showValue(row[key])}
                     </Link>

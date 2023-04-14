@@ -4,15 +4,15 @@ import type { ZodAny, ZodEffects } from "zod";
 
 import { fields } from "./fields";
 
-export const formatValidator = (form: keyof typeof fields) =>
+export const formatValidator = (model: keyof typeof fields) =>
   withZod(
     z.object(
       Object.fromEntries(
-        Object.keys(fields[form])
-          .filter((name) => fields[form][name].validation)
+        Object.keys(fields[model])
+          .filter((name) => fields[model][name].validation)
           .map((name) => [
             name,
-            fields[form][name].validation as ZodEffects<ZodAny, any, any>,
+            fields[model][name].validation as ZodEffects<ZodAny, any, any>,
           ])
       )
     )
