@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Alerts, Columns, Form, Template } from "~/components";
+import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getUser, saveFeedToStorage } from "~/utils";
@@ -110,7 +110,14 @@ export default function CreateMeeting() {
           </>
         }
       >
-        Add meeting description
+        <HelpTopic
+          title={strings.help.conference_providers_title}
+          content={strings.help.conference_providers_content}
+        />
+        <HelpTopic
+          title={strings.help.online_location_title}
+          content={strings.help.online_location_description}
+        />
       </Columns>
     </Template>
   );

@@ -19,10 +19,10 @@ import {
   validObjectId,
   formatChanges,
   formatString,
-  formatSelect,
 } from "~/helpers";
 import {
   Alerts,
+  Button,
   Columns,
   Form,
   Panel,
@@ -119,7 +119,16 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
 
   const group = await db.group.findUnique({
     select: {
-      ...formatSelect("group"),
+      id: true,
+      name: true,
+      recordID: true,
+      notes: true,
+      email: true,
+      phone: true,
+      website: true,
+      venmo: true,
+      paypal: true,
+      square: true,
       meetings: {
         select: {
           day: true,
@@ -222,6 +231,11 @@ export default function GroupEdit() {
                 })
               )}
             />
+            <div className="flex justify-center pt-4">
+              <Button url={`/add-meeting/${group.id}`}>
+                {strings.meetings.add}
+              </Button>
+            </div>
           </>
         }
       >

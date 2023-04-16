@@ -10,6 +10,7 @@ export * from "./Form";
 export * from "./Geocode";
 export * from "./Header";
 export * from "./HelpText";
+export * from "./HelpTopic";
 export * from "./Input";
 export * from "./Label";
 export * from "./LoadMore";

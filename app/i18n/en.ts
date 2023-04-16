@@ -13,11 +13,15 @@ export const strings = {
   },
   activity: {
     create: "Created",
+    create_group: "Created group",
+    create_meeting: "Created meeting",
     description: "A log of recent site activity",
     empty: "No activity yet",
     name: "Name",
     title: "Activity",
     update: "Updated %properties%",
+    update_group: "Updated group %properties%",
+    update_meeting: "Updated meeting %properties%",
     what: "What",
     when: "When",
     who: "Who",
@@ -84,6 +88,14 @@ export const strings = {
     venmo: "Venmo",
     website: "Website",
   },
+  help: {
+    conference_providers_title: "Which conference providers are supported?",
+    conference_providers_content:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+    online_location_title: "Can online meetings have a location?",
+    online_location_description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+  },
   json_updated: "JSON updated",
   languages: {
     AM: "Amharic",
@@ -146,7 +158,7 @@ export const strings = {
     location_help: "Building name",
     location_notes: "Location notes",
     location_notes_help: "Additional location info",
-    name: "Name",
+    name: "Meeting name",
     notes_notes: "Avoid adding information here that could go in other fields",
     ongoing: "Ongoing",
     time: "Time",

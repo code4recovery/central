@@ -85,12 +85,19 @@ export default function ActivityScreen() {
             when: formatDate(activity.createdAt.toString()),
             what:
               activity.type === "create"
-                ? strings.activity.create
-                : formatString(strings.activity.update, {
-                    properties: activity.changes
-                      .map(({ field }) => field)
-                      .join(", "),
-                  }),
+                ? activity.meeting
+                  ? strings.activity.create_meeting
+                  : strings.activity.create_group
+                : formatString(
+                    activity.meeting
+                      ? strings.activity.update_meeting
+                      : strings.activity.update_group,
+                    {
+                      properties: activity.changes
+                        .map(({ field }) => field)
+                        .join(", "),
+                    }
+                  ),
             user: (
               <div className="flex gap-2 items-center">
                 <Avatar
