@@ -3,7 +3,7 @@ import { useIsSubmitting, ValidatedForm } from "remix-validated-form";
 import {
   Button,
   Checkbox,
-  ComboBox,
+  Geocode,
   Input,
   Label,
   Select,
@@ -76,80 +76,6 @@ export function Form({
                       key={name}
                     >
                       <Label htmlFor={name}>{label}</Label>
-                      {[
-                        "email",
-                        "number",
-                        "tel",
-                        "text",
-                        "time",
-                        "url",
-                      ].includes(type) && (
-                        <Input
-                          {...fields[form][name]}
-                          defaultValue={values?.[name]}
-                          name={name}
-                        />
-                      )}
-                      {type === "textarea" && (
-                        <Textarea
-                          {...fields[form][name]}
-                          defaultValue={values?.[name]}
-                          name={name}
-                        />
-                      )}
-                      {type === "colors" && (
-                        <div className="grid grid-cols-5 gap-2 items-top">
-                          {Object.keys(config.themes).map((color) => {
-                            const {
-                              background,
-                              backgroundHover,
-                              focusRing,
-                              label,
-                              text,
-                            } =
-                              config.themes[
-                                color as keyof typeof config.themes
-                              ];
-                            return (
-                              <input
-                                key={color}
-                                type="radio"
-                                name={name}
-                                value={color}
-                                title={color}
-                                defaultChecked={color === values?.[name]}
-                                className={cx(
-                                  "relative h-10 flex cursor-pointer justify-center rounded w-full border-0 checked:ring-2 checked:ring-offset-1",
-                                  background,
-                                  backgroundHover,
-                                  className,
-                                  focusRing,
-                                  text
-                                )}
-                                aria-label={label}
-                              />
-                            );
-                          })}
-                        </div>
-                      )}
-                      {type === "combobox" && (
-                        <ComboBox
-                          className={className}
-                          defaultValue={values?.[name] as string | number}
-                          name={name}
-                          options={options}
-                          required={required}
-                        />
-                      )}
-                      {type === "select" && (
-                        <Select
-                          className={className}
-                          defaultValue={values?.[name] as string | number}
-                          name={name}
-                          options={options}
-                          required={required}
-                        />
-                      )}
                       {type === "checkbox" && (
                         <Checkbox
                           {...fields[form][name]}
@@ -190,6 +116,78 @@ export function Form({
                             </div>
                           ))}
                         </div>
+                      )}
+                      {[
+                        "email",
+                        "number",
+                        "tel",
+                        "text",
+                        "time",
+                        "url",
+                      ].includes(type) && (
+                        <Input
+                          {...fields[form][name]}
+                          defaultValue={values?.[name]}
+                          name={name}
+                        />
+                      )}
+                      {type === "colors" && (
+                        <div className="grid grid-cols-5 gap-2 items-top">
+                          {Object.keys(config.themes).map((color) => {
+                            const {
+                              background,
+                              backgroundHover,
+                              focusRing,
+                              label,
+                              text,
+                            } =
+                              config.themes[
+                                color as keyof typeof config.themes
+                              ];
+                            return (
+                              <input
+                                key={color}
+                                type="radio"
+                                name={name}
+                                value={color}
+                                title={color}
+                                defaultChecked={color === values?.[name]}
+                                className={cx(
+                                  "relative h-10 flex cursor-pointer justify-center rounded w-full border-0 checked:ring-2 checked:ring-offset-1",
+                                  background,
+                                  backgroundHover,
+                                  className,
+                                  focusRing,
+                                  text
+                                )}
+                                aria-label={label}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                      {type === "geocode" && (
+                        <Geocode
+                          {...fields[form][name]}
+                          defaultValue={values?.[name] as string}
+                          name={name}
+                        />
+                      )}
+                      {type === "select" && (
+                        <Select
+                          className={className}
+                          defaultValue={values?.[name] as string | number}
+                          name={name}
+                          options={options}
+                          required={required}
+                        />
+                      )}
+                      {type === "textarea" && (
+                        <Textarea
+                          {...fields[form][name]}
+                          defaultValue={values?.[name]}
+                          name={name}
+                        />
                       )}
                     </div>
                   );

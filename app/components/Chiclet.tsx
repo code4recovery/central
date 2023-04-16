@@ -1,9 +1,7 @@
-import { ReactNode } from "react";
-
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 
-export function Chiclet({ children }: { children: ReactNode }) {
+export function Chiclet({ children }: { children: React.ReactNode }) {
   const {
     theme: { background, border },
   } = useUser();

@@ -60,6 +60,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       },
       users: {
         select: {
+          id: true,
           emailHash: true,
           name: true,
         },

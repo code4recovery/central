@@ -125,6 +125,55 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       type: "text",
       validation: required.string,
     },
+    conference_url: {
+      label: strings.meetings.conference_url,
+      type: "url",
+      span: 6,
+      validation: optional.url,
+      helpText: strings.meetings.conference_url_help,
+    },
+    conference_url_notes: {
+      label: strings.meetings.conference_url_notes,
+      type: "text",
+      span: 6,
+      validation: optional.string,
+      helpText: strings.meetings.conference_url_notes_help,
+    },
+    conference_phone: {
+      label: strings.meetings.conference_phone,
+      type: "tel",
+      span: 6,
+      validation: optional.string, // todo phone validator
+      helpText: strings.meetings.conference_phone_help,
+    },
+    conference_phone_notes: {
+      label: strings.meetings.conference_phone_notes,
+      type: "text",
+      span: 6,
+      validation: optional.string,
+      helpText: strings.meetings.conference_phone_notes_help,
+    },
+    geocode: {
+      label: strings.meetings.geocode,
+      type: "geocode",
+      span: 12,
+      validation: optional.string,
+      helpText: strings.meetings.geocode_help,
+    },
+    location: {
+      label: strings.meetings.location,
+      type: "text",
+      span: 6,
+      validation: optional.string,
+      helpText: strings.meetings.location_help,
+    },
+    location_notes: {
+      label: strings.meetings.location_notes,
+      type: "text",
+      span: 6,
+      validation: optional.string,
+      helpText: strings.meetings.location_notes_help,
+    },
     day: {
       label: strings.meetings.day,
       options: config.days.map((day, index) => ({
@@ -158,36 +207,6 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       type: "number",
       validation: optional.number,
     },
-    conference_url: {
-      label: strings.meetings.conference_url,
-      type: "url",
-      span: 6,
-      validation: optional.url,
-    },
-    conference_url_notes: {
-      label: strings.meetings.conference_url_notes,
-      type: "text",
-      span: 6,
-      validation: optional.string,
-    },
-    conference_phone: {
-      label: strings.meetings.conference_phone,
-      type: "tel",
-      span: 6,
-      validation: optional.string, // todo phone validator
-    },
-    conference_phone_notes: {
-      label: strings.meetings.conference_phone_notes,
-      type: "text",
-      span: 6,
-      validation: optional.string,
-    },
-    notes: {
-      helpText: strings.meetings.notes_notes,
-      label: "Notes",
-      type: "textarea",
-      validation: optional.string,
-    },
     languages: {
       label: strings.meetings.languages,
       options: Object.keys(strings.languages)
@@ -217,6 +236,12 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
         })),
       type: "checkboxes",
       validation: optional.array,
+    },
+    notes: {
+      helpText: strings.meetings.notes_notes,
+      label: "Notes",
+      type: "textarea",
+      validation: optional.string,
     },
   },
   user: {

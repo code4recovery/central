@@ -17,6 +17,7 @@ export type Field = {
     | "checkboxes"
     | "colors"
     | "combobox"
+    | "geocode"
     | "hidden"
     | "select"
     | "textarea"

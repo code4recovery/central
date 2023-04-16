@@ -1,5 +1,5 @@
 import { config, formatClasses as cx } from "~/helpers";
-import { Field } from "~/types";
+import type { Field } from "~/types";
 
 export function Checkbox({
   className,

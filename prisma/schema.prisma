@@ -51,6 +51,40 @@ model Change {
   createdAt  DateTime @default(now())
 }
 
+model Geocode {
+  id                String     @id @default(auto()) @map("_id") @db.ObjectId
+  Meetings          Meeting[]
+  Searches          Geoquery[]
+  neighborhood      String?
+  city              String?
+  state             String?
+  country           String?
+  formatted_address String     @unique
+  latitude          Float?
+  longitude         Float?
+  north             Float?
+  east              Float?
+  south             Float?
+  west              Float?
+  location_type     String?
+  place_id          String
+  plus_code         String?
+  timezone          String?
+  types             String?
+  response          String
+  createdAt         DateTime   @default(now())
+}
+
+model Geoquery {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  query     String    @unique
+  geocodeID String?   @db.ObjectId
+  geocode   Geocode?  @relation(fields: [geocodeID], references: [id])
+  createdAt DateTime  @default(now())
+  queriedAt DateTime?
+  meetings  Meeting[]
+}
+
 model Group {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   meetings  Meeting[]
@@ -92,6 +126,12 @@ model Meeting {
   conference_url_notes   String?
   conference_phone       String?
   conference_phone_notes String?
+  location               String?
+  location_notes         String?
+  geocodeID              String?    @db.ObjectId
+  geocode                Geocode?   @relation(fields: [geocodeID], references: [id])
+  geoqueryID             String?    @db.ObjectId
+  geoquery               Geoquery?  @relation(fields: [geoqueryID], references: [id])
   activity               Activity[]
   accountID              String     @db.ObjectId
   account                Account    @relation(fields: [accountID], references: [id])

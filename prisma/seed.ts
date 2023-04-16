@@ -105,7 +105,7 @@ async function seed() {
         name: primary_contact_name || primary_contact_email.split("@")[0],
       });
     }
-    if (alt_contact_email) {
+    if (alt_contact_email && alt_contact_email !== primary_contact_email) {
       users.push({
         currentAccountID: account.id,
         email: alt_contact_email,

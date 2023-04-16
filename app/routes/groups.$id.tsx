@@ -138,6 +138,7 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
       groupIDs: { has: id },
     },
     select: {
+      id: true,
       name: true,
       emailHash: true,
       lastSeen: true,
