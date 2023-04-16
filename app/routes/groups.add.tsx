@@ -1,11 +1,12 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Columns, Form, Template } from "~/components";
 import { formatValidator } from "~/helpers";
-import { db, getUser } from "~/utils";
+import { strings } from "~/i18n";
+import { db, getUser, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = formatValidator("group");
@@ -13,7 +14,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (error) {
     return validationError(error);
   }
-  const { currentAccountID } = await getUser(request);
+  const { id, currentAccountID } = await getUser(request);
   const group = await db.group.create({
     data: {
       ...data,
@@ -21,7 +22,16 @@ export const action: ActionFunction = async ({ request }) => {
       account: { connect: { id: currentAccountID } },
     },
   });
-  return redirect(`/groups/${group.id}`); // todo flash message
+  await db.activity.create({
+    data: {
+      type: "create",
+      groupID: group.id,
+      userID: id,
+    },
+  });
+  return redirectWith(`/groups/${group.id}`, request, {
+    success: strings.group.added,
+  });
 };
 
 export const loader: LoaderFunction = async () => {

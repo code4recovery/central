@@ -1,15 +1,7 @@
 import { Alert } from "./Alert";
+import type { Alert as AlertType } from "~/types";
 
-export function Alerts({
-  data,
-}: {
-  data: {
-    warning?: string;
-    error?: string;
-    info?: string;
-    success?: string;
-  };
-}) {
+export function Alerts({ data }: { data: AlertType }) {
   const alertTypes: Array<keyof typeof data> = [
     "warning",
     "error",

@@ -1,4 +1,4 @@
-import type { Group } from "@prisma/client";
+import type { Group, Meeting } from "@prisma/client";
 
 import type { Field } from "~/types";
 
@@ -9,7 +9,15 @@ const arrayEquals = (array1: string[], array2: string[]) =>
 export function formatChanges(
   fields: { [index: string]: Field },
   value: {
-    [key: string]: string | string[] | number | Group | Date | null | undefined;
+    [key: string]:
+      | string
+      | string[]
+      | number
+      | Group
+      | Date
+      | null
+      | undefined
+      | Meeting[];
   },
   data: {
     [key: string]: string | string[] | number | Group | Date | null | undefined;

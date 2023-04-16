@@ -10,7 +10,7 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Columns, Form, Template } from "~/components";
 import { config, formatValidator, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getUserID } from "~/utils";
+import { db, getUser } from "~/utils";
 
 export const action: ActionFunction = async ({ params, request }) => {
   if (!validObjectId(params.id)) {
@@ -18,7 +18,7 @@ export const action: ActionFunction = async ({ params, request }) => {
   }
 
   // security
-  const id = await getUserID(request);
+  const { id } = await getUser(request);
   const account = db.account.findFirst({
     where: { id: params.id, adminIDs: { has: id } },
   });
@@ -50,7 +50,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     return redirect(config.home); // todo flash invalid id message to this page
   }
 
-  const id = await getUserID(request);
+  const { id } = await getUser(request);
   const account = await db.account.findFirst({
     where: { id: params.id, adminIDs: { has: id } },
   });

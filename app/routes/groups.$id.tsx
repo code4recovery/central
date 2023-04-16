@@ -31,7 +31,7 @@ import {
   Template,
 } from "~/components";
 import { strings } from "~/i18n";
-import { db, getUser, saveFeedToStorage } from "~/utils";
+import { db, getUser, jsonWith, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -40,6 +40,9 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   const group = await db.group.findUnique({
     where: { id },
+    include: {
+      meetings: true,
+    },
   });
   if (!group) {
     return redirect("/groups"); // todo flash invalid id message to this page
@@ -94,6 +97,10 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     where: { id },
   });
 
+  if (!group.meetings.length) {
+    return json({ success: strings.group.updated });
+  }
+
   // save feed
   try {
     await saveFeedToStorage(currentAccountID);
@@ -105,9 +112,9 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 };
 
-export const loader: LoaderFunction = async ({ params: { id } }) => {
+export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
-    return redirect("/groups"); // todo flash invalid id message to this page
+    return redirect("/groups"); // todo throw 404
   }
 
   const group = await db.group.findUnique({
@@ -130,7 +137,7 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
   });
 
   if (!group) {
-    return redirect("/groups"); // todo flash invalid id message to this page
+    return redirect("/groups"); // todo throw 404
   }
 
   const users = await db.user.findMany({
@@ -171,12 +178,13 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
     where: { groupID: id },
   });
 
-  return json({ activities, group, users });
+  return jsonWith(request, { activities, group, users });
 };
 
 export default function GroupEdit() {
-  const { activities, group, users } = useLoaderData();
+  const { activities, alert, group, users } = useLoaderData();
   const actionData = useActionData();
+  const alerts = { ...actionData, ...alert };
   return (
     <Template
       breadcrumbs={[["/groups", strings.group.title]]}
@@ -185,7 +193,7 @@ export default function GroupEdit() {
       <Columns
         primary={
           <>
-            {actionData && <Alerts data={actionData} />}
+            {alerts && <Alerts data={alerts} />}
             <Form form="group" values={group} />
             <Table
               columns={{
@@ -218,6 +226,19 @@ export default function GroupEdit() {
         }
       >
         <Panel
+          title={strings.representatives.title}
+          emptyText={strings.representatives.empty}
+        >
+          {users.map((user: User) => (
+            <PanelRow
+              user={user}
+              key={user.id}
+              text={user.name}
+              date={user.lastSeen?.toString()}
+            />
+          ))}
+        </Panel>
+        <Panel
           title={strings.activity.title}
           emptyText={strings.activity.empty}
         >
@@ -245,19 +266,6 @@ export default function GroupEdit() {
               />
             )
           )}
-        </Panel>
-        <Panel
-          title={strings.representatives.title}
-          emptyText={strings.representatives.empty}
-        >
-          {users.map((user: User) => (
-            <PanelRow
-              user={user}
-              key={user.id}
-              text={user.name}
-              date={user.lastSeen?.toString()}
-            />
-          ))}
         </Panel>
       </Columns>
     </Template>

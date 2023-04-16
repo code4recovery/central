@@ -73,7 +73,7 @@ export const strings = {
     email: "Email",
     empty: "No groups added yet",
     empty_search: "No groups matched “%search%”",
-    name: "Group",
+    name: "Group name",
     notes: "Group notes",
     paypal: "PayPal",
     phone: "Phone",

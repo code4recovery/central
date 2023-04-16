@@ -8,10 +8,8 @@ export function Panel({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="bg-white dark:bg-black rounded-md shadow overflow-hidden">
-      <h3 className="bg-neutral-50 dark:bg-neutral-800 px-4 py-3 border-b border-neutral-300 dark:border-neutral-700">
-        {title}
-      </h3>
+    <div className="bg-white dark:bg-black rounded-md shadow overflow-hidden divide-y divide-neutral-300 dark:divide-neutral-800">
+      <h3 className="bg-neutral-50 dark:bg-neutral-800 px-4 py-3">{title}</h3>
       {Array.isArray(children) && children.length ? (
         children
       ) : (
