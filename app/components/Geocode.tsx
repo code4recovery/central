@@ -35,7 +35,12 @@ export function Geocode({
     if (addresses.state === "idle" && addresses.data == null) {
       addresses.load("/geocode");
     }
-  }, [addresses]);
+    if (addresses.state === "idle" && addresses.data && defaultValue) {
+      setSelectedAddress(
+        addresses.data.filter(({ id }: Address) => id === defaultValue)[0]
+      );
+    }
+  }, [addresses, defaultValue]);
 
   const filtered = useMemo(
     () =>
@@ -68,26 +73,23 @@ export function Geocode({
         as="div"
         className="group relative"
         disabled={geocoder.state === "submitting"}
-        name={name}
+        name={name.replace("ID", "[id]")}
         nullable
         value={selectedAddress ?? null}
         onChange={setSelectedAddress}
         onBlur={() => {
-          setTimeout(() => {
-            if (
-              !selectedAddress?.formatted_address
-                .toLowerCase()
-                .includes(query.toLowerCase())
-            ) {
-              setSelectedAddress(undefined);
-              if (query) {
-                geocoder.submit(
-                  { query },
-                  { method: "post", action: "/geocode" }
-                );
-              }
+          if (
+            !selectedAddress?.formatted_address
+              .toLowerCase()
+              .includes(query.toLowerCase())
+          ) {
+            if (query) {
+              geocoder.submit(
+                { query },
+                { method: "post", action: "/geocode" }
+              );
             }
-          }, 100);
+          }
         }}
       >
         <Combobox.Input

@@ -1,7 +1,8 @@
 export const config = {
   aboutUrl: "https://code4recovery.org",
   batchSize: 25,
-  checkboxClassNames: "h-4 w-4 rounded border-neutral-500 m-0 mt-0.5",
+  checkboxClassNames:
+    "h-4 w-4 rounded border-neutral-500 m-0 mt-0.5 focus:ring-offset-transparent focus:ring-2",
   days: [
     "sunday",
     "monday",
@@ -34,7 +35,7 @@ export const config = {
       border: "border-gray-500",
       focusOutline:
         "focus-visible:outline-gray-600 dark:focus-visible:outline-gray-400",
-      focusRing: "focus:ring-neutral-500 checked:ring-gray-500",
+      focusRing: "focus:ring-gray-500 checked:ring-gray-500",
       text: "text-gray-600 dark:text-gray-600",
       accentColor: "#1f2937",
     },

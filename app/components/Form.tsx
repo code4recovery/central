@@ -84,7 +84,7 @@ export function Form({
                         />
                       )}
                       {type === "checkboxes" && (
-                        <div className="items-start gap-x-5 gap-y-3 grid grid-cols-3 sm:grid-cols-4">
+                        <div className="items-start gap-x-5 gap-y-3 grid grid-cols-3 lg:grid-cols-4">
                           {options?.map(({ value: optionValue, label }) => (
                             <div
                               className="flex items-top gap-2 m-0"
@@ -101,14 +101,14 @@ export function Form({
                                   Array.isArray(values?.[name]) &&
                                   values?.[name]?.includes(optionValue)
                                 }
-                                id={`${optionValue}`}
+                                id={optionValue}
                                 name={name}
                                 type="checkbox"
-                                value={`${optionValue}`}
+                                value={optionValue}
                               />
                               <label
                                 className="text-sm truncate"
-                                htmlFor={`${optionValue}`}
+                                htmlFor={optionValue}
                                 title={label}
                               >
                                 {label}

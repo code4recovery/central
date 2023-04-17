@@ -13,6 +13,7 @@ import {
   Button,
   Columns,
   Form,
+  HelpTopic,
   Panel,
   PanelRow,
   Template,
@@ -27,7 +28,7 @@ import {
 } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getUser, saveFeedToStorage } from "~/utils";
+import { db, getUser, jsonWith, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -41,12 +42,23 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 
   const validator = formatValidator("meeting");
-  const { data, error } = await validator.validate(await request.formData());
+  const formData = await request.formData();
+  const geocodeID = formData.get("geocode[id]")?.toString();
+  const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
   }
 
   const changes = formatChanges(fields.meeting, meeting, data);
+
+  if (meeting.geocodeID !== geocodeID) {
+    changes.push({
+      field: "geocodeID",
+      type: "geocode",
+      before: meeting.geocodeID,
+      after: geocodeID,
+    });
+  }
 
   // exit if no changes
   if (!changes.length) {
@@ -138,7 +150,7 @@ async function getMeeting(id: string) {
   };
 }
 
-export const loader: LoaderFunction = async ({ params: { id } }) => {
+export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
     return redirect(config.home); // todo throw 404
   }
@@ -172,7 +184,7 @@ export const loader: LoaderFunction = async ({ params: { id } }) => {
     where: { meetingID: meeting.id },
   });
 
-  return json({ activities, meeting });
+  return jsonWith(request, { activities, meeting });
 };
 
 export const meta: MetaFunction = () => ({
@@ -180,9 +192,10 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const { activities, meeting } = useLoaderData();
+  const { activities, alert, meeting } = useLoaderData();
   const actionData = useActionData<typeof action>();
   const { accountUrl } = useUser();
+  const alerts = { ...alert, ...actionData };
 
   return (
     <Template
@@ -195,7 +208,7 @@ export default function EditMeeting() {
       <Columns
         primary={
           <>
-            {actionData && <Alerts data={actionData} />}
+            {alerts && <Alerts data={alerts} />}
             <Form form="meeting" values={meeting} />
           </>
         }
@@ -223,6 +236,18 @@ export default function EditMeeting() {
             {strings.meetings.archive}
           </Button>
         </div>
+        <HelpTopic
+          title={strings.help.conference_providers_title}
+          content={strings.help.conference_providers_content}
+        />
+        <HelpTopic
+          title={strings.help.online_location_title}
+          content={strings.help.online_location_description}
+        />
+        <HelpTopic
+          title={strings.help.phone_format_title}
+          content={strings.help.phone_format_description}
+        />
         <Panel
           title={strings.activity.title}
           emptyText={strings.activity.empty}

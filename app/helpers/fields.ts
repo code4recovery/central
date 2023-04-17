@@ -153,11 +153,10 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: optional.string,
       helpText: strings.meetings.conference_phone_notes_help,
     },
-    geocode: {
+    geocodeID: {
       label: strings.meetings.geocode,
       type: "geocode",
       span: 12,
-      validation: optional.string,
       helpText: strings.meetings.geocode_help,
     },
     location: {

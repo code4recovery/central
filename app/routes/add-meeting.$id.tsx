@@ -1,4 +1,8 @@
-import type { ActionFunction, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
@@ -6,11 +10,13 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getUser, saveFeedToStorage } from "~/utils";
+import { db, getUser, redirectWith, saveFeedToStorage } from "~/utils";
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ params: { id }, request }) => {
   const validator = formatValidator("meeting");
-  const { data, error } = await validator.validate(await request.formData());
+  const formData = await request.formData();
+  const geocodeID = formData.get("geocode[id]")?.toString();
+  const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
   }
@@ -32,8 +38,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { id: userID, currentAccountID } = await getUser(request);
 
-  const groupID = "todo"; // todo
-
   // update meeting
   const meeting = await db.meeting.create({
     data: {
@@ -47,8 +51,9 @@ export const action: ActionFunction = async ({ request }) => {
       conference_phone,
       conference_phone_notes,
       notes,
+      geocode: { connect: geocodeID ? { id: geocodeID } : undefined },
       group: {
-        connect: { id: groupID },
+        connect: { id },
       },
       languages: {
         connect: [
@@ -82,12 +87,22 @@ export const action: ActionFunction = async ({ request }) => {
   // save feed
   try {
     await saveFeedToStorage(currentAccountID);
-    return json({ success: strings.json_updated });
+    return redirectWith(`/meetings/${meeting.id}`, request, {
+      success: strings.json_updated,
+    });
   } catch (e) {
     if (e instanceof Error) {
       return json({ error: e.message });
     }
   }
+};
+
+export const loader: LoaderFunction = async ({ params: { id } }) => {
+  const group = await db.group.findUnique({
+    select: { id: true, name: true },
+    where: { id },
+  });
+  return json({ group });
 };
 
 export const meta: MetaFunction = () => ({
@@ -96,17 +111,20 @@ export const meta: MetaFunction = () => ({
 
 export default function CreateMeeting() {
   const actionData = useActionData();
-  const loaderData = useLoaderData();
+  const { group } = useLoaderData();
   return (
     <Template
       title={strings.meetings.add}
-      breadcrumbs={[["/meetings", strings.meetings.title]]}
+      breadcrumbs={[
+        ["/groups", strings.group.title],
+        [`/groups/${group.id}`, group.name],
+      ]}
     >
       <Columns
         primary={
           <>
             {actionData && <Alerts data={actionData} />}
-            <Form form="meeting" values={loaderData} />
+            <Form form="meeting" />
           </>
         }
       >
@@ -117,6 +135,10 @@ export default function CreateMeeting() {
         <HelpTopic
           title={strings.help.online_location_title}
           content={strings.help.online_location_description}
+        />
+        <HelpTopic
+          title={strings.help.phone_format_title}
+          content={strings.help.phone_format_description}
         />
       </Columns>
     </Template>

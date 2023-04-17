@@ -95,6 +95,9 @@ export const strings = {
     online_location_title: "Can online meetings have a location?",
     online_location_description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+    phone_format_title: "What's the recommended format for Zoom phone numbers?",
+    phone_format_description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
   },
   json_updated: "JSON updated",
   languages: {

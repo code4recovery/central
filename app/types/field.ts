@@ -22,7 +22,7 @@ export type Field = {
     | "select"
     | "textarea"
     | InputType;
-  validation:
+  validation?:
     | ZodEffects<any, any, any>
     | ZodUnion<
         [
