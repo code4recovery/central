@@ -18,8 +18,8 @@ type Meeting = {
   start?: Date;
   time?: string;
   timezone?: string;
-  languages?: { connect: { code?: string }[] };
-  types?: { connect: { code?: string }[] };
+  languages?: { where: { code: string }; create: { code: string } }[];
+  types?: { where: { code: string }; create: { code: string } }[];
 
   // group info
   recordID: string;
@@ -49,6 +49,8 @@ async function seed() {
   await db.activity.deleteMany();
   await db.meeting.deleteMany();
   await db.group.deleteMany();
+  //await db.language.deleteMany();
+  //await db.type.deleteMany();
   await db.user.deleteMany({ where: { NOT: { email } } });
   await db.account.deleteMany({ where: { NOT: { url } } });
 
@@ -93,6 +95,8 @@ async function seed() {
       primary_contact_email,
       alt_contact_name,
       alt_contact_email,
+      languages,
+      types,
       ...meetingInfo
     } = data;
 
@@ -118,6 +122,12 @@ async function seed() {
       data: {
         ...meetingInfo,
         account: { connect: { id: account.id } },
+        languages: {
+          connectOrCreate: languages,
+        },
+        types: {
+          connectOrCreate: types,
+        },
         group: {
           connectOrCreate: {
             where: {
@@ -171,12 +181,12 @@ async function getMeetings(): Promise<Meeting[]> {
   );
   const meetings: Meeting[] = [];
 
-  rows.slice(120, 140).forEach((row) => {
+  rows.slice(150, 170).forEach((row) => {
     const meeting = {
       name: row.name,
       timezone: row.timezone,
       notes: row.notes,
-      types: convertTypes(row.types),
+      types: connectTypes(row.types),
       languages: connectLanguages(row.languages, row.types),
       conference_url: row.url,
       conference_url_notes: row.access_code,
@@ -260,14 +270,17 @@ const connectLanguages = (languages: string, types: string) => {
           }
           return undefined;
         })
-        .filter((e) => e),
+        .filter((e) => typeof e !== "undefined"),
     ]),
   ];
   if (!normalized.length) normalized = ["EN"];
-  return { connect: normalized.map((code) => ({ code })) };
+  return normalized.map((code) => ({
+    where: { code: code as string },
+    create: { code: code as string },
+  }));
 };
 
-const convertTypes = (types: string) => {
+const connectTypes = (types: string) => {
   const normalized = [
     ...new Set(
       types
@@ -292,15 +305,14 @@ const convertTypes = (types: string) => {
           }
           return undefined;
         })
-        .filter((e) => e)
+        .filter((e) => typeof e !== "undefined")
         .sort()
     ),
   ];
   return normalized.length
-    ? {
-        connect: normalized.map((code) => ({
-          code,
-        })),
-      }
+    ? normalized.map((code) => ({
+        where: { code: code as string },
+        create: { code: code as string },
+      }))
     : undefined;
 };
