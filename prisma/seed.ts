@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 
 import { getGoogleSheet } from "~/helpers";
 import { strings } from "~/i18n";
+import { log } from "~/utils";
 
 const db = new PrismaClient();
 const typesNotFound: string[] = [];
@@ -161,14 +162,14 @@ async function seed() {
 
   const seconds = Math.round((Date.now() - start) / 1000);
 
-  console.log(`${meetings.length} meetings imported in ${seconds} seconds`);
+  log(`${meetings.length} meetings imported in ${seconds} seconds`);
 
   if (typesNotFound.length) {
-    console.log({ typesNotFound });
+    log({ typesNotFound });
   }
 
   if (languagesNotFound.length) {
-    console.log({ languagesNotFound });
+    log({ languagesNotFound });
   }
 }
 

@@ -4,7 +4,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { Alert, Avatar, Table, Template } from "~/components";
-import { formatDate, formatString } from "~/helpers";
+import { fields, formatDate, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
 
@@ -94,7 +94,11 @@ export default function ActivityScreen() {
                       : strings.activity.update_group,
                     {
                       properties: activity.changes
-                        .map(({ field }) => field)
+                        .map(({ field }) =>
+                          fields[activity.meeting ? "meeting" : "group"][
+                            field
+                          ].label?.toLocaleLowerCase()
+                        )
                         .join(", "),
                     }
                   ),

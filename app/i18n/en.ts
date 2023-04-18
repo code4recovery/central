@@ -154,7 +154,7 @@ export const strings = {
     edit: "Edit meeting",
     empty: "No meetings added yet",
     empty_search: "No meetings matched “%search%”",
-    geocode: "Address or city",
+    geocode: "Location",
     geocode_help: "Online meetings can have approximate locations",
     languages: "Languages",
     location: "Location name",

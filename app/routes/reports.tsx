@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
 import {
+  ArchiveBoxIcon,
   ClockIcon,
   ComputerDesktopIcon,
   GlobeAsiaAustraliaIcon,
@@ -42,6 +43,10 @@ export default function Reports() {
     stale: {
       icon: <ClockIcon className={iconClass} />,
       title: "Stale",
+    },
+    archive: {
+      icon: <ArchiveBoxIcon className={iconClass} />,
+      title: "Archive",
     },
   };
 

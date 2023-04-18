@@ -1,7 +1,7 @@
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { AddressType, Client } from "@googlemaps/google-maps-services-js";
-import { db } from "~/utils";
+import { db, getIDs } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
@@ -82,8 +82,6 @@ export const action: ActionFunction = async ({ request }) => {
       params: { location, timestamp, key },
     });
 
-    console.log(plus_code);
-
     geocode = {
       neighborhood,
       city,
@@ -98,7 +96,7 @@ export const action: ActionFunction = async ({ request }) => {
       west: bounds?.southwest.lng,
       location_type,
       place_id,
-      plus_code: plus_code?.toString(),
+      plus_code: plus_code?.global_code.toString(),
       timezone: timeZoneId,
       types: types.join(),
       response: JSON.stringify(response.data.results[0]),
@@ -133,11 +131,21 @@ export const action: ActionFunction = async ({ request }) => {
   });
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  const { currentAccountID } = await getIDs(request);
   const addresses = await db.geocode.findMany({
     select: {
       id: true,
       formatted_address: true,
+    },
+    where: {
+      meetings: {
+        some: {
+          group: {
+            accountID: currentAccountID,
+          },
+        },
+      },
     },
   });
   return json(addresses);

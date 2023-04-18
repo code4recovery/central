@@ -43,22 +43,20 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   const validator = formatValidator("meeting");
   const formData = await request.formData();
-  const geocodeID = formData.get("geocode[id]")?.toString();
   const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
   }
 
-  const changes = formatChanges(fields.meeting, meeting, data);
-
-  if (meeting.geocodeID !== geocodeID) {
-    changes.push({
-      field: "geocodeID",
-      type: "geocode",
-      before: meeting.geocodeID,
-      after: geocodeID,
+  // patch geocode data
+  Object.keys(fields.meeting)
+    .filter((field) => fields.meeting[field].type === "geocode")
+    .forEach((field) => {
+      const value = formData.get(`${field}[id]`)?.toString();
+      data[field] = value;
     });
-  }
+
+  const changes = formatChanges(fields.meeting, meeting, data);
 
   // exit if no changes
   if (!changes.length) {
@@ -269,7 +267,9 @@ export default function EditMeeting() {
                     ? strings.activity.create
                     : formatString(strings.activity.update, {
                         properties: changes
-                          .map(({ field }) => field)
+                          .map(({ field }) =>
+                            fields.meeting[field].label?.toLocaleLowerCase()
+                          )
                           .join(", "),
                       })
                 }

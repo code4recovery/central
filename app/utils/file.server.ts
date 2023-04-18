@@ -1,6 +1,7 @@
 import { Storage } from "@google-cloud/storage";
 
 import { db } from "./db.server";
+import { log } from "./log.server";
 
 export async function saveFeedToStorage(accountID: string) {
   const projectId = process.env.GOOGLE_CLOUD_BUCKET ?? "";
@@ -118,7 +119,7 @@ export async function saveFeedToStorage(accountID: string) {
 
   const feedURL = `https://${projectId}.storage.googleapis.com/${filename}`;
 
-  console.log(`wrote ${meetings.length} entries to ${feedURL}`);
+  log(`wrote ${meetings.length} entries to ${feedURL}`);
 
   return feedURL;
 }

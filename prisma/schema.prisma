@@ -53,8 +53,8 @@ model Change {
 
 model Geocode {
   id                String     @id @default(auto()) @map("_id") @db.ObjectId
-  Meetings          Meeting[]
-  Searches          Geoquery[]
+  meetings          Meeting[]
+  searches          Geoquery[]
   neighborhood      String?
   city              String?
   state             String?

@@ -273,7 +273,9 @@ export default function GroupEdit() {
                     ? strings.activity.create
                     : formatString(strings.activity.update, {
                         properties: changes
-                          .map(({ field }) => field)
+                          .map(({ field }) =>
+                            fields.group[field].label?.toLocaleLowerCase()
+                          )
                           .join(", "),
                       })
                 }

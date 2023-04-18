@@ -73,7 +73,7 @@ export function Geocode({
         as="div"
         className="group relative"
         disabled={geocoder.state === "submitting"}
-        name={name.replace("ID", "[id]")}
+        name={name}
         nullable
         value={selectedAddress ?? null}
         onChange={setSelectedAddress}

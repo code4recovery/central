@@ -15,7 +15,7 @@ import { db, getIDs, redirectWith, saveFeedToStorage } from "~/utils";
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const validator = formatValidator("meeting");
   const formData = await request.formData();
-  const geocodeID = formData.get("geocode[id]")?.toString();
+  const geocodeID = formData.get("geocodeID[id]")?.toString(); // todo handle programatically
   const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
