@@ -1,5 +1,4 @@
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
-import type { User } from "@prisma/client";
 
 import { config } from "~/helpers";
 import type { Alert as AlertType } from "~/types";
@@ -9,58 +8,76 @@ if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET must be set");
 }
 
-const { getSession, commitSession, destroySession } =
-  createCookieSessionStorage({
-    cookie: {
-      name: "session",
-      secure: process.env.NODE_ENV === "production",
-      secrets: [process.env.SESSION_SECRET],
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-      httpOnly: true,
-    },
-  });
+const storage = createCookieSessionStorage({
+  cookie: {
+    httpOnly: true,
+    maxAge: 60 * 60 * 24 * 30,
+    name: "session",
+    path: "/",
+    sameSite: "lax",
+    secrets: [process.env.SESSION_SECRET],
+    secure: process.env.NODE_ENV === "production",
+  },
+});
 
-export async function createUserSession(userId: string, redirectTo: string) {
-  const session = await getSession();
-  session.set("userId", userId);
+export async function createUserSession(
+  id: string,
+  currentAccountID: string,
+  redirectTo: string
+) {
+  const session = await storage.getSession();
+  session.set("id", id);
+  session.set("currentAccountID", currentAccountID);
   return redirect(redirectTo, {
     headers: {
-      "Set-Cookie": await commitSession(session),
+      "Set-Cookie": await storage.commitSession(session),
     },
   });
 }
 
-export async function getUser(request: Request): Promise<User> {
-  const session = await getSession(request.headers.get("Cookie"));
-  const id = session.get("userId");
-  const user = await db.user.findUnique({ where: { id } });
-  if (!user) {
-    throw unauthorized(request);
-  }
-  return user;
+export async function getIDs(request: Request) {
+  const session = await getSession(request);
+  return {
+    id: session.get("id"),
+    currentAccountID: session.get("currentAccountID"),
+  };
+}
+
+export async function getSession(request: Request) {
+  return await storage.getSession(request.headers.get("Cookie"));
 }
 
 export async function getUserOrRedirect(request: Request) {
   const { pathname } = new URL(request.url);
 
-  const routeIsSecure = pathname !== "/" && !pathname.startsWith("/auth");
+  // stop processing if it's the favicon
   const routeIsStatic = pathname.endsWith(".svg");
-
   if (routeIsStatic) {
     return;
   }
 
-  const { id } = await getUser(request);
+  // limited number of public routes on the site
+  const routeIsPublic = pathname === "/" || pathname.startsWith("/auth");
 
+  // get user
+  const { id } = await getIDs(request);
   const user = id
     ? await db.user.findFirst({
-        where: { id },
-        include: {
-          accounts: true,
-          adminAccounts: true,
+        select: {
+          id: true,
+          currentAccountID: true,
+          adminAccountIDs: true,
+          name: true,
+          emailHash: true,
+          accounts: {
+            select: {
+              id: true,
+              theme: true,
+              url: true,
+            },
+          },
         },
+        where: { id },
       })
     : undefined;
 
@@ -69,10 +86,10 @@ export async function getUserOrRedirect(request: Request) {
       data: { lastSeen: new Date() },
       where: { id },
     });
-    if (!routeIsSecure) {
+    if (routeIsPublic) {
       throw redirect(config.home);
     }
-  } else if (routeIsSecure) {
+  } else if (!routeIsPublic) {
     throw unauthorized(request);
   }
 
@@ -91,7 +108,7 @@ export async function getUserOrRedirect(request: Request) {
 }
 
 export async function jsonWith(request: Request, payload: object) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
 
   const info = session.get("info") as string;
   const error = session.get("error") as string;
@@ -111,17 +128,17 @@ export async function jsonWith(request: Request, payload: object) {
     { ...payload, alert },
     {
       headers: {
-        "Set-Cookie": await commitSession(session),
+        "Set-Cookie": await storage.commitSession(session),
       },
     }
   );
 }
 
 export async function logout(request: Request) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
   return redirect("/", {
     headers: {
-      "Set-Cookie": await destroySession(session),
+      "Set-Cookie": await storage.destroySession(session),
     },
   });
 }
@@ -133,11 +150,11 @@ export async function redirectWith(
     [Property in keyof AlertType]: string;
   }
 ) {
-  const session = await getSession(request.headers.get("Cookie"));
+  const session = await getSession(request);
   session.flash(Object.keys(payload)[0], Object.values(payload)[0]);
   return redirect(route, {
     headers: {
-      "Set-Cookie": await commitSession(session),
+      "Set-Cookie": await storage.commitSession(session),
     },
   });
 }

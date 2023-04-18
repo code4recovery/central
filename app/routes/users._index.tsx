@@ -7,10 +7,10 @@ import { Avatar, Button, Chiclet, Table, Template } from "~/components";
 import { formatDate } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getUser } from "~/utils";
+import { db, getIDs } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getUser(request);
+  const { currentAccountID } = await getIDs(request);
   const users = await db.user.findMany({
     orderBy: { lastSeen: "desc" },
     select: {

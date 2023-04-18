@@ -15,7 +15,7 @@ import { validationError } from "remix-validated-form";
 import { Alert, Avatar, Button, LoadMore, Table, Template } from "~/components";
 import { config, formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getUser } from "~/utils";
+import { db, getIDs } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -32,7 +32,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
-  const { currentAccountID } = await getUser(request);
+  const { currentAccountID } = await getIDs(request);
 
   const groups = await db.group.findMany({
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
@@ -44,7 +44,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getUser(request);
+  const { currentAccountID } = await getIDs(request);
   const groupCount = await db.group.count({
     where: { accountID: currentAccountID },
   });

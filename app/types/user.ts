@@ -1,7 +1,6 @@
 export type User = {
   accountUrl: string;
   currentAccountID: string;
-  email: string;
   emailHash: string;
   id: string;
   isAdmin: boolean;

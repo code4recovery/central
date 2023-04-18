@@ -31,7 +31,7 @@ import {
   Template,
 } from "~/components";
 import { strings } from "~/i18n";
-import { db, getUser, jsonWith, saveFeedToStorage } from "~/utils";
+import { db, getIDs, jsonWith, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return json({ info: strings.no_updates });
   }
 
-  const { id: userID, currentAccountID } = await getUser(request);
+  const { id: userID, currentAccountID } = await getIDs(request);
 
   // create an activity record
   const activity = await db.activity.create({

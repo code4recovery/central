@@ -10,7 +10,7 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getUser, redirectWith, saveFeedToStorage } from "~/utils";
+import { db, getIDs, redirectWith, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const validator = formatValidator("meeting");
@@ -36,7 +36,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     types,
   } = data;
 
-  const { id: userID, currentAccountID } = await getUser(request);
+  const { id: userID, currentAccountID } = await getIDs(request);
 
   // update meeting
   const meeting = await db.meeting.create({

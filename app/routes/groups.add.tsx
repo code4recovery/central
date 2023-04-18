@@ -6,7 +6,7 @@ import { validationError } from "remix-validated-form";
 import { Columns, Form, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getUser, redirectWith } from "~/utils";
+import { db, getIDs, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = formatValidator("group");
@@ -14,7 +14,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (error) {
     return validationError(error);
   }
-  const { id, currentAccountID } = await getUser(request);
+  const { id, currentAccountID } = await getIDs(request);
   const group = await db.group.create({
     data: {
       ...data,

@@ -8,6 +8,10 @@ export const loader: LoaderFunction = async ({ params }) => {
   const { loginToken, emailHash, go } = params;
 
   const user = await db.user.findFirst({
+    select: {
+      id: true,
+      currentAccountID: true,
+    },
     where: {
       emailHash,
       loginToken,
@@ -20,7 +24,11 @@ export const loader: LoaderFunction = async ({ params }) => {
       where: { id: user.id },
     });
 
-    return await createUserSession(user.id, go ?? config.home);
+    return await createUserSession(
+      user.id,
+      user.currentAccountID,
+      go ?? config.home
+    );
   }
 
   return redirect("/?msg=expired");

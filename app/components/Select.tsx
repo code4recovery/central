@@ -1,6 +1,6 @@
 import { config, formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
-import { Option } from "~/types";
+import type { Option } from "~/types";
 
 export function Select({
   className,

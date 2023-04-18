@@ -50,7 +50,7 @@ export default function Reports() {
       title={strings.reports.title}
       description={strings.reports.description}
     >
-      <div className="grid grid-cols-3 gap-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 px-4 md:px-0">
         {Object.keys(reports).map((report) => (
           <Link
             className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-950 shadow rounded text-center px-5 py-10 space-y-2"

@@ -16,7 +16,6 @@ import { Avatar } from "./Avatar";
 export function Header() {
   const {
     currentAccountID,
-    email,
     emailHash,
     id,
     isAdmin,
@@ -211,9 +210,6 @@ export function Header() {
                   <div className="ml-3">
                     <div className="text-base font-medium text-neutral-800 dark:text-neutral-200">
                       {name}
-                    </div>
-                    <div className="text-sm font-medium text-neutral-500">
-                      {email}
                     </div>
                   </div>
                 </div>

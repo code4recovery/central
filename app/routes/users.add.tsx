@@ -8,7 +8,7 @@ import { Alerts, Columns, Form, Template } from "~/components";
 import { formatToken, formatValidator } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getUser, sendMail } from "~/utils";
+import { db, getIDs, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = formatValidator("user");
@@ -18,7 +18,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
   const { name, email } = data;
 
-  const { currentAccountID } = await getUser(request);
+  const { currentAccountID } = await getIDs(request);
 
   const emailHash = md5(email);
   const loginToken = formatToken();

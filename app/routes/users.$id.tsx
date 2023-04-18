@@ -1,9 +1,5 @@
-import {
-  ActionFunction,
-  LoaderFunction,
-  json,
-  redirect,
-} from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
@@ -11,7 +7,7 @@ import { Alerts, Button, Columns, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getUser } from "~/utils";
+import { db, getIDs } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -23,7 +19,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
-  const { currentAccountID } = await getUser(request);
+  const { currentAccountID } = await getIDs(request);
 
   const { name, email, admin } = data;
 
