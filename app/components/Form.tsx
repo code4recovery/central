@@ -212,7 +212,7 @@ function Submit() {
           ? "text-neutral-500 bg-neutral-300 dark:bg-neutral-700"
           : undefined
       }
-      disabled={isSubmitting}
+      icon={isSubmitting ? "spinner" : undefined}
     >
       {isSubmitting ? strings.form.saving : strings.form.save}
     </Button>

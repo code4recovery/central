@@ -57,6 +57,12 @@ export async function saveFeedToStorage(accountID: string) {
           },
         },
       },
+      where: {
+        archived: false,
+        group: {
+          accountID,
+        },
+      },
     })
   )
     .map(

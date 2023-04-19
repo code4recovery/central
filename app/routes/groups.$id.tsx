@@ -140,6 +140,9 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
           languages: { select: { code: true } },
           types: { select: { code: true } },
         },
+        where: {
+          archived: false,
+        },
       },
     },
     where: { id },
@@ -268,17 +271,18 @@ export default function GroupEdit() {
                 key={id}
                 user={user}
                 date={createdAt.toString()}
-                text={
-                  type === "create"
-                    ? strings.activity.create
-                    : formatString(strings.activity.update, {
-                        properties: changes
-                          .map(({ field }) =>
-                            fields.group[field].label?.toLocaleLowerCase()
-                          )
-                          .join(", "),
-                      })
-                }
+                text={formatString(
+                  strings.activity.general[
+                    type as keyof typeof strings.activity.general
+                  ],
+                  {
+                    properties: changes
+                      .map(({ field }) =>
+                        fields.group[field].label?.toLocaleLowerCase()
+                      )
+                      .join(", "),
+                  }
+                )}
               />
             )
           )}

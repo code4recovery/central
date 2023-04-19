@@ -18,6 +18,7 @@ import {
   PanelRow,
   Template,
 } from "~/components";
+import { ArchiveForm } from "~/components/ArchiveForm";
 import {
   config,
   fields,
@@ -36,13 +37,39 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 
   const meeting = await getMeeting(id);
+  const { id: userID, currentAccountID } = await getIDs(request);
 
   if (!meeting) {
     return redirect("/meetings"); // todo flash invalid id message to this page
   }
+  const formData = await request.formData();
+
+  if (formData.has("action")) {
+    const archived = formData.get("action") === "archive";
+    await db.meeting.update({
+      where: { id },
+      data: {
+        archived,
+      },
+    });
+    await db.activity.create({
+      data: {
+        meetingID: meeting.id,
+        type: archived ? "archive" : "unarchive",
+        userID,
+      },
+    });
+    try {
+      await saveFeedToStorage(currentAccountID);
+      return json({ success: strings.meetings.archived });
+    } catch (e) {
+      if (e instanceof Error) {
+        return json({ error: e.message });
+      }
+    }
+  }
 
   const validator = formatValidator("meeting");
-  const formData = await request.formData();
   const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
@@ -62,8 +89,6 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!changes.length) {
     return json({ info: strings.no_updates });
   }
-
-  const { id: userID, currentAccountID } = await getIDs(request);
 
   // create an activity record
   const activity = await db.activity.create({
@@ -226,13 +251,7 @@ export default function EditMeeting() {
           >
             {strings.meetings.duplicate}
           </Button>
-          <Button
-            icon="archive"
-            onClick={() => alert("not implemented yet")}
-            secondary
-          >
-            {strings.meetings.archive}
-          </Button>
+          <ArchiveForm archived={meeting.archived} />
         </div>
         <HelpTopic
           title={strings.help.conference_providers_title}
@@ -262,17 +281,18 @@ export default function EditMeeting() {
                 key={id}
                 user={user}
                 date={createdAt.toString()}
-                text={
-                  type === "create"
-                    ? strings.activity.create
-                    : formatString(strings.activity.update, {
-                        properties: changes
-                          .map(({ field }) =>
-                            fields.meeting[field].label?.toLocaleLowerCase()
-                          )
-                          .join(", "),
-                      })
-                }
+                text={formatString(
+                  strings.activity.general[
+                    type as keyof typeof strings.activity.general
+                  ],
+                  {
+                    properties: changes
+                      .map(({ field }) =>
+                        fields.meeting[field].label?.toLocaleLowerCase()
+                      )
+                      .join(", "),
+                  }
+                )}
               />
             )
           )}

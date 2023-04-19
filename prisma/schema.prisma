@@ -128,6 +128,7 @@ model Meeting {
   conference_phone_notes String?
   location               String?
   location_notes         String?
+  archived               Boolean    @default(false)
   geocodeID              String?    @db.ObjectId
   geocode                Geocode?   @relation(fields: [geocodeID], references: [id])
   geoqueryID             String?    @db.ObjectId

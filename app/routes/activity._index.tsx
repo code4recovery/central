@@ -83,25 +83,20 @@ export default function ActivityScreen() {
                   link: `/groups/${activity.group?.id}`,
                 }),
             when: formatDate(activity.createdAt.toString()),
-            what:
-              activity.type === "create"
-                ? activity.meeting
-                  ? strings.activity.create_meeting
-                  : strings.activity.create_group
-                : formatString(
-                    activity.meeting
-                      ? strings.activity.update_meeting
-                      : strings.activity.update_group,
-                    {
-                      properties: activity.changes
-                        .map(({ field }) =>
-                          fields[activity.meeting ? "meeting" : "group"][
-                            field
-                          ].label?.toLocaleLowerCase()
-                        )
-                        .join(", "),
-                    }
-                  ),
+            what: formatString(
+              strings.activity[activity.meeting ? "meeting" : "group"][
+                activity.type as keyof typeof strings.activity.group
+              ],
+              {
+                properties: activity.changes
+                  .map(({ field }) =>
+                    fields[activity.meeting ? "meeting" : "group"][
+                      field
+                    ].label?.toLocaleLowerCase()
+                  )
+                  .join(", "),
+              }
+            ),
             user: (
               <div className="flex gap-2 items-center">
                 <Avatar

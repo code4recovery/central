@@ -35,11 +35,20 @@ export const action: ActionFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
 
   const meetings = await db.meeting.findMany({
-    include: { types: true, languages: true },
+    select: {
+      day: true,
+      time: true,
+      timezone: true,
+      name: true,
+      updatedAt: true,
+      id: true,
+      languages: { select: { code: true } },
+      types: { select: { code: true } },
+    },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     skip: Number(skip),
     take: config.batchSize,
-    where: { accountID: currentAccountID },
+    where: { accountID: currentAccountID, archived: false },
   });
   return json(meetings);
 };
@@ -49,6 +58,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
 
   const where = {
+    archived: false,
     OR: [
       {
         id: {

@@ -9,12 +9,11 @@ import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { Spinner } from "~/icons";
 
-type Icon = "archive" | "duplicate" | "external";
+type Icon = "archive" | "duplicate" | "external" | "spinner";
 
 export function Button({
   children,
   className,
-  disabled,
   icon,
   onClick,
   secondary = false,
@@ -22,7 +21,6 @@ export function Button({
 }: {
   children: React.ReactNode;
   className?: string;
-  disabled?: boolean;
   icon?: Icon;
   onClick?: () => void;
   secondary?: boolean;
@@ -40,6 +38,17 @@ export function Button({
         return <DocumentDuplicateIcon className={iconClass} />;
       case "external":
         return <ArrowTopRightOnSquareIcon className={iconClass} />;
+      case "spinner":
+        return (
+          <Spinner
+            className={cx(
+              secondary
+                ? "fill-neutral-200 dark:fill-neutral-900"
+                : "fill-neutral-300 dark:fill-neutral-700",
+              iconClass
+            )}
+          />
+        );
     }
     return null;
   }
@@ -47,9 +56,14 @@ export function Button({
   const buttonClass = cx(
     "flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
     "gap-2 group items-center justify-center px-4 py-2 rounded-md shadow-sm text-center text-sm",
-    "disabled:text-neutral-500 disabled:bg-neutral-300 dark:disabled:bg-neutral-700",
-    { "text-white dark:text-black": !secondary },
-    { "opacity-80 hover:opacity-100 border": secondary },
+    {
+      "text-white dark:text-black disabled:text-neutral-500 disabled:bg-neutral-300 dark:disabled:bg-neutral-700":
+        !secondary,
+    },
+    {
+      "opacity-80 hover:opacity-100 disabled:opacity-50 disabled:hover:opacity-50 border":
+        secondary,
+    },
     { [background]: !secondary },
     { [text]: secondary },
     { [border]: secondary },
@@ -77,13 +91,8 @@ export function Button({
       {children}
     </Link>
   ) : (
-    <button className={buttonClass} disabled={disabled}>
-      <Spinner
-        className={cx(
-          "hidden group-disabled:block text-neutral-200 dark:text-neutral-800 fill-neutral-500",
-          iconClass
-        )}
-      />
+    <button className={buttonClass} disabled={icon === "spinner"}>
+      {renderIcon(icon)}
       {children}
     </button>
   );

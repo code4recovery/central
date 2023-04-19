@@ -123,6 +123,7 @@ async function seed() {
       data: {
         ...meetingInfo,
         account: { connect: { id: account.id } },
+        archived: false,
         languages: {
           connectOrCreate: languages,
         },
