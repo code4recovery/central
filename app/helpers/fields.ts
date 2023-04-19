@@ -156,8 +156,19 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     geocodeID: {
       label: strings.meetings.geocode,
       type: "geocode",
-      span: 12,
+      span: 9,
       helpText: strings.meetings.geocode_help,
+    },
+    timezone: {
+      label: strings.meetings.timezone,
+      options: config.timezones.map((value) => {
+        const [group, ...rest] = value.split("/");
+        const label = rest.join(" • ").split("_").join(" ");
+        return { value, label, group };
+      }),
+      span: 3,
+      type: "select",
+      validation: optional.string,
     },
     location: {
       label: strings.meetings.location,
@@ -179,30 +190,19 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
         value: `${index}`,
         label: strings.days[day as keyof typeof strings.days],
       })),
-      span: 3,
+      span: 4,
       type: "select",
       validation: optional.number,
     },
     time: {
       label: strings.meetings.time,
-      span: 3,
+      span: 4,
       type: "time",
-      validation: optional.string,
-    },
-    timezone: {
-      label: strings.meetings.timezone,
-      options: config.timezones.map((value) => {
-        const [group, ...rest] = value.split("/");
-        const label = rest.join(" • ").split("_").join(" ");
-        return { value, label, group };
-      }),
-      span: 3,
-      type: "select",
       validation: optional.string,
     },
     duration: {
       label: strings.meetings.duration,
-      span: 3,
+      span: 4,
       type: "number",
       validation: optional.number,
     },

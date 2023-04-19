@@ -44,8 +44,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
   const formData = await request.formData();
 
-  if (formData.has("action")) {
-    const archived = formData.get("action") === "archive";
+  if (formData.has("subaction")) {
+    const archived = formData.get("subaction") === "archive";
     await db.meeting.update({
       where: { id },
       data: {
@@ -178,6 +178,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     return redirect(config.home); // todo throw 404
   }
   const meeting = await getMeeting(id);
+  const { currentAccountID } = await getIDs(request);
   if (!meeting) {
     return redirect(config.home); // todo throw 404
   }
@@ -207,7 +208,50 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     where: { meetingID: meeting.id },
   });
 
-  return jsonWith(request, { activities, meeting });
+  const timezones = await db.meeting.findMany({
+    select: {
+      timezone: true,
+    },
+    distinct: ["timezone"],
+  });
+
+  const languages = await db.language.findMany({
+    select: {
+      code: true,
+    },
+    where: {
+      meetings: {
+        some: {
+          group: {
+            accountID: currentAccountID,
+          },
+        },
+      },
+    },
+  });
+
+  const types = await db.type.findMany({
+    select: {
+      code: true,
+    },
+    where: {
+      meetings: {
+        some: {
+          group: {
+            accountID: currentAccountID,
+          },
+        },
+      },
+    },
+  });
+
+  const optionsInUse = {
+    timezones: timezones.map(({ timezone }) => timezone),
+    languages: languages.map(({ code }) => code),
+    types: types.map(({ code }) => code),
+  };
+
+  return jsonWith(request, { activities, meeting, optionsInUse });
 };
 
 export const meta: MetaFunction = () => ({
@@ -215,7 +259,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const { activities, alert, meeting } = useLoaderData();
+  const { activities, alert, meeting, optionsInUse } = useLoaderData();
   const actionData = useActionData<typeof action>();
   const { accountUrl } = useUser();
   const alerts = { ...alert, ...actionData };
@@ -232,7 +276,7 @@ export default function EditMeeting() {
         primary={
           <>
             {alerts && <Alerts data={alerts} />}
-            <Form form="meeting" values={meeting} />
+            <Form form="meeting" values={meeting} optionsInUse={optionsInUse} />
           </>
         }
       >

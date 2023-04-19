@@ -3,6 +3,7 @@ import { useIsSubmitting, ValidatedForm } from "remix-validated-form";
 import {
   Button,
   Checkbox,
+  Checkboxes,
   Geocode,
   Input,
   Label,
@@ -15,21 +16,19 @@ import {
   formatClasses as cx,
   formatValidator,
 } from "~/helpers";
-import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 
 export function Form({
   form,
+  optionsInUse,
   values,
   isAdmin,
 }: {
   form: keyof typeof fields;
+  optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
   isAdmin?: boolean;
 }) {
-  const {
-    theme: { focusRing, text },
-  } = useUser();
   return (
     <ValidatedForm
       autoComplete="off"
@@ -84,38 +83,12 @@ export function Form({
                         />
                       )}
                       {type === "checkboxes" && (
-                        <div className="items-start gap-x-5 gap-y-3 grid grid-cols-3 lg:grid-cols-4">
-                          {options?.map(({ value: optionValue, label }) => (
-                            <div
-                              className="flex items-top gap-2 m-0"
-                              key={optionValue}
-                            >
-                              <input
-                                className={cx(
-                                  config.checkboxClassNames,
-                                  focusRing,
-                                  text,
-                                  className
-                                )}
-                                defaultChecked={
-                                  Array.isArray(values?.[name]) &&
-                                  values?.[name]?.includes(optionValue)
-                                }
-                                id={optionValue}
-                                name={name}
-                                type="checkbox"
-                                value={optionValue}
-                              />
-                              <label
-                                className="text-sm truncate"
-                                htmlFor={optionValue}
-                                title={label}
-                              >
-                                {label}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
+                        <Checkboxes
+                          {...fields[form][name]}
+                          name={name}
+                          optionsInUse={optionsInUse?.[name]}
+                          values={values?.[name]}
+                        />
                       )}
                       {[
                         "email",

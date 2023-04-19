@@ -3,6 +3,7 @@ export * from "./Alerts";
 export * from "./Avatar";
 export * from "./Button";
 export * from "./Checkbox";
+export * from "./Checkboxes";
 export * from "./Chiclet";
 export * from "./Columns";
 export * from "./Footer";

@@ -7,12 +7,11 @@ import { strings } from "~/i18n";
 
 export function ArchiveForm({ archived }: { archived: boolean }) {
   return (
-    <ValidatedForm method="post" validator={withZod(z.object({}))}>
-      <input
-        type="hidden"
-        name="action"
-        value={archived ? "unarchive" : "archive"}
-      />
+    <ValidatedForm
+      method="post"
+      validator={withZod(z.object({}))}
+      subaction={archived ? "unarchive" : "archive"}
+    >
       <Submit archived={archived} />
     </ValidatedForm>
   );

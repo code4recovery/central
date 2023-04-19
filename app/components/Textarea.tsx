@@ -13,7 +13,11 @@ export function Textarea({
   placeholder,
   required,
 }: Partial<Field> & { defaultValue?: string | string[]; name: string }) {
-  const { error, getInputProps } = useField(name);
+  const { error, getInputProps } = useField(name, {
+    validationBehavior: {
+      initial: "onChange",
+    },
+  });
   const {
     theme: { focusRing },
   } = useUser();

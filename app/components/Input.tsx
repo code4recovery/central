@@ -23,7 +23,11 @@ export function Input({
   const {
     theme: { focusRing },
   } = useUser();
-  const { error, getInputProps } = useField(name);
+  const { error, getInputProps } = useField(name, {
+    validationBehavior: {
+      initial: "onChange",
+    },
+  });
   return (
     <>
       <div className="relative">

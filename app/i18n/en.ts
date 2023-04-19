@@ -169,10 +169,11 @@ export const strings = {
     empty: "No meetings added yet",
     empty_search: "No meetings matched “%search%”",
     geocode: "Location",
-    geocode_help: "Online meetings can have approximate locations",
+    geocode_help:
+      "Online meetings can have approximate locations, eg neighborhood, city, state/province",
     languages: "Languages",
     location: "Location name",
-    location_help: "Building name",
+    location_help: "Building name (optional)",
     location_notes: "Location notes",
     location_notes_help: "Additional location info",
     name: "Meeting name",
