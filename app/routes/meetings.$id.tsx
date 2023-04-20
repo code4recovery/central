@@ -334,8 +334,8 @@ export default function EditMeeting() {
           )}
         </Panel>
         <Panel
-          title={strings.reports.title}
-          emptyText={strings.reports.empty}
+          title={strings.feedback.title}
+          emptyText={strings.feedback.empty}
         />
       </Columns>
     </Template>

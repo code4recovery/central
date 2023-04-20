@@ -75,6 +75,10 @@ export const strings = {
       subject: "Confirm your email address to log in",
     },
   },
+  feedback: {
+    title: "Feedback",
+    empty: "No feedback received yet",
+  },
   form: {
     invalidEmail: "Invalid email",
     required: "Required",
@@ -119,7 +123,7 @@ export const strings = {
     EL: "Greek",
     EN: "English",
     ES: "Spanish",
-    FA: "Farsi",
+    FA: "Persian",
     FR: "French",
     HE: "Hebrew",
     HI: "Hindi",
