@@ -44,9 +44,9 @@ export default function Reports() {
       icon: <ClockIcon className={iconClass} />,
       title: "Stale",
     },
-    archive: {
+    archived: {
       icon: <ArchiveBoxIcon className={iconClass} />,
-      title: "Archive",
+      title: "Archived",
     },
   };
 

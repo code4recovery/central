@@ -208,13 +208,6 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     where: { meetingID: meeting.id },
   });
 
-  const timezones = await db.meeting.findMany({
-    select: {
-      timezone: true,
-    },
-    distinct: ["timezone"],
-  });
-
   const languages = await db.language.findMany({
     select: {
       code: true,
@@ -246,7 +239,6 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   });
 
   const optionsInUse = {
-    timezones: timezones.map(({ timezone }) => timezone),
     languages: languages.map(({ code }) => code),
     types: types.map(({ code }) => code),
   };

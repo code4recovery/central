@@ -235,7 +235,7 @@ export default function GroupEdit() {
               )}
             />
             <div className="flex justify-center pt-4">
-              <Button url={`/add-meeting/${group.id}`}>
+              <Button url={`/groups/${group.id}/add`}>
                 {strings.meetings.add}
               </Button>
             </div>

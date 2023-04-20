@@ -197,6 +197,11 @@ export const strings = {
     title: "Search Results",
   },
   reports: {
+    archived: {
+      title: "Archived",
+      description: "There are %count% archived meetings in this account.",
+      empty: "There are no archived meetings in this account.",
+    },
     description: "A list of all the reports in your account",
     empty: "No reports yet",
     title: "Reports",
