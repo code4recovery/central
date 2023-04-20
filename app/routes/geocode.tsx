@@ -20,6 +20,7 @@ export const action: ActionFunction = async ({ request }) => {
           formatted_address: true,
           latitude: true,
           longitude: true,
+          timezone: true,
         },
       },
     },
@@ -29,7 +30,7 @@ export const action: ActionFunction = async ({ request }) => {
   });
 
   if (result) {
-    return json({ result, status: "cache" });
+    return json({ ...result.geocode, status: "cache" });
   }
 
   const key = process.env.GOOGLE_MAPS_API_KEY ?? "";
@@ -76,9 +77,8 @@ export const action: ActionFunction = async ({ request }) => {
     )[0]?.long_name;
 
     const timestamp = new Date();
-    const {
-      request: { timeZoneId },
-    } = await client.timezone({
+
+    const result = await client.timezone({
       params: { location, timestamp, key },
     });
 
@@ -97,7 +97,7 @@ export const action: ActionFunction = async ({ request }) => {
       location_type,
       place_id,
       plus_code: plus_code?.global_code.toString(),
-      timezone: timeZoneId,
+      timezone: result.data?.timeZoneId,
       types: types.join(),
       response: JSON.stringify(response.data.results[0]),
     };
@@ -106,7 +106,7 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ status: "error", message });
   }
 
-  const { formatted_address, latitude, longitude } = geocode;
+  const { formatted_address, latitude, longitude, timezone } = geocode;
 
   const geoquery = await db.geoquery.create({
     data: {
@@ -121,12 +121,11 @@ export const action: ActionFunction = async ({ request }) => {
   });
 
   return json({
-    result: {
-      id: geoquery.geocodeID,
-      formatted_address,
-      latitude,
-      longitude,
-    },
+    id: geoquery.geocodeID,
+    formatted_address,
+    latitude,
+    longitude,
+    timezone,
     status: "geocode",
   });
 };
@@ -137,6 +136,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     select: {
       id: true,
       formatted_address: true,
+      timezone: true,
     },
     where: {
       meetings: {

@@ -1,5 +1,5 @@
 import { config, formatClasses as cx } from "~/helpers";
-import { useUser } from "~/hooks";
+import { useTimezone, useUser } from "~/hooks";
 import type { Option } from "~/types";
 
 export function Select({
@@ -18,32 +18,39 @@ export function Select({
   const {
     theme: { focusRing },
   } = useUser();
+  const { timezone } = useTimezone();
+  const value = name === "timezone" ? timezone : undefined;
 
   const groups = [...new Set(options.map(({ group }) => group))];
 
   return (
-    <select
-      name={name}
-      id={name}
-      className={cx(config.fieldClassNames, focusRing, className)}
-      defaultValue={defaultValue}
-    >
-      {!required && <option></option>}
-      {groups.map((groupName) => {
-        return groupName ? (
-          <optgroup label={groupName} key={groupName}>
+    <>
+      {value && <input type="hidden" name={name} value={value} />}
+      <select
+        name={value ? name : undefined}
+        id={name}
+        className={cx(config.fieldClassNames, focusRing, className)}
+        defaultValue={defaultValue}
+        value={value}
+        disabled={!!value}
+      >
+        {!required && <option></option>}
+        {groups.map((groupName) => {
+          return groupName ? (
+            <optgroup label={groupName} key={groupName}>
+              <Options
+                options={options.filter(({ group }) => group === groupName)}
+              />
+            </optgroup>
+          ) : (
             <Options
-              options={options.filter(({ group }) => group === groupName)}
+              options={options.filter(({ group }) => !group)}
+              key="ungrouped"
             />
-          </optgroup>
-        ) : (
-          <Options
-            options={options.filter(({ group }) => !group)}
-            key="ungrouped"
-          />
-        );
-      })}
-    </select>
+          );
+        })}
+      </select>
+    </>
   );
 }
 

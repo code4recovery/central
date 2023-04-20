@@ -5,13 +5,14 @@ import { Combobox } from "@headlessui/react";
 
 import type { Field } from "~/types";
 import { config, formatClasses as cx } from "~/helpers";
-import { useUser } from "~/hooks";
+import { useTimezone, useUser } from "~/hooks";
 import { HelpText } from "./HelpText";
 import { Spinner } from "~/icons";
 
 type Address = {
   id: string;
   formatted_address: string;
+  timezone: string;
 };
 
 export function Geocode({
@@ -30,6 +31,7 @@ export function Geocode({
   const {
     theme: { background, focusRing },
   } = useUser();
+  const { setTimezone } = useTimezone();
 
   useEffect(() => {
     if (addresses.state === "idle" && addresses.data == null) {
@@ -57,15 +59,13 @@ export function Geocode({
   );
 
   useEffect(() => {
-    if (geocoder.state === "idle" && geocoder.data?.result) {
-      const address = {
-        id: geocoder.data.result.id,
-        formatted_address: geocoder.data.result.formatted_address,
-      };
+    if (geocoder.state === "idle" && geocoder.data) {
+      const address = geocoder.data;
       filtered.push(address);
       setSelectedAddress(address);
+      setTimezone(address.timezone);
     }
-  }, [addresses, filtered, geocoder]);
+  }, [addresses, filtered, geocoder, setTimezone]);
 
   return (
     <>

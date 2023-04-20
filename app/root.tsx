@@ -11,9 +11,10 @@ import {
 } from "@remix-run/react";
 
 import styles from "./tailwind.css";
-import { UserContext } from "./hooks";
+import { TimezoneContext, UserContext } from "./hooks";
 import { strings } from "~/i18n";
 import { getUserOrRedirect } from "~/utils";
+import { useState } from "react";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -34,6 +35,7 @@ export const meta: MetaFunction = () => ({
 
 export default function App() {
   const { user } = useLoaderData();
+  const [timezone, setTimezone] = useState<string>();
   return (
     <html lang="en" className="h-full">
       <head>
@@ -41,9 +43,11 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-neutral-200 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 flex flex-col h-full">
-        <UserContext.Provider value={user}>
-          <Outlet />
-        </UserContext.Provider>
+        <TimezoneContext.Provider value={{ timezone, setTimezone }}>
+          <UserContext.Provider value={user}>
+            <Outlet />
+          </UserContext.Provider>
+        </TimezoneContext.Provider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
