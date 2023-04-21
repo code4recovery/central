@@ -5,7 +5,7 @@ import { Combobox } from "@headlessui/react";
 
 import type { Field } from "~/types";
 import { config, formatClasses as cx } from "~/helpers";
-import { useTimezone, useUser } from "~/hooks";
+import { useGeocode, useUser } from "~/hooks";
 import { HelpText } from "./HelpText";
 import { Spinner } from "~/icons";
 
@@ -31,18 +31,20 @@ export function Geocode({
   const {
     theme: { background, focusRing },
   } = useUser();
-  const { setTimezone } = useTimezone();
+  const { setGeocode } = useGeocode();
 
   useEffect(() => {
     if (addresses.state === "idle" && addresses.data == null) {
       addresses.load("/geocode");
     }
     if (addresses.state === "idle" && addresses.data && defaultValue) {
-      setSelectedAddress(
-        addresses.data.filter(({ id }: Address) => id === defaultValue)[0]
-      );
+      const foundAddress = addresses.data.filter(
+        ({ id }: Address) => id === defaultValue
+      )[0];
+      setSelectedAddress(foundAddress);
+      setGeocode(foundAddress);
     }
-  }, [addresses, defaultValue]);
+  }, [addresses, defaultValue, setGeocode]);
 
   const filtered = useMemo(
     () =>
@@ -63,9 +65,12 @@ export function Geocode({
       const address = geocoder.data;
       filtered.push(address);
       setSelectedAddress(address);
-      setTimezone(address.timezone);
+      setGeocode({
+        timezone: address.timezone,
+        location_type: address.location_type,
+      });
     }
-  }, [addresses, filtered, geocoder, setTimezone]);
+  }, [addresses, filtered, geocoder, setGeocode]);
 
   return (
     <>

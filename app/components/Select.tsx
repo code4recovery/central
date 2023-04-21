@@ -1,5 +1,5 @@
 import { config, formatClasses as cx } from "~/helpers";
-import { useTimezone, useUser } from "~/hooks";
+import { useGeocode, useUser } from "~/hooks";
 import type { Option } from "~/types";
 
 export function Select({
@@ -18,7 +18,9 @@ export function Select({
   const {
     theme: { focusRing },
   } = useUser();
-  const { timezone } = useTimezone();
+  const {
+    geocode: { timezone },
+  } = useGeocode();
   const value = name === "timezone" ? timezone : undefined;
 
   const groups = [...new Set(options.map(({ group }) => group))];
@@ -30,7 +32,7 @@ export function Select({
         name={value ? name : undefined}
         id={name}
         className={cx(config.fieldClassNames, focusRing, className)}
-        defaultValue={defaultValue}
+        defaultValue={!value ? defaultValue : undefined}
         value={value}
         disabled={!!value}
       >

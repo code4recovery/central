@@ -19,6 +19,7 @@ export const action: ActionFunction = async ({ request }) => {
           id: true,
           formatted_address: true,
           latitude: true,
+          location_type: true,
           longitude: true,
           timezone: true,
         },
@@ -106,7 +107,8 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ status: "error", message });
   }
 
-  const { formatted_address, latitude, longitude, timezone } = geocode;
+  const { formatted_address, latitude, location_type, longitude, timezone } =
+    geocode;
 
   const geoquery = await db.geoquery.create({
     data: {
@@ -124,6 +126,7 @@ export const action: ActionFunction = async ({ request }) => {
     id: geoquery.geocodeID,
     formatted_address,
     latitude,
+    location_type,
     longitude,
     timezone,
     status: "geocode",
@@ -136,6 +139,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     select: {
       id: true,
       formatted_address: true,
+      location_type: true,
       timezone: true,
     },
     where: {

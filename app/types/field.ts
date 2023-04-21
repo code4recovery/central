@@ -12,6 +12,7 @@ export type Field = {
   placeholder?: string;
   required?: boolean;
   span?: number;
+  streetAddressOnly?: boolean;
   type:
     | "checkbox"
     | "checkboxes"

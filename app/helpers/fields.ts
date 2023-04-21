@@ -176,6 +176,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       span: 6,
       validation: optional.string,
       helpText: strings.meetings.location_help,
+      streetAddressOnly: true,
     },
     location_notes: {
       label: strings.meetings.location_notes,
@@ -183,6 +184,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       span: 6,
       validation: optional.string,
       helpText: strings.meetings.location_notes_help,
+      streetAddressOnly: true,
     },
     day: {
       label: strings.meetings.day,

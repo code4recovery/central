@@ -1,2 +1,2 @@
-export * from "./timezone";
+export * from "./geocode";
 export * from "./user";

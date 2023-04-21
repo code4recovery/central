@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
@@ -11,10 +12,10 @@ import {
 } from "@remix-run/react";
 
 import styles from "./tailwind.css";
-import { TimezoneContext, UserContext } from "./hooks";
+import { GeocodeContext, UserContext } from "./hooks";
 import { strings } from "~/i18n";
+import type { Geocode } from "./types";
 import { getUserOrRedirect } from "~/utils";
-import { useState } from "react";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -35,7 +36,7 @@ export const meta: MetaFunction = () => ({
 
 export default function App() {
   const { user } = useLoaderData();
-  const [timezone, setTimezone] = useState<string>();
+  const [geocode, setGeocode] = useState<Geocode>({});
   return (
     <html lang="en" className="h-full">
       <head>
@@ -43,11 +44,11 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-neutral-200 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 flex flex-col h-full">
-        <TimezoneContext.Provider value={{ timezone, setTimezone }}>
+        <GeocodeContext.Provider value={{ geocode, setGeocode }}>
           <UserContext.Provider value={user}>
             <Outlet />
           </UserContext.Provider>
-        </TimezoneContext.Provider>
+        </GeocodeContext.Provider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

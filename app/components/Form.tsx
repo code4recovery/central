@@ -16,6 +16,7 @@ import {
   formatClasses as cx,
   formatValidator,
 } from "~/helpers";
+import { useGeocode } from "~/hooks";
 import { strings } from "~/i18n";
 
 export function Form({
@@ -29,6 +30,10 @@ export function Form({
   values?: { [key: string]: string | string[] };
   isAdmin?: boolean;
 }) {
+  const {
+    geocode: { location_type },
+  } = useGeocode();
+  const streetAddress = location_type !== "APPROXIMATE";
   return (
     <ValidatedForm
       autoComplete="off"
@@ -47,6 +52,10 @@ export function Form({
             <div className="grid grid-cols-12 gap-5">
               {Object.keys(fields[form])
                 .filter((name) => !fields[form][name].adminOnly || isAdmin)
+                .filter(
+                  (name) =>
+                    !fields[form][name].streetAddressOnly || streetAddress
+                )
                 .map((name) => {
                   const { className, label, options, required, span, type } =
                     fields[form][name];
