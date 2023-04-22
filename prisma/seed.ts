@@ -26,6 +26,7 @@ type Meeting = {
   recordID: string;
   phone?: string;
   email?: string;
+  website?: string;
   primary_contact_name?: string;
   primary_contact_email?: string;
   alt_contact_name?: string;
@@ -98,6 +99,7 @@ async function seed() {
       alt_contact_email,
       languages,
       types,
+      website,
       ...meetingInfo
     } = data;
 
@@ -146,6 +148,7 @@ async function seed() {
               recordID,
               phone,
               email,
+              website,
               users: {
                 connectOrCreate: users.map((user) => ({
                   where: {
