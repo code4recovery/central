@@ -9,4 +9,5 @@ export * from "./format-string";
 export * from "./format-token";
 export * from "./format-validator";
 export * from "./get-google-sheet";
+export * from "./valid-conference-url";
 export * from "./valid-object-id";

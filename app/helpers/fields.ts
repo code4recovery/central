@@ -5,10 +5,20 @@ import { strings } from "~/i18n";
 import type { Field } from "~/types";
 
 import { config } from "./config";
+import { validConferenceUrl } from "./valid-conference-url";
 
 const optional = {
   array: zfd.repeatable(),
   boolean: zfd.checkbox(),
+  conference_url: zfd.text(
+    z
+      .string()
+      .url()
+      .refine((val) => validConferenceUrl(val), {
+        message: "Conference provider is not supported.",
+      })
+      .optional()
+  ),
   email: zfd.text(
     z.string().email({ message: strings.form.invalidEmail }).optional()
   ),
@@ -129,7 +139,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       label: strings.meetings.conference_url,
       type: "url",
       span: 6,
-      validation: optional.url,
+      validation: optional.conference_url,
       helpText: strings.meetings.conference_url_help,
     },
     conference_url_notes: {

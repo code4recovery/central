@@ -3,6 +3,22 @@ export const config = {
   batchSize: 25,
   checkboxClassNames:
     "h-4 w-4 rounded border-neutral-500 m-0 mt-0.5 focus:ring-offset-transparent focus:ring-2",
+  conference_providers: {
+    "bluejeans.com": "Bluejeans",
+    "discord.gg": "Discord",
+    "freeconference.com": "Free Conference",
+    "freeconferencecall.com": "FreeConferenceCall",
+    "goto.com": "GoTo",
+    "gotomeet.me": "GoTo",
+    "gotomeeting.com": "GoTo",
+    "meet.google.com": "Google Hangouts",
+    "meet.jit.si": "Jitsi",
+    "meetings.dialpad.com": "Dialpad",
+    "skype.com": "Skype",
+    "webex.com": "WebEx",
+    "zoho.com": "Zoho",
+    "zoom.us": "Zoom",
+  },
   days: [
     "sunday",
     "monday",

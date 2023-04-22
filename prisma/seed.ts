@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import md5 from "blueimp-md5";
 import { DateTime } from "luxon";
 
-import { getGoogleSheet } from "~/helpers";
+import { getGoogleSheet, validConferenceUrl } from "~/helpers";
 import { strings } from "~/i18n";
 import { log } from "~/utils";
 
@@ -184,19 +184,22 @@ async function getMeetings(): Promise<Meeting[]> {
   const meetings: Meeting[] = [];
 
   rows.slice(150, 170).forEach((row) => {
+    const urlIsValid = validConferenceUrl(row.url);
+
     const meeting = {
       name: row.name,
       timezone: row.timezone,
       notes: row.notes,
       types: connectTypes(row.types),
       languages: connectLanguages(row.languages, row.types),
-      conference_url: row.url,
+      conference_url: urlIsValid ? row.url : undefined,
       conference_url_notes: row.access_code,
 
       // group info
       recordID: row.meeting_id,
       phone: row.phone,
       email: row.email,
+      website: !urlIsValid ? row.url : undefined,
       primary_contact_name: row.primary_contact_name,
       primary_contact_email: row.primary_contact_email,
       alt_contact_name: row.alt_contact_name,
