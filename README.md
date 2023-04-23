@@ -12,12 +12,11 @@ Central is developed on the MERN stack (MongoDB, Express, React, Node.js). It us
 
 You can set up and run Central yourself. It requires these third-party services:
 
-- [Google Cloud Run](https://cloud.google.com/run)
-- [Google Sheets API](https://developers.google.com/sheets/api)
+- Google [Cloud Run](https://cloud.google.com/run)
+- Google [Cloud Storage](https://cloud.google.com/storage)
+- Google [Geocoding](https://developers.google.com/maps/documentation/geocoding/overview), [Sheets](https://developers.google.com/sheets/api), and [Time Zone](https://developers.google.com/maps/documentation/timezone/overview) APIs
 - [MongoDB](https://www.mongodb.com/)
-- [Google Cloud Storage](https://cloud.google.com/storage)
 - [SendGrid](https://sendgrid.com/)
-- [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/overview)
 - Sentry (coming soon)
 
 ## Run locally

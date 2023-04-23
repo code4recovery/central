@@ -259,13 +259,6 @@ export default function EditMeeting() {
           >
             {strings.meetings.view}
           </Button>
-          <Button
-            icon="duplicate"
-            onClick={() => alert("not implemented yet")}
-            secondary
-          >
-            {strings.meetings.duplicate}
-          </Button>
           <ArchiveForm archived={meeting.archived} />
         </div>
         <HelpTopic
