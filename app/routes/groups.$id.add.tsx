@@ -10,7 +10,14 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, redirectWith, saveFeedToStorage } from "~/utils";
+import {
+  db,
+  getIDs,
+  log,
+  optionsInUse,
+  redirectWith,
+  saveFeedToStorage,
+} from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const validator = formatValidator("meeting");
@@ -92,17 +99,21 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     });
   } catch (e) {
     if (e instanceof Error) {
-      return json({ error: e.message });
+      log(e);
+      return json({ error: `File storage error: ${e.message}` });
     }
   }
 };
 
-export const loader: LoaderFunction = async ({ params: { id } }) => {
+export const loader: LoaderFunction = async ({ params: { id }, request }) => {
+  const { currentAccountID } = await getIDs(request);
+
   const group = await db.group.findUnique({
     select: { id: true, name: true },
     where: { id },
   });
-  return json({ group });
+
+  return json({ group, optionsInUse: await optionsInUse(currentAccountID) });
 };
 
 export const meta: MetaFunction = () => ({
@@ -111,7 +122,7 @@ export const meta: MetaFunction = () => ({
 
 export default function CreateMeeting() {
   const actionData = useActionData();
-  const { group } = useLoaderData();
+  const { group, optionsInUse } = useLoaderData();
   return (
     <Template
       title={strings.meetings.add}
@@ -124,7 +135,7 @@ export default function CreateMeeting() {
         primary={
           <>
             {actionData && <Alerts data={actionData} />}
-            <Form form="meeting" />
+            <Form form="meeting" optionsInUse={optionsInUse} />
           </>
         }
       >

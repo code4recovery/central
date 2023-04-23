@@ -7,7 +7,7 @@ import { Alerts, Button, Columns, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getIDs } from "~/utils";
+import { db, getIDs, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -33,7 +33,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
         : { disconnect: { id: currentAccountID } },
     },
   });
-  return json({ success: strings.users.updated });
+  return redirectWith("/users", request, { success: strings.users.updated });
 };
 
 export const loader: LoaderFunction = async ({ params: { id } }) => {

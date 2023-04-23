@@ -8,13 +8,13 @@ export async function saveFeedToStorage(accountID: string) {
   const private_key = process.env.GOOGLE_CLOUD_PRIVATE_KEY?.split(
     String.raw`\n`
   ).join("\n");
-  const client_email = `${projectId}@${projectId}.iam.gserviceaccount.com`;
+  const client_email = process.env.GOOGLE_CLOUD_CLIENT_EMAIL ?? "";
 
   const filename = `${accountID}.json`;
 
-  if (!projectId || !private_key) {
+  if (!projectId || !private_key || !client_email) {
     throw Error(
-      "need GOOGLE_CLOUD_BUCKET and GOOGLE_CLOUD_PRIVATE_KEY env vars"
+      "need GOOGLE_CLOUD_BUCKET, GOOGLE_CLOUD_PRIVATE_KEY, and GOOGLE_CLOUD_CLIENT_EMAIL env vars"
     );
   }
 

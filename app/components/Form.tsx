@@ -33,7 +33,7 @@ export function Form({
   const {
     geocode: { location_type },
   } = useGeocode();
-  const streetAddress = location_type !== "APPROXIMATE";
+  const streetAddress = location_type && location_type !== "APPROXIMATE";
   return (
     <ValidatedForm
       autoComplete="off"

@@ -14,7 +14,7 @@ You can set up and run Central yourself. It requires these third-party services:
 
 - [Google Cloud Run](https://cloud.google.com/run)
 - [Google Sheets API](https://developers.google.com/sheets/api)
-- [MongoDB](https://www.mongodb.com/) (we use [Atlas](https://www.mongodb.com/atlas/database))
+- [MongoDB](https://www.mongodb.com/)
 - [Google Cloud Storage](https://cloud.google.com/storage)
 - [SendGrid](https://sendgrid.com/)
 - [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/overview)
@@ -22,52 +22,62 @@ You can set up and run Central yourself. It requires these third-party services:
 
 ## Run locally
 
-Create a `.env` file that looks like this, and replace
+Start by creating a `.env` file in your project root with the following content, then continue to the next steps to configure services.
 
-```sh
-# MongoDB connection URL
-DATABASE_URL="mongodb+srv://<user>:<password>@cluster0.t0piiqe.mongodb.net/<database>"
+```bash
+# Random security salt (to protect sessions)
+SESSION_SECRET="<make.up.a.cryptographic.salt>"
 
-# Google Sheets API
-GOOGLE_SHEET_API_KEY="<your.google.sheets.api.key>"
+# MongoDB connection URL (to store data)
+DATABASE_URL="mongodb+srv://<user>:<password>@cluster0.<cluster>.mongodb.net/<database>"
 
-# Google Cloud Storage
+# Google Cloud Storage (to store JSON files)
 GOOGLE_CLOUD_BUCKET="<your.bucket>"
 GOOGLE_CLOUD_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n<private.key.goes.here>==\n-----END PRIVATE KEY-----\n"
 
-# Random salt
-SESSION_SECRET="<make.up.a.cryptographic.salt>"
+# Google Maps API (to find locations and timezones)
+GOOGLE_MAPS_API_KEY="<your.google.maps.api.key>"
 
-# Initial account seed
-USER_NAME="<your.name>"
-USER_EMAIL="<your.email@address.com>"
-
-# Email
+# SendGrid (to send email)
 SENDGRID_API_KEY="<your.sendgrid.api.key>"
 SENDGRID_SENDER="<your.sender@address.com>"
 SENDGRID_TEMPLATE="<your.sendgrid.template.id>"
+
+# Only necessary to seed OIAA data
+GOOGLE_SHEET_API_KEY="<your.google.sheets.api.key>"
+USER_NAME="<your.name>"
+USER_EMAIL="<your.email@address.com>"
 ```
 
-You may wish to seed your database with an existing Meeting Guide JSON feed. Coming soon.
+### Create a session secret
 
-To run locally, run `npm i` once, then run `npm run dev`. Your site will be running at [http://localhost:3000/](http://localhost:3000/)
+You can type any string of random characters here, or use a random string generator.
 
-## Set up Cloud Storage
+### Set up MongoDB
+
+1. Install MongoDB or sign up for [Atlas](https://www.mongodb.com/atlas/database)
+1. Create a database
+1. Copy the connection string to your `.env`
+
+### Set up Google Cloud Storage
 
 1. Set up a bucket, add the name to your `.env`
-1. Get the private key from the JSON file and add it to your `.env`
-1. Grant user Storage Admin permissions
-1. Grant `anyUser` Storage Viewer permissions
-1. Go to cloud shell and add your CORS policy
+1. Grant `anyUser` with `Storage Viewer` permissions
+1. Go to Credentials and look for a service account with the name `<bucket>@<project>.iam.gserviceaccount.com` copy and add this to your `.env`
+1. Click on it > Permissions > Grant access and paste the name in new principals, keep `Service Account Admin` as the role, and Save
+1. Now go to keys > add key > JSON
+1. Get the private key from the JSON file you just downloaded and add it to your `.env`
+1. Go to cloud shell and add your CORS policy, by pasting `printf '[{"origin": ["*"],"responseHeader": ["*"],"method": ["GET"],"maxAgeSeconds": 3600}]' > cors.json`
+1. now substitude your bucket name and run `gsutil cors set cors.json gs://<bucket>` (you may need to run this again if you see a 401 error)
 
-```
-printf '[{"origin": ["*"],"responseHeader": ["*"],"method":
-["GET"],"maxAgeSeconds": 3600}]' > cors.json
+### Set up Google Maps JavaScript API
 
-gsutil cors set cors.json gs://<bucket_name>
-```
+1. In Cloud Console Enable Maps JavaScript API
+1. Go to Credentials > Create Credentials
+1. You may restrict it to the JavaScript Maps API (if you can figure out how to restrict it to the proper IP addresses for Cloud Run, let us know!)
+1. Copy the API key and add it to your `.env`
 
-## Set up SendGrid
+### Set up SendGrid
 
 1. Set up an account at SendGrid
 1. Get API key and sender email, add to `.env`
@@ -856,7 +866,14 @@ gsutil cors set cors.json gs://<bucket_name>
 
 </details>
 
-## Deploy to Cloud Run
+### Run locally
+
+1. Run `npm i` (you don't need to do this ever time but should do it when you pull changes)
+1. Seeding with a Meeting Guide JSON feed and setting up a blank instance are both coming soon
+1. For now you must seed a sample of OIAA data by running `npm run seed`
+1. Now run `npm run dev`. Your site should be running at [http://localhost:3000/](http://localhost:3000/)
+
+### Deploy to Cloud Run
 
 1. Add this repository (or a clone of it) to Cloud Run
-1. Set your environment variables
+1. Set your environment variables with the values in your `.env`

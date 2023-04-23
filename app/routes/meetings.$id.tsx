@@ -29,7 +29,14 @@ import {
 } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith, saveFeedToStorage } from "~/utils";
+import {
+  db,
+  getIDs,
+  jsonWith,
+  log,
+  optionsInUse,
+  saveFeedToStorage,
+} from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -64,7 +71,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       return json({ success: strings.meetings.archived });
     } catch (e) {
       if (e instanceof Error) {
-        return json({ error: e.message });
+        log(e);
+        return json({ error: `File storage error: ${e.message}` });
       }
     }
   }
@@ -152,7 +160,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
-      return json({ error: e.message });
+      log(e);
+      return json({ error: `File storage error: ${e.message}` });
     }
   }
 };
@@ -208,42 +217,11 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     where: { meetingID: meeting.id },
   });
 
-  const languages = await db.language.findMany({
-    select: {
-      code: true,
-    },
-    where: {
-      meetings: {
-        some: {
-          group: {
-            accountID: currentAccountID,
-          },
-        },
-      },
-    },
+  return jsonWith(request, {
+    activities,
+    meeting,
+    optionsInUse: await optionsInUse(currentAccountID),
   });
-
-  const types = await db.type.findMany({
-    select: {
-      code: true,
-    },
-    where: {
-      meetings: {
-        some: {
-          group: {
-            accountID: currentAccountID,
-          },
-        },
-      },
-    },
-  });
-
-  const optionsInUse = {
-    languages: languages.map(({ code }) => code),
-    types: types.map(({ code }) => code),
-  };
-
-  return jsonWith(request, { activities, meeting, optionsInUse });
 };
 
 export const meta: MetaFunction = () => ({

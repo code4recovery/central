@@ -31,7 +31,7 @@ import {
   Template,
 } from "~/components";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith, saveFeedToStorage } from "~/utils";
+import { db, getIDs, jsonWith, log, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -107,7 +107,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
-      return json({ error: e.message });
+      log(e);
+      return json({ error: `File storage error: ${e.message}` });
     }
   }
 };
