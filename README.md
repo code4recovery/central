@@ -33,10 +33,11 @@ DATABASE_URL="mongodb+srv://<user>:<password>@cluster0.<cluster>.mongodb.net/<da
 
 # Google Cloud Storage (to store JSON files)
 GOOGLE_CLOUD_BUCKET="<your.bucket>"
+GOOGLE_CLOUD_CLIENT_EMAIL="<bucket>@<account>.iam.gserviceaccount.com"
 GOOGLE_CLOUD_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n<private.key.goes.here>==\n-----END PRIVATE KEY-----\n"
 
-# Google Maps API (to find locations and timezones)
-GOOGLE_MAPS_API_KEY="<your.google.maps.api.key>"
+# Google Geocoding, Sheets, and Time Zone APIs
+GOOGLE_API_KEY="<your.google.api.key>"
 
 # SendGrid (to send email)
 SENDGRID_API_KEY="<your.sendgrid.api.key>"
@@ -70,11 +71,11 @@ You can type any string of random characters here, or use a random string genera
 1. Go to cloud shell and add your CORS policy, by pasting `printf '[{"origin": ["*"],"responseHeader": ["*"],"method": ["GET"],"maxAgeSeconds": 3600}]' > cors.json`
 1. now substitude your bucket name and run `gsutil cors set cors.json gs://<bucket>` (you may need to run this again if you see a 401 error)
 
-### Set up Google Maps JavaScript API
+### Set up Google Geocoding and Time Zone APIs
 
-1. In Cloud Console Enable Maps JavaScript API
+1. In Cloud Console, enable the Geocoding and Time Zone APIs
 1. Go to Credentials > Create Credentials
-1. You may restrict it to the JavaScript Maps API (if you can figure out how to restrict it to the proper IP addresses for Cloud Run, let us know!)
+1. Restrict to these two APIs (if you can figure out how to restrict it to the proper IP addresses for Cloud Run, let us know!)
 1. Copy the API key and add it to your `.env`
 
 ### Set up SendGrid

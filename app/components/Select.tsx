@@ -29,7 +29,7 @@ export function Select({
     <>
       {value && <input type="hidden" name={name} value={value} />}
       <select
-        name={value ? name : undefined}
+        name={!value ? name : undefined}
         id={name}
         className={cx(config.fieldClassNames, focusRing, className)}
         defaultValue={!value ? defaultValue : undefined}

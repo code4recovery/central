@@ -44,8 +44,8 @@ model Activity {
 model Change {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   field      String
-  before     String
-  after      String
+  before     String?
+  after      String?
   activityID String   @db.ObjectId
   activity   Activity @relation(fields: [activityID], references: [id])
   createdAt  DateTime @default(now())

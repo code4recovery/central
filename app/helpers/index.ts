@@ -8,6 +8,7 @@ export * from "./format-slug";
 export * from "./format-string";
 export * from "./format-token";
 export * from "./format-validator";
+export * from "./format-value";
 export * from "./get-google-sheet";
 export * from "./valid-conference-url";
 export * from "./valid-object-id";

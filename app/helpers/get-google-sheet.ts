@@ -5,7 +5,7 @@ type Row = { [key: string]: string };
 export async function getGoogleSheet(sheetId: string) {
   const rows: Row[] = [];
 
-  const data = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:Z10000?key=${process.env.GOOGLE_SHEET_API_KEY}`;
+  const data = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:Z10000?key=${process.env.GOOGLE_API_KEY}`;
   const response = await fetch(data);
   const { values } = await response.json();
 

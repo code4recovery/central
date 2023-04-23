@@ -19,6 +19,7 @@ import {
   validObjectId,
   formatChanges,
   formatString,
+  formatValue,
 } from "~/helpers";
 import {
   Alerts,
@@ -78,8 +79,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       await db.change.create({
         data: {
           activityID: activity.id,
-          before: Array.isArray(before) ? before.join(", ") : `${before}`,
-          after: Array.isArray(after) ? after.join(", ") : `${after}`,
+          before: formatValue(before),
+          after: formatValue(after),
           field,
         },
       })

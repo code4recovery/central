@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { Link } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
@@ -29,6 +29,7 @@ export function Table({
   };
   rows: Row[];
 }) {
+  const navigate = useNavigate();
   const keys = Object.keys(columns);
   const {
     theme: { text },
@@ -96,33 +97,28 @@ export function Table({
               )}
             </dl>
           );
+
+          // make row clickable
+          const rowProps = row.link
+            ? {
+                className:
+                  "hover:bg-neutral-100 dark:hover:bg-neutral-950 hover:bg-opacity-50 cursor-pointer",
+                onClick: () => navigate(row.link as string),
+              }
+            : {};
+
           return (
-            <tr
-              key={row.id}
-              className={cx({
-                "hover:bg-neutral-100 dark:hover:bg-neutral-950 hover:bg-opacity-50 cursor-pointer":
-                  !!row.link,
-              })}
-            >
-              <td className="w-2/5 max-w-0 font-medium sm:w-auto sm:max-w-none">
-                {row.link ? (
-                  <Link to={row.link} className="block p-3">
-                    <div className={cx(text, "underline")}>
-                      {showValue(row[keys[0]])}
-                    </div>
-                    {stack}
-                  </Link>
-                ) : (
-                  <div className="p-3">
-                    {row[keys[0]]}
-                    {stack}
-                  </div>
-                )}
+            <tr key={row.id} {...rowProps}>
+              <td className="w-2/5 max-w-0 font-medium sm:w-auto sm:max-w-none p-3">
+                <div className={row.link ? cx(text, "underline") : undefined}>
+                  {showValue(row[keys[0]])}
+                </div>
+                {stack}
               </td>
               {keys.slice(1, 4).map((key, index) => (
                 <td
                   key={key}
-                  className={cx({
+                  className={cx("p-3", {
                     "hidden lg:table-cell w-1/5": index === 0,
                     "hidden sm:table-cell w-1/4": index === 1,
                     "w-1/5": index === 2,
@@ -130,13 +126,7 @@ export function Table({
                     "text-right": columns[key].align === "right",
                   })}
                 >
-                  {row.link ? (
-                    <Link to={row.link} className="block p-3">
-                      {showValue(row[key])}
-                    </Link>
-                  ) : (
-                    <div className="p-3">{showValue(row[key])}</div>
-                  )}
+                  {showValue(row[key])}
                 </td>
               ))}
             </tr>

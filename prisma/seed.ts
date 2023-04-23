@@ -33,12 +33,11 @@ type Meeting = {
   alt_contact_email?: string;
 };
 
-async function seed() {
+(async () => {
   const start = Date.now();
 
   const name = process.env.USER_NAME;
   const email = process.env.USER_EMAIL;
-  const url = "https://aa-intergroup.org/meetings";
 
   if (!name || !email) {
     console.error("USER_NAME or USER_EMAIL vars missing");
@@ -47,33 +46,29 @@ async function seed() {
 
   const meetings = await getMeetings();
 
+  // delete everything except accounts, users with accounts, and geocodes
   await db.change.deleteMany();
   await db.activity.deleteMany();
   await db.meeting.deleteMany();
   await db.group.deleteMany();
   //await db.language.deleteMany();
   //await db.type.deleteMany();
-  await db.user.deleteMany({ where: { NOT: { email } } });
-  await db.account.deleteMany({ where: { NOT: { url } } });
+  await db.user.deleteMany({ where: { accounts: { none: {} } } });
 
-  let account = await db.account.findFirst({
-    where: { url },
-  });
+  // create account if it doesnt exist yet
+  let account = await db.account.findFirst();
   if (!account) {
     account = await db.account.create({
       data: {
         name: "Online Intergroup of AA",
-        url,
+        url: "https://aa-intergroup.org/meetings",
         theme: "sky",
       },
     });
   }
 
-  const user = await db.user.findUnique({
-    where: {
-      email,
-    },
-  });
+  // create user if it doesnt exist yet
+  const user = await db.user.findUnique({ where: { email } });
   if (!user) {
     await db.user.create({
       data: {
@@ -175,10 +170,9 @@ async function seed() {
   if (languagesNotFound.length) {
     log({ languagesNotFound });
   }
-}
+})();
 
-seed();
-
+// get meeting and group data from OIAA google sheet
 async function getMeetings(): Promise<Meeting[]> {
   // fetch sheet
   const rows = await getGoogleSheet(
