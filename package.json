@@ -12,7 +12,7 @@
     "push": "npx prisma db push"
   },
   "prisma": {
-    "seed": "node --require esbuild-register prisma/seed.ts"
+    "seed": "npx prisma db push && node --require esbuild-register prisma/seed.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^6.9.4",

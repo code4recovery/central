@@ -1,13 +1,12 @@
 import type { User } from "@prisma/client";
 import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import { Avatar, Button, Chiclet, Table, Template } from "~/components";
+import { Alerts, Avatar, Button, Chiclet, Table, Template } from "~/components";
 import { formatDate } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getIDs } from "~/utils";
+import { db, getIDs, jsonWith } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
@@ -22,7 +21,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     },
     where: { accountIDs: { has: currentAccountID } },
   });
-  return json({ users });
+  return jsonWith(request, { users });
 };
 
 export const meta: MetaFunction = () => ({
@@ -30,13 +29,15 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Users() {
-  const { users } = useLoaderData();
+  const { alert, users } = useLoaderData();
   const { currentAccountID, isAdmin } = useUser();
+
   return (
     <Template
       title={strings.users.title}
       cta={isAdmin && <Button url="/users/add">{strings.users.add}</Button>}
     >
+      {alert && <Alerts data={alert} />}
       <Table
         columns={{
           name: { label: strings.users.name },

@@ -1,6 +1,5 @@
 import md5 from "blueimp-md5";
 import type { ActionFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
@@ -8,30 +7,51 @@ import { Alerts, Columns, Form, Template } from "~/components";
 import { formatToken, formatValidator } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getIDs, sendMail } from "~/utils";
+import { db, getIDs, redirectWith, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const validator = formatValidator("user");
+  const { currentAccountID } = await getIDs(request);
+
+  const validator = formatValidator("user", {
+    validator: async (data) =>
+      !(await db.user.count({
+        where: { email: data.email, currentAccountID },
+      })),
+    params: {
+      message: strings.users.exists,
+      path: ["email"],
+    },
+  });
   const { data, error } = await validator.validate(await request.formData());
   if (error) {
     return validationError(error);
   }
+
   const { name, email } = data;
-
-  const { currentAccountID } = await getIDs(request);
-
   const emailHash = md5(email);
   const loginToken = formatToken();
-  await db.user.create({
-    data: {
-      name,
-      email,
-      emailHash,
-      loginToken,
-      currentAccountID,
-      accounts: { connect: { id: currentAccountID } },
-    },
-  });
+
+  if (await db.user.count({ where: { email } })) {
+    // if user exists, add them to this account
+    db.user.update({
+      where: { email },
+      data: { accounts: { connect: { id: currentAccountID } } },
+    });
+  } else {
+    // otherwise create
+    await db.user.create({
+      data: {
+        name,
+        email,
+        emailHash,
+        loginToken,
+        currentAccountID,
+        accounts: { connect: { id: currentAccountID } },
+      },
+    });
+  }
+
+  // send invitation
   await sendMail(
     email,
     "invite",
@@ -39,7 +59,10 @@ export const action: ActionFunction = async ({ request }) => {
     `/auth/${emailHash}/${loginToken}`,
     currentAccountID
   );
-  return json({ success: strings.users.added });
+
+  return redirectWith("/users", request, {
+    success: strings.users.added,
+  });
 };
 
 export default function User() {

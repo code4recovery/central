@@ -281,6 +281,7 @@ export const strings = {
     edit_profile: "Edit Profile",
     email: "Email address",
     email_description: "Kept private",
+    exists: "This user is already added",
     last_seen: "Last Seen",
     last_seen_never: "Never",
     menu_option: "Users",

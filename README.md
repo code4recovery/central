@@ -17,9 +17,7 @@ You can set up and run Central yourself. It requires these third-party services:
 - [MongoDB](https://www.mongodb.com/) (we use [Atlas](https://www.mongodb.com/atlas/database))
 - [Google Cloud Storage](https://cloud.google.com/storage)
 - [SendGrid](https://sendgrid.com/)
-- Google Geocoding API (coming soon)
-- Google TimeZone API (coming soon)
-- Mapbox (coming soon)
+- [Google Maps JavaScript API](https://developers.google.com/maps/documentation/javascript/overview)
 - Sentry (coming soon)
 
 ## Run locally
@@ -71,9 +69,11 @@ gsutil cors set cors.json gs://<bucket_name>
 
 ## Set up SendGrid
 
-1. Set up an account at sendgrid
-1. Get API key and sender email, add to `.env` or environment variables
-1. Create email template (see below), add template to `.env` or environment variables
+1. Set up an account at SendGrid
+1. Get API key and sender email, add to `.env`
+1. Go to Email API > Dynamic Templates > Create a Dynamic Template and enter the content below (feel free to customize)
+1. In the Subject field enter `{{ subject }}`
+1. Add your template's Template ID to your `.env`
 
 <details>
 
