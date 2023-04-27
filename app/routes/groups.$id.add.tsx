@@ -63,21 +63,17 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
         connect: { id },
       },
       languages: {
-        connect: [
-          ...languages.map((code: string) => ({
-            code,
-          })),
-        ],
+        connectOrCreate: languages.map((code: string) => ({
+          where: { code },
+          create: { code },
+        })),
       },
-      types: types.length
-        ? {
-            connect: [
-              ...types.map((code: string) => ({
-                code,
-              })),
-            ],
-          }
-        : undefined,
+      types: {
+        connectOrCreate: types.map((code: string) => ({
+          where: { code },
+          create: { code },
+        })),
+      },
       account: { connect: { id: currentAccountID } },
     },
   });

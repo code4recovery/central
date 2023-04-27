@@ -124,7 +124,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   // prepare checkbox updates
   const changedCheckboxFields: {
     [key: string]: {
-      connect: { code: string }[];
+      connectOrCreate: { where: { code: string }; create: { code: string } }[];
       disconnect: { code: string }[];
     };
   } = {};
@@ -133,13 +133,13 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     .filter(({ type }) => type === "checkboxes")
     .forEach(({ field, before, after }) => {
       if (Array.isArray(before) && Array.isArray(after)) {
-        const connect = after
+        const connectOrCreate = after
           .filter((value) => !before.includes(value))
-          .map((code: string) => ({ code }));
+          .map((code: string) => ({ where: { code }, create: { code } }));
         const disconnect = before
           .filter((value) => !after.includes(value))
           .map((code: string) => ({ code }));
-        changedCheckboxFields[field] = { connect, disconnect };
+        changedCheckboxFields[field] = { connectOrCreate, disconnect };
       }
     });
 
@@ -255,7 +255,7 @@ export default function EditMeeting() {
           <Button
             icon="external"
             secondary
-            url={`${accountUrl}?id=${meeting.id}`}
+            url={`${accountUrl}?meeting=${meeting.id}`}
           >
             {strings.meetings.view}
           </Button>
