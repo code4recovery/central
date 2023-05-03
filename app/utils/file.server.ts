@@ -2,8 +2,9 @@ import { Storage } from "@google-cloud/storage";
 
 import { db } from "./db.server";
 import { log } from "./log.server";
+import { config } from "~/helpers";
 
-export async function saveFeedToStorage(accountID: string) {
+export async function saveFeedToStorage(accountID: string, request: Request) {
   const projectId = process.env.GOOGLE_CLOUD_BUCKET ?? "";
   const private_key = process.env.GOOGLE_CLOUD_PRIVATE_KEY?.split(
     String.raw`\n`
@@ -26,6 +27,8 @@ export async function saveFeedToStorage(accountID: string) {
     },
   });
 
+  const { protocol, host } = new URL(request.url);
+
   const meetings = (
     await db.meeting.findMany({
       select: {
@@ -46,6 +49,7 @@ export async function saveFeedToStorage(accountID: string) {
         group: {
           select: {
             name: true,
+            recordID: true,
             notes: true,
             email: true,
             phone: true,
@@ -88,7 +92,15 @@ export async function saveFeedToStorage(accountID: string) {
         timezone,
         notes,
         types: [
-          ...languages.map(({ code }) => code),
+          ...languages
+            .map(({ code }) => code)
+            .map((code) =>
+              code in config.languageSubstitutions
+                ? config.languageSubstitutions[
+                    code as keyof typeof config.languageSubstitutions
+                  ]
+                : code
+            ),
           ...types.map(({ code }) => code),
         ],
         day,
@@ -98,6 +110,7 @@ export async function saveFeedToStorage(accountID: string) {
         conference_phone,
         conference_phone_notes,
         group: group.name,
+        group_id: group.recordID,
         group_notes: group.notes,
         email: group.email,
         phone: group.phone,
@@ -105,6 +118,7 @@ export async function saveFeedToStorage(accountID: string) {
         venmo: group.venmo,
         paypal: group.paypal,
         square: group.square,
+        edit_url: `${protocol}//${host}/meetings/${id}`,
         updated: updatedAt
           .toISOString()
           .split("T")

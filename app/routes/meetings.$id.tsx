@@ -68,7 +68,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       },
     });
     try {
-      await saveFeedToStorage(currentAccountID);
+      await saveFeedToStorage(currentAccountID, request);
       return json({ success: strings.meetings.archived });
     } catch (e) {
       if (e instanceof Error) {
@@ -157,7 +157,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await saveFeedToStorage(currentAccountID);
+    await saveFeedToStorage(currentAccountID, request);
     return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
@@ -252,11 +252,7 @@ export default function EditMeeting() {
         }
       >
         <div className="flex gap-5 flex-wrap">
-          <Button
-            icon="external"
-            secondary
-            url={`${accountUrl}?meeting=${meeting.id}`}
-          >
+          <Button icon="external" secondary url={`${accountUrl}${meeting.id}`}>
             {strings.meetings.view}
           </Button>
           <ArchiveForm archived={meeting.archived} />

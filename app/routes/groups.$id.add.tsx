@@ -89,7 +89,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await saveFeedToStorage(currentAccountID);
+    await saveFeedToStorage(currentAccountID, request);
     return redirectWith(`/meetings/${meeting.id}`, request, {
       success: strings.json_updated,
     });

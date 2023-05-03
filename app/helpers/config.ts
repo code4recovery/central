@@ -32,6 +32,15 @@ export const config = {
   fieldClassNames:
     "bg-white dark:bg-black block border-0 leading-6 py-1.5 rounded-md ring-1 ring-neutral-300 dark:ring-neutral-700 ring-inset shadow-sm w-full placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:ring-2 focus:ring-inset disabled:opacity-50",
   home: "/groups",
+  languageSubstitutions: {
+    ES: "S",
+    RU: "RUS",
+    IT: "ITA",
+    KO: "KOR",
+    PL: "POL",
+    PT: "POR",
+    PA: "PUN",
+  },
   themes: {
     slate: {
       label: "Slate",

@@ -104,7 +104,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await saveFeedToStorage(currentAccountID);
+    await saveFeedToStorage(currentAccountID, request);
     return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
