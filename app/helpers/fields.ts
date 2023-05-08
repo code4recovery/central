@@ -15,7 +15,7 @@ const optional = {
       .string()
       .url()
       .refine((val) => validConferenceUrl(val), {
-        message: "Conference provider is not supported.",
+        message: strings.form.invalidConferenceProvider,
       })
       .optional()
   ),
@@ -23,7 +23,21 @@ const optional = {
     z.string().email({ message: strings.form.invalidEmail }).optional()
   ),
   number: zfd.numeric(z.number().optional()),
+  paypal: zfd.text(
+    z
+      .string()
+      .refine((val) => val.match(/^[a-z0-9]+$/i), {
+        message: strings.form.invalidPayPal,
+      })
+      .optional()
+  ),
+  square: zfd.text(
+    z.string().startsWith("$", strings.form.invalidSquare).optional()
+  ),
   string: zfd.text(z.string().optional()),
+  venmo: zfd.text(
+    z.string().startsWith("@", strings.form.invalidVenmo).optional()
+  ),
   url: zfd.text(z.string().url().optional()),
 };
 
@@ -102,19 +116,19 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     venmo: {
       label: strings.group.venmo,
       type: "text",
-      validation: optional.string, // todo venmo validator
+      validation: optional.venmo,
       span: 4,
     },
     paypal: {
       label: strings.group.paypal,
       type: "text",
-      validation: optional.string, // todo paypal validator
+      validation: optional.paypal,
       span: 4,
     },
     square: {
       label: strings.group.square,
       type: "text",
-      validation: optional.string, // todo square validator
+      validation: optional.square,
       span: 4,
     },
   },

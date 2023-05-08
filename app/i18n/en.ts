@@ -80,7 +80,11 @@ export const strings = {
     empty: "No feedback received yet",
   },
   form: {
+    invalidConferenceProvider: "Conference provider is not supported",
     invalidEmail: "Invalid email",
+    invalidPayPal: "Invalid PayPal.me username, eg 'MyGroupName'",
+    invalidSquare: "Cashtags should start with $",
+    invalidVenmo: "Venmo handles should start with @",
     required: "Required",
     save: "Save",
     saving: "Saving",
