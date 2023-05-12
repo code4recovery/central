@@ -5,7 +5,7 @@ import { strings } from "~/i18n";
 import type { Field } from "~/types";
 
 import { config } from "./config";
-import { validConferenceUrl } from "./valid-conference-url";
+import { validConferenceUrl, validPayPal, validPhone } from "./format-valid";
 
 const optional = {
   array: zfd.repeatable(),
@@ -26,8 +26,16 @@ const optional = {
   paypal: zfd.text(
     z
       .string()
-      .refine((val) => val.match(/^[a-z0-9]+$/i), {
+      .refine((val) => validPayPal(val), {
         message: strings.form.invalidPayPal,
+      })
+      .optional()
+  ),
+  phone: zfd.text(
+    z
+      .string()
+      .refine((val) => validPhone(val), {
+        message: strings.form.invalidPhone,
       })
       .optional()
   ),
@@ -43,13 +51,11 @@ const optional = {
 
 const required = {
   array: zfd.repeatable(z.array(zfd.text()).min(1)),
-  //boolean: zfd.checkbox().refine((val) => val, "Please check this box"),
   email: zfd.text(
     z
       .string({ required_error: strings.form.required })
       .email({ message: strings.form.invalidEmail })
   ),
-  number: zfd.numeric(),
   string: zfd.text(),
   url: zfd.text(z.string().url()),
 };
@@ -104,7 +110,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     phone: {
       label: strings.group.phone,
       type: "text",
-      validation: optional.string, // todo phone validator
+      validation: optional.phone,
       span: 4,
     },
     website: {

@@ -83,6 +83,8 @@ export const strings = {
     invalidConferenceProvider: "Conference provider is not supported",
     invalidEmail: "Invalid email",
     invalidPayPal: "Invalid PayPal.me username, eg 'MyGroupName'",
+    invalidPhone:
+      "Phone numbers should only contain digits or +,()-# characters",
     invalidSquare: "Cashtags should start with $",
     invalidVenmo: "Venmo handles should start with @",
     required: "Required",
