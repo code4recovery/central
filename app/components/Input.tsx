@@ -25,7 +25,7 @@ export function Input({
   } = useUser();
   const { error, getInputProps } = useField(name, {
     validationBehavior: {
-      initial: "onChange",
+      initial: "onBlur",
     },
   });
   return (

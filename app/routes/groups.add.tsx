@@ -9,12 +9,23 @@ import { strings } from "~/i18n";
 import { db, getIDs, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const validator = formatValidator("group");
+  const { id, currentAccountID } = await getIDs(request);
+
+  const validator = formatValidator("group", {
+    validator: async (data) =>
+      !(await db.group.count({
+        where: { recordID: data.recordID, accountID: currentAccountID },
+      })),
+    params: {
+      message: strings.group.recordExists,
+      path: ["recordID"],
+    },
+  });
+
   const { data, error } = await validator.validate(await request.formData());
   if (error) {
     return validationError(error);
   }
-  const { id, currentAccountID } = await getIDs(request);
   const group = await db.group.create({
     data: {
       ...data,

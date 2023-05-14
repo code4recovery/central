@@ -7,6 +7,7 @@ export * from "./format-day-time";
 export * from "./format-slug";
 export * from "./format-string";
 export * from "./format-token";
+export * from "./format-url";
 export * from "./format-validator";
 export * from "./format-valid";
 export * from "./format-value";

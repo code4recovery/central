@@ -8,7 +8,7 @@ import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
-import { formatValidator } from "~/helpers";
+import { formatSlug, formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
 import {
   db,
@@ -45,10 +45,20 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   const { id: userID, currentAccountID } = await getIDs(request);
 
+  const slugs = (
+    await db.meeting.findMany({
+      select: { slug: true },
+      where: { accountID: currentAccountID },
+    })
+  ).map(({ slug }) => slug);
+
+  const slug = formatSlug(name, slugs);
+
   // update meeting
   const meeting = await db.meeting.create({
     data: {
       name,
+      slug,
       day,
       time,
       timezone,

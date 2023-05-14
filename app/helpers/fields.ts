@@ -5,7 +5,12 @@ import { strings } from "~/i18n";
 import type { Field } from "~/types";
 
 import { config } from "./config";
-import { validConferenceUrl, validPayPal, validPhone } from "./format-valid";
+import {
+  validConferenceProvider,
+  validConferenceUrl,
+  validPayPal,
+  validPhone,
+} from "./format-valid";
 
 const optional = {
   array: zfd.repeatable(),
@@ -13,9 +18,18 @@ const optional = {
   conference_url: zfd.text(
     z
       .string()
-      .url()
-      .refine((val) => validConferenceUrl(val), {
-        message: strings.form.invalidConferenceProvider,
+      .url(strings.form.invalidUrl)
+      .superRefine((val, ctx) => {
+        if (!validConferenceProvider(val))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: strings.form.invalidConferenceProvider,
+          });
+        if (!validConferenceUrl(val))
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: strings.form.invalidConferenceUrl,
+          });
       })
       .optional()
   ),
@@ -88,13 +102,13 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       label: strings.group.name,
       type: "text",
       validation: required.string,
-      span: 10,
+      span: 9,
     },
     recordID: {
       label: strings.group.recordID,
       type: "text",
       validation: optional.string,
-      span: 2,
+      span: 3,
     },
     notes: {
       label: strings.group.notes,
@@ -173,7 +187,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       label: strings.meetings.conference_phone,
       type: "tel",
       span: 6,
-      validation: optional.string, // todo phone validator
+      validation: optional.phone,
       helpText: strings.meetings.conference_phone_help,
     },
     conference_phone_notes: {

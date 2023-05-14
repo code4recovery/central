@@ -2,7 +2,7 @@ import { Storage } from "@google-cloud/storage";
 
 import { db } from "./db.server";
 import { log } from "./log.server";
-import { config } from "~/helpers";
+import { config, formatUrl } from "~/helpers";
 
 export async function saveFeedToStorage(accountID: string, request: Request) {
   const projectId = process.env.GOOGLE_CLOUD_BUCKET ?? "";
@@ -11,7 +11,12 @@ export async function saveFeedToStorage(accountID: string, request: Request) {
   ).join("\n");
   const client_email = process.env.GOOGLE_CLOUD_CLIENT_EMAIL ?? "";
 
-  const filename = `${accountID}.json`;
+  const account = await db.account.findUnique({ where: { id: accountID } });
+  if (!account) {
+    throw Error("could not find account");
+  }
+
+  const filename = `${account.id}.json`;
 
   if (!projectId || !private_key || !client_email) {
     throw Error(
@@ -87,7 +92,7 @@ export async function saveFeedToStorage(accountID: string, request: Request) {
         updatedAt,
         group,
       }) => ({
-        slug: slug || id,
+        slug,
         name,
         timezone,
         notes,
@@ -119,6 +124,7 @@ export async function saveFeedToStorage(accountID: string, request: Request) {
         paypal: group.paypal,
         square: group.square,
         edit_url: `${protocol}//${host}/meetings/${id}`,
+        url: formatUrl(account.url, slug),
         updated: updatedAt
           .toISOString()
           .split("T")

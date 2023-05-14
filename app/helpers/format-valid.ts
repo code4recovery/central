@@ -1,15 +1,23 @@
 import { config } from "./config";
 
-export function validConferenceUrl(url: string): url is string {
+export function validConferenceProvider(url: string): url is string {
   if (!url) return false;
   try {
-    const { host, pathname } = new URL(url);
-    return (
-      pathname.length > 4 &&
-      Object.keys(config.conference_providers).some((domain) =>
-        host.endsWith(domain)
-      )
+    const { host } = new URL(url);
+    return Object.keys(config.conference_providers).some((domain) =>
+      host.endsWith(domain)
     );
+  } catch {
+    return false;
+  }
+}
+
+export function validConferenceUrl(url: string): url is string {
+  if (!url) return false;
+  if (!validConferenceProvider(url)) return false;
+  try {
+    const { pathname } = new URL(url);
+    return pathname.length > 4;
   } catch {
     return false;
   }
@@ -25,4 +33,14 @@ export function validPayPal(handle: string): handle is string {
 
 export function validPhone(phone: string): phone is string {
   return !!phone.match(/^[0-9-+(),#]*$/);
+}
+
+export function validUrl(url: string): url is string {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
 }

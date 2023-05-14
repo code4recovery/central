@@ -81,11 +81,13 @@ export const strings = {
   },
   form: {
     invalidConferenceProvider: "Conference provider is not supported",
+    invalidConferenceUrl: "The conference URL is incomplete",
     invalidEmail: "Invalid email",
     invalidPayPal: "Invalid PayPal.me username, eg 'MyGroupName'",
     invalidPhone:
       "Phone numbers should only contain digits or +,()-# characters",
     invalidSquare: "Cashtags should start with $",
+    invalidUrl: "The URL is invalid",
     invalidVenmo: "Venmo handles should start with @",
     required: "Required",
     save: "Save",
@@ -103,6 +105,7 @@ export const strings = {
     notes: "Group notes",
     paypal: "PayPal",
     phone: "Phone",
+    recordExists: "Record ID already in use",
     recordID: "Record ID",
     square: "Square",
     title: "Groups",

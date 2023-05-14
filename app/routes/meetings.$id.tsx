@@ -24,6 +24,7 @@ import {
   fields,
   formatChanges,
   formatString,
+  formatUrl,
   formatValidator,
   formatValue,
   validObjectId,
@@ -255,9 +256,7 @@ export default function EditMeeting() {
           <Button
             icon="external"
             secondary
-            url={`${accountUrl}${accountUrl.endsWith("/") ? "" : "/"}${
-              meeting.id
-            }`}
+            url={formatUrl(accountUrl, meeting.slug)}
           >
             {strings.meetings.view}
           </Button>
