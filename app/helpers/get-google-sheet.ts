@@ -9,9 +9,10 @@ export async function getGoogleSheet(sheetId: string) {
   const response = await fetch(data);
   const { values } = await response.json();
 
-  const headers: string[] = values
+  const headers: string[] = [];
+  values
     .shift()
-    .map((header: string) => formatSlug(header));
+    .forEach((header: string) => headers.push(formatSlug(header, headers)));
 
   values.forEach((value: string[]) => {
     const row: Row = {};

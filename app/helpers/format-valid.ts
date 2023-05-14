@@ -2,10 +2,17 @@ import { config } from "./config";
 
 export function validConferenceUrl(url: string): url is string {
   if (!url) return false;
-  const { host } = new URL(url);
-  return !!Object.keys(config.conference_providers).filter((domain) =>
-    host.endsWith(domain)
-  ).length;
+  try {
+    const { host, pathname } = new URL(url);
+    return (
+      pathname.length > 4 &&
+      Object.keys(config.conference_providers).some((domain) =>
+        host.endsWith(domain)
+      )
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function validObjectId(objectID?: string): objectID is string {

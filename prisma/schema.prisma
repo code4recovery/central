@@ -34,9 +34,9 @@ model Activity {
   user      User     @relation(fields: [userID], references: [id])
   type      String
   groupID   String?  @db.ObjectId
-  group     Group?   @relation(fields: [groupID], references: [id])
+  group     Group?   @relation(fields: [groupID], references: [id], onDelete: Cascade)
   meetingID String?  @db.ObjectId
-  meeting   Meeting? @relation(fields: [meetingID], references: [id])
+  meeting   Meeting? @relation(fields: [meetingID], references: [id], onDelete: Cascade)
   changes   Change[]
   createdAt DateTime @default(now())
 }
@@ -47,7 +47,7 @@ model Change {
   before     String?
   after      String?
   activityID String   @db.ObjectId
-  activity   Activity @relation(fields: [activityID], references: [id])
+  activity   Activity @relation(fields: [activityID], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
 }
 
@@ -100,7 +100,7 @@ model Group {
   userIDs   String[]   @db.ObjectId
   users     User[]     @relation(fields: [userIDs], references: [id])
   accountID String     @db.ObjectId
-  account   Account    @relation(fields: [accountID], references: [id])
+  account   Account    @relation(fields: [accountID], references: [id], onDelete: Cascade)
   activity  Activity[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -109,9 +109,16 @@ model Group {
   @@fulltext([name, notes, website, recordID])
 }
 
+model Language {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  code       String    @unique
+  meetingIDs String[]  @db.ObjectId
+  meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
+}
+
 model Meeting {
   id                     String     @id @default(auto()) @map("_id") @db.ObjectId
-  slug                   String?
+  slug                   String
   name                   String
   timezone               String?
   day                    Int?
@@ -135,20 +142,13 @@ model Meeting {
   geoquery               Geoquery?  @relation(fields: [geoqueryID], references: [id])
   activity               Activity[]
   accountID              String     @db.ObjectId
-  account                Account    @relation(fields: [accountID], references: [id])
+  account                Account    @relation(fields: [accountID], references: [id], onDelete: Cascade)
   groupID                String     @db.ObjectId
-  group                  Group      @relation(fields: [groupID], references: [id])
+  group                  Group      @relation(fields: [groupID], references: [id], onDelete: Cascade)
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
 
   @@fulltext([name, slug, notes])
-}
-
-model Language {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  code       String    @unique
-  meetingIDs String[]  @db.ObjectId
-  meetings   Meeting[] @relation(fields: [meetingIDs], references: [id])
 }
 
 model Type {
