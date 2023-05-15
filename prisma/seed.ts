@@ -63,7 +63,16 @@ async function seed() {
   const user = await db.user.findUnique({
     where: { email: process.env.SEED_USER_EMAIL },
   });
-  if (!user) {
+  if (user) {
+    await db.user.update({
+      data: {
+        accounts: { connect: { id: account.id } },
+      },
+      where: {
+        id: user.id,
+      },
+    });
+  } else {
     await db.user.create({
       data: {
         name: process.env.SEED_USER_NAME,
@@ -76,7 +85,7 @@ async function seed() {
     });
   }
 
-  const groups = groupify(meetings, account.id);
+  const groups = await groupify(meetings, account.id);
 
   for (const group of groups) {
     await db.group.create({
@@ -87,6 +96,9 @@ async function seed() {
           create: group.meetings.map((meeting) => ({
             ...meeting,
             account: { connect: { id: account!.id } },
+            geocode: meeting.geocode
+              ? { connect: { id: meeting.geocode } }
+              : undefined,
             languages: {
               connectOrCreate: meeting.types
                 ?.filter((code) => code in strings.languages)

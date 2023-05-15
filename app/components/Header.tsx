@@ -1,8 +1,13 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
+  ArrowLeftOnRectangleIcon,
   Bars3Icon,
+  CheckIcon,
+  Cog6ToothIcon,
   MagnifyingGlassIcon,
+  UserGroupIcon,
+  UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Link, NavLink, useSearchParams } from "@remix-run/react";
@@ -15,6 +20,7 @@ import { Avatar } from "./Avatar";
 
 export function Header() {
   const {
+    accounts,
     currentAccountID,
     emailHash,
     id,
@@ -25,20 +31,61 @@ export function Header() {
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search") || undefined;
 
-  const navItems = {
+  type NavItem = {
+    icon?: JSX.Element;
+    label: string;
+    reload?: boolean;
+    url: string;
+  };
+
+  const navItems: { primary: NavItem[]; secondary: NavItem[][] } = {
     primary: [
-      ["/groups", strings.group.title],
-      ["/activity", strings.activity.title],
-      ["/reports", strings.reports.title],
+      {
+        url: "/groups",
+        label: strings.group.title,
+      },
+      {
+        url: "/activity",
+        label: strings.activity.title,
+      },
+      { url: "/reports", label: strings.reports.title },
     ],
     secondary: [
       isAdmin
         ? [
-            [`/accounts/${currentAccountID}`, strings.account.title],
-            ["/users", strings.users.title],
+            {
+              url: `/accounts/${currentAccountID}`,
+              label: strings.account.title,
+              icon: <Cog6ToothIcon />,
+            },
+            {
+              url: "/users",
+              label: strings.users.title,
+              icon: <UserGroupIcon />,
+            },
           ]
-        : [[`/users/${id}`, strings.users.edit_profile]],
-      [["/auth/out", strings.auth.out]],
+        : [
+            {
+              url: `/users/${id}`,
+              label: strings.users.edit_profile,
+              icon: <UserIcon />,
+            },
+          ],
+      accounts.length > 1
+        ? accounts.map(({ id, name }) => ({
+            url: `/accounts/switch/${id}`,
+            label: name,
+            icon: currentAccountID === id ? <CheckIcon /> : undefined,
+            reload: true,
+          }))
+        : [],
+      [
+        {
+          url: "/auth/out",
+          label: strings.auth.out,
+          icon: <ArrowLeftOnRectangleIcon />,
+        },
+      ],
     ],
   };
 
@@ -62,7 +109,7 @@ export function Header() {
                     </Link>
                   </div>
                   <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
-                    {navItems.primary.map(([url, label]) => (
+                    {navItems.primary.map(({ url, label }) => (
                       <NavLink
                         key={url}
                         to={url}
@@ -150,29 +197,33 @@ export function Header() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-black py-1 shadow-lg focus:outline-none divide-neutral-200 dark:divide-neutral-800 divide-y">
-                        {navItems.secondary.map((group, index) => (
-                          <div key={index} className="py-1">
-                            {group.map(([url, label]) => (
-                              <Menu.Item key={url}>
-                                {({ active }) => (
-                                  <NavLink
-                                    to={url}
-                                    className={cx(
-                                      {
-                                        "bg-neutral-100 dark:bg-neutral-900":
-                                          active,
-                                      },
-                                      "block px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300"
-                                    )}
-                                  >
-                                    {label}
-                                  </NavLink>
-                                )}
-                              </Menu.Item>
-                            ))}
-                          </div>
-                        ))}
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white dark:bg-black py-1 shadow-lg focus:outline-none divide-neutral-200 dark:divide-neutral-800 divide-y">
+                        {navItems.secondary
+                          .filter((e) => e.length)
+                          .map((group, index) => (
+                            <div key={index} className="py-1">
+                              {group.map(({ url, label, icon, reload }) => (
+                                <Menu.Item key={url}>
+                                  {({ active }) => (
+                                    <NavLink
+                                      className={cx(
+                                        {
+                                          "bg-neutral-100 dark:bg-neutral-900":
+                                            active,
+                                        },
+                                        "px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 flex gap-2 items-center"
+                                      )}
+                                      reloadDocument={reload}
+                                      to={url}
+                                    >
+                                      <div className="w-4">{icon}</div>
+                                      {label}
+                                    </NavLink>
+                                  )}
+                                </Menu.Item>
+                              ))}
+                            </div>
+                          ))}
                       </Menu.Items>
                     </Transition>
                   </Menu>
@@ -182,7 +233,7 @@ export function Header() {
 
             <Disclosure.Panel className="lg:hidden">
               <div className="space-y-1 pt-2 pb-3">
-                {navItems.primary.map(([url, label]) => (
+                {navItems.primary.map(({ url, label }) => (
                   <NavLink
                     key={url}
                     to={url}
@@ -214,19 +265,23 @@ export function Header() {
                   </div>
                 </div>
                 <div className="mt-3 space-y-1 divide-neutral-200 dark:divide-neutral-800 divide-y">
-                  {navItems.secondary.map((group, index) => (
-                    <div key={index} className="py-1">
-                      {group.map(([url, label]) => (
-                        <NavLink
-                          key={url}
-                          to={url}
-                          className="block px-4 py-2 text-base font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-800 dark:hover:text-neutral-200"
-                        >
-                          {label}
-                        </NavLink>
-                      ))}
-                    </div>
-                  ))}
+                  {navItems.secondary
+                    .filter((e) => e.length)
+                    .map((group, index) => (
+                      <div key={index} className="py-1">
+                        {group.map(({ url, label, icon, reload }) => (
+                          <NavLink
+                            className="flex gap-2 items-center px-4 py-2 text-base font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-800 dark:hover:text-neutral-200"
+                            key={url}
+                            reloadDocument={reload}
+                            to={url}
+                          >
+                            <div className="w-4">{icon}</div>
+                            {label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    ))}
                 </div>
               </div>
             </Disclosure.Panel>

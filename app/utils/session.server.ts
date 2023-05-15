@@ -1,6 +1,8 @@
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
+import type { Account } from "@prisma/client";
 
-import { config } from "~/helpers";
+import { config, formatString } from "~/helpers";
+import { strings } from "~/i18n";
 import type { Alert as AlertType } from "~/types";
 import { db } from "./db.server";
 
@@ -19,6 +21,20 @@ const storage = createCookieSessionStorage({
     secure: process.env.NODE_ENV === "production",
   },
 });
+
+export async function changeAccount(request: Request, account: Account) {
+  const session = await getSession(request);
+  session.set("currentAccountID", account.id);
+  session.flash(
+    "success",
+    formatString(strings.account.switched, { name: account.name })
+  );
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await storage.commitSession(session),
+    },
+  });
+}
 
 export async function createUserSession(
   id: string,
@@ -72,6 +88,7 @@ export async function getUserOrRedirect(request: Request) {
           accounts: {
             select: {
               id: true,
+              name: true,
               theme: true,
               url: true,
             },

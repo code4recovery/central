@@ -1,4 +1,5 @@
 import type { JSONData } from "~/types";
+import { geocode } from "~/utils";
 
 type Group = {
   email?: string;
@@ -16,6 +17,7 @@ type Group = {
     conference_phone?: string;
     conference_phone_notes?: string;
     day?: number;
+    geocode?: string | null;
     languages?: string[];
     name: string;
     notes?: string;
@@ -30,18 +32,22 @@ type Group = {
   }[];
 };
 
-export function groupify(meetings: JSONData[], currentAccountID: string) {
+export async function groupify(meetings: JSONData[], currentAccountID: string) {
   const groups: Group[] = [];
 
   for (const entry of meetings) {
+    const geo = entry.formatted_address
+      ? await geocode(entry.formatted_address)
+      : undefined;
+
     const meeting = {
       conference_phone: entry.conference_phone,
       conference_phone_notes: entry.conference_phone_notes,
       conference_url: entry.conference_url,
       conference_url_notes: entry.conference_url_notes,
       day: entry.day,
-      end_time: entry.end_time,
-      formatted_address: entry.formatted_address,
+      duration: 60,
+      geocode: geo ? geo.id : undefined,
       location: entry.location,
       name: entry.name,
       notes: entry.notes,

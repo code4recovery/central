@@ -1,4 +1,9 @@
 export type User = {
+  accounts: {
+    id: string;
+    name: string;
+    theme: string;
+  }[];
   accountUrl: string;
   currentAccountID: string;
   emailHash: string;

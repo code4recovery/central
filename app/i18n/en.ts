@@ -4,6 +4,8 @@ export const strings = {
     description: "Settings apply to all account users.",
     name: "Service entity name",
     name_description: "Used in emails",
+    notFound: "Could not find account.",
+    switched: "Switched account to %name%",
     theme: "Color theme",
     title: "Account Settings",
     updated: "Account updated.",
@@ -114,12 +116,12 @@ export const strings = {
     website: "Website",
   },
   help: {
-    conference_providers_title: "Which conference providers are supported?",
+    conference_providers_title: "What makes a good conference URL?",
     conference_providers_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+      "Conference URLs should be links that the user can click to join the meeting directly. They should be links to widely-recognized services, and should go straight in to the meeting. Other types of URLs should go in the group website field.",
     online_location_title: "Can online meetings have a location?",
     online_location_description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+      "Yes, online meetings can have approximate locations, such as Philadelphia, PA. These can be thought of as places of origin or affinity for the meeting. Specifying this will also set the meeting timezone.",
     phone_format_title: "What's the recommended format for Zoom phone numbers?",
     phone_format_description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",

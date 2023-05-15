@@ -12,10 +12,18 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 import { validationError } from "remix-validated-form";
 
-import { Alert, Avatar, Button, LoadMore, Table, Template } from "~/components";
+import {
+  Alert,
+  Alerts,
+  Avatar,
+  Button,
+  LoadMore,
+  Table,
+  Template,
+} from "~/components";
 import { config, formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs } from "~/utils";
+import { db, getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -45,6 +53,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
+  console.log(currentAccountID);
   const groupCount = await db.group.count({
     where: { accountID: currentAccountID },
   });
@@ -70,7 +79,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     take: config.batchSize,
     where: { accountID: currentAccountID },
   });
-  return json({ loadedGroups, groupCount });
+  return jsonWith(request, { loadedGroups, groupCount });
 };
 
 export const meta: MetaFunction = () => ({
@@ -78,7 +87,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
-  const { loadedGroups, groupCount } = useLoaderData<typeof loader>();
+  const { alert, loadedGroups, groupCount } = useLoaderData<typeof loader>();
   const [groups, setGroups] =
     useState<Array<Group & { meetings: Meeting[]; users: User[] }>>(
       loadedGroups
@@ -100,6 +109,7 @@ export default function Index() {
       cta={<Button url="/groups/add">{strings.group.add}</Button>}
     >
       {!groups.length && <Alert message={strings.group.empty} type="info" />}
+      {alert && <Alerts data={alert} />}
       <Table
         columns={{
           name: { label: strings.group.name },
