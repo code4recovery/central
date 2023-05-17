@@ -22,12 +22,14 @@ export async function getOiaaData(url: string) {
       .map((e) => e.trim())
       .filter((e) => e);
     const isConferenceUrl = validConferenceUrl(row["url"]);
+    const isConferencePhone = looksLikeConferencePhone(row["phone"]);
     for (const dayTime of times) {
       const slug = formatSlug(row["name"], slugs);
       slugs.push(slug);
       data.push({
         ...convertDayTime(dayTime, row.timezone),
         conference_url: isConferenceUrl ? row["url"] : undefined,
+        conference_phone: isConferencePhone ? row["phone"] : undefined,
         contact_1_email: row["primary-contact-email"],
         contact_1_name: row["primary-contact-name"],
         contact_2_email: row["alt-email"],
@@ -38,6 +40,7 @@ export async function getOiaaData(url: string) {
         notes: row["notes"],
         slug,
         types: convertTypes(row.types, row.languages, typesLookup),
+        phone: isConferencePhone ? undefined : row["phone"],
         website: isConferenceUrl ? undefined : row["url"],
       });
     }
@@ -103,4 +106,30 @@ function convertTypes(
   ];
 
   return newTypes;
+}
+
+function looksLikeConferencePhone(str: string) {
+  const zoomPhones = [
+    "6465588656",
+    "6469313860",
+    "3017158592",
+    "3052241968",
+    "3092053325",
+    "3126266799",
+    "6892781000",
+    "7193594580",
+    "2532050468",
+    "2532158782",
+    "3462487799",
+    "3602095623",
+    "3863475053",
+    "5074734847",
+    "5642172000",
+    "6694449171",
+    "6699009128",
+  ];
+
+  const phone = str.replace(/\D/g, "");
+
+  return zoomPhones.some((zoomPhone) => phone.includes(zoomPhone));
 }

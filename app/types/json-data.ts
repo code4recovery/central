@@ -18,6 +18,7 @@ export type JSONData = {
   name: string;
   notes?: string;
   paypal?: string;
+  phone?: string;
   regions?: string[];
   slug: string;
   square?: string;
