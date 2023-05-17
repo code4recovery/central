@@ -21,9 +21,9 @@ import {
   Table,
   Template,
 } from "~/components";
-import { config, formatString, formatDate } from "~/helpers";
+import { formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith } from "~/utils";
+import { getGroupCount, getGroups, getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -38,63 +38,17 @@ export const action: ActionFunction = async ({ request }) => {
     return validationError(error);
   }
 
-  const { skip } = data;
-
   const { currentAccountID } = await getIDs(request);
 
-  const groups = await db.group.findMany({
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    select: {
-      id: true,
-      name: true,
-      updatedAt: true,
-      meetings: {
-        select: {
-          id: true,
-        },
-      },
-      users: {
-        select: {
-          id: true,
-          emailHash: true,
-          name: true,
-        },
-      },
-    },
-    skip: Number(skip),
-    take: config.batchSize,
-    where: { accountID: currentAccountID },
-  });
+  const groups = await getGroups(currentAccountID, data.skip);
+
   return json(groups);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
-  const groupCount = await db.group.count({
-    where: { accountID: currentAccountID },
-  });
-  const loadedGroups = await db.group.findMany({
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    select: {
-      id: true,
-      name: true,
-      updatedAt: true,
-      meetings: {
-        select: {
-          id: true,
-        },
-      },
-      users: {
-        select: {
-          id: true,
-          emailHash: true,
-          name: true,
-        },
-      },
-    },
-    take: config.batchSize,
-    where: { accountID: currentAccountID },
-  });
+  const groupCount = await getGroupCount(currentAccountID);
+  const loadedGroups = await getGroups(currentAccountID);
   return jsonWith(request, { loadedGroups, groupCount });
 };
 
@@ -111,11 +65,10 @@ export default function Index() {
   const actionData = useActionData();
 
   useEffect(() => {
-    console.log("updating with ", actionData);
     if (actionData) {
-      setGroups([...groups, ...actionData]);
+      setGroups((groups) => [...groups, ...actionData]);
     }
-  }, [groups, actionData]);
+  }, [actionData]);
 
   return (
     <Template
