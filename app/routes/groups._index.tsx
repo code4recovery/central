@@ -44,20 +44,6 @@ export const action: ActionFunction = async ({ request }) => {
 
   const groups = await db.group.findMany({
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    skip: Number(skip),
-    take: config.batchSize,
-    where: { accountID: currentAccountID },
-  });
-  return json(groups);
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
-  console.log(currentAccountID);
-  const groupCount = await db.group.count({
-    where: { accountID: currentAccountID },
-  });
-  const loadedGroups = await db.group.findMany({
     select: {
       id: true,
       name: true,
@@ -75,7 +61,37 @@ export const loader: LoaderFunction = async ({ request }) => {
         },
       },
     },
-    orderBy: [{ updatedAt: "desc" }],
+    skip: Number(skip),
+    take: config.batchSize,
+    where: { accountID: currentAccountID },
+  });
+  return json(groups);
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const { currentAccountID } = await getIDs(request);
+  const groupCount = await db.group.count({
+    where: { accountID: currentAccountID },
+  });
+  const loadedGroups = await db.group.findMany({
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: {
+      id: true,
+      name: true,
+      updatedAt: true,
+      meetings: {
+        select: {
+          id: true,
+        },
+      },
+      users: {
+        select: {
+          id: true,
+          emailHash: true,
+          name: true,
+        },
+      },
+    },
     take: config.batchSize,
     where: { accountID: currentAccountID },
   });
@@ -95,6 +111,7 @@ export default function Index() {
   const actionData = useActionData();
 
   useEffect(() => {
+    console.log("updating with ", actionData);
     if (actionData) {
       setGroups([...groups, ...actionData]);
     }
