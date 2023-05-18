@@ -3,7 +3,7 @@ import md5 from "blueimp-md5";
 
 import { strings } from "~/i18n";
 import type { JSONData } from "~/types";
-import { log } from "~/utils";
+import { log, saveFeedToStorage } from "~/utils";
 import { getOiaaData } from "./get-oiaa-data";
 import { groupify } from "./groupify";
 
@@ -127,4 +127,6 @@ async function seed() {
   const seconds = Math.round((Date.now() - start) / 1000);
 
   log(`${meetings.length} meetings imported in ${seconds} seconds`);
+
+  saveFeedToStorage(account.id);
 }

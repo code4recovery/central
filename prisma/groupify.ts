@@ -22,6 +22,7 @@ type Group = {
     name: string;
     notes?: string;
     slug: string;
+    timezone?: string;
     time?: string;
     types?: string[];
   }[];
@@ -53,6 +54,7 @@ export async function groupify(meetings: JSONData[], currentAccountID: string) {
       notes: entry.notes,
       slug: entry.slug,
       time: entry.time,
+      timezone: entry.timezone,
       types: entry.types,
     };
 

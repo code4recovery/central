@@ -4,7 +4,7 @@ import { db } from "./db.server";
 import { log } from "./log.server";
 import { config, formatUrl } from "~/helpers";
 
-export async function saveFeedToStorage(accountID: string, request: Request) {
+export async function saveFeedToStorage(accountID: string) {
   const projectId = process.env.GOOGLE_CLOUD_BUCKET ?? "";
   const private_key = process.env.GOOGLE_CLOUD_PRIVATE_KEY?.split(
     String.raw`\n`
@@ -31,8 +31,6 @@ export async function saveFeedToStorage(accountID: string, request: Request) {
       client_email,
     },
   });
-
-  const { protocol, host } = new URL(request.url);
 
   const meetings = (
     await db.meeting.findMany({
@@ -123,7 +121,7 @@ export async function saveFeedToStorage(accountID: string, request: Request) {
         venmo: group.venmo,
         paypal: group.paypal,
         square: group.square,
-        edit_url: `${protocol}//${host}/meetings/${id}`,
+        edit_url: `${process.env.BASE_URL}/meetings/${id}`,
         url: formatUrl(account.url, slug),
         updated: updatedAt
           .toISOString()

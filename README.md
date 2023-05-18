@@ -24,6 +24,9 @@ You can set up and run Central yourself. It requires these third-party services:
 Start by creating a `.env` file in your project root with the following content, then continue to the next steps to configure services.
 
 ```bash
+# Base URL (to populate edit URLs)
+BASE_URL="http://localhost:3000"
+
 # Random security salt (to protect sessions)
 SESSION_SECRET="<make.up.a.cryptographic.salt>"
 
@@ -48,6 +51,10 @@ GOOGLE_SHEET_API_KEY="<your.google.sheets.api.key>"
 USER_NAME="<your.name>"
 USER_EMAIL="<your.email@address.com>"
 ```
+
+### Set a base URL
+
+This will be the base for the `edit_url`s in your JSON which link back to meeting entries. Use your Central URL without the trailing slash.
 
 ### Create a session secret
 
