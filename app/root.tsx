@@ -73,7 +73,11 @@ export function ErrorBoundary() {
     ? {
         title: "Error",
         text: error.message,
-        data: <pre>{error.stack}</pre>,
+        data: (
+          <pre className="max-w-full text-left overflow-scroll">
+            {error.stack}
+          </pre>
+        ),
       }
     : {
         title: "Error",

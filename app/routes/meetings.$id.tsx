@@ -55,7 +55,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     });
     await db.activity.create({
       data: {
-        meetingID: meeting.id,
+        meetingID: id,
         type: archived ? "archive" : "unarchive",
         userID,
       },
@@ -169,10 +169,41 @@ async function getMeeting(id?: string) {
   }
   const meeting = await db.meeting.findUniqueOrThrow({
     where: { id },
-    include: {
-      group: true,
-      languages: true,
-      types: true,
+    select: {
+      ...Object.keys(fields.meeting).reduce(
+        (ac, a) => ({ ...ac, [a]: true }),
+        {}
+      ),
+      activity: {
+        orderBy: [{ createdAt: "desc" }],
+        select: {
+          id: true,
+          createdAt: true,
+          changes: {
+            select: { field: true },
+          },
+          type: true,
+          user: {
+            select: {
+              name: true,
+              emailHash: true,
+            },
+          },
+        },
+        take: 5,
+      },
+      group: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      languages: {
+        select: { code: true },
+      },
+      types: {
+        select: { code: true },
+      },
     },
   });
   return {
@@ -185,34 +216,8 @@ async function getMeeting(id?: string) {
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
   const { currentAccountID } = await getIDs(request);
-  const activities = await db.activity.findMany({
-    orderBy: [{ createdAt: "desc" }],
-    select: {
-      id: true,
-      createdAt: true,
-      changes: {
-        select: { field: true },
-      },
-      meeting: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      type: true,
-      user: {
-        select: {
-          name: true,
-          emailHash: true,
-        },
-      },
-    },
-    take: 5,
-    where: { meetingID: meeting.id },
-  });
 
   return jsonWith(request, {
-    activities,
     meeting,
     optionsInUse: await optionsInUse(currentAccountID),
   });
@@ -223,7 +228,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const { activities, alert, meeting, optionsInUse } = useLoaderData();
+  const { alert, meeting, optionsInUse } = useLoaderData();
   const actionData = useActionData<typeof action>();
   const { accountUrl } = useUser();
   const alerts = { ...alert, ...actionData };
@@ -270,7 +275,7 @@ export default function EditMeeting() {
           title={strings.activity.title}
           emptyText={strings.activity.empty}
         >
-          {activities.map(
+          {meeting.activity.map(
             ({
               id,
               changes,

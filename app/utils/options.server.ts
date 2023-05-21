@@ -8,9 +8,7 @@ export async function optionsInUse(accountID: string) {
     where: {
       meetings: {
         some: {
-          group: {
-            accountID,
-          },
+          accountID,
         },
       },
     },
@@ -23,9 +21,7 @@ export async function optionsInUse(accountID: string) {
     where: {
       meetings: {
         some: {
-          group: {
-            accountID,
-          },
+          accountID,
         },
       },
     },
