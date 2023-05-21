@@ -4,7 +4,7 @@ import type {
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
@@ -20,7 +20,6 @@ import {
 } from "~/components";
 import { ArchiveForm } from "~/components/ArchiveForm";
 import {
-  config,
   fields,
   formatChanges,
   formatString,
@@ -41,16 +40,9 @@ import {
 } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
-  if (!validObjectId(id)) {
-    return redirect("/meetings"); // todo flash invalid id message to this page
-  }
-
   const meeting = await getMeeting(id);
   const { id: userID, currentAccountID } = await getIDs(request);
 
-  if (!meeting) {
-    return redirect("/meetings"); // todo flash invalid id message to this page
-  }
   const formData = await request.formData();
 
   if (formData.has("subaction")) {
@@ -168,8 +160,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 };
 
-async function getMeeting(id: string) {
-  const meeting = await db.meeting.findUnique({
+async function getMeeting(id?: string) {
+  if (!validObjectId(id)) {
+    throw new Response(null, {
+      status: 404,
+      statusText: strings.group.notFound,
+    });
+  }
+  const meeting = await db.meeting.findUniqueOrThrow({
     where: { id },
     include: {
       group: true,
@@ -185,14 +183,8 @@ async function getMeeting(id: string) {
 }
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
-  if (!validObjectId(id)) {
-    return redirect(config.home); // todo throw 404
-  }
   const meeting = await getMeeting(id);
   const { currentAccountID } = await getIDs(request);
-  if (!meeting) {
-    return redirect(config.home); // todo throw 404
-  }
   const activities = await db.activity.findMany({
     orderBy: [{ createdAt: "desc" }],
     select: {

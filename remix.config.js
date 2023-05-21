@@ -2,6 +2,7 @@
 module.exports = {
   future: {
     unstable_tailwind: true,
+    v2_errorBoundary: true,
     v2_routeConvention: true,
   },
   ignoredRouteFiles: ["**/.*"],

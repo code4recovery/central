@@ -116,10 +116,13 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
-    return redirect("/groups"); // todo throw 404
+    throw new Response(null, {
+      status: 404,
+      statusText: strings.group.notFound,
+    });
   }
 
-  const group = await db.group.findUnique({
+  const group = await db.group.findUniqueOrThrow({
     select: {
       id: true,
       name: true,
@@ -149,10 +152,6 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     },
     where: { id },
   });
-
-  if (!group) {
-    return redirect("/groups"); // todo throw 404
-  }
 
   const users = await db.user.findMany({
     where: {

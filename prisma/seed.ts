@@ -36,7 +36,7 @@ async function seed() {
     return;
   }
 
-  meetings = meetings.slice(0, 200);
+  //meetings = meetings.slice(0, 200);
 
   // create account if it doesnt exist yet
   let account = await db.account.findFirst({
