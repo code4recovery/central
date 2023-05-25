@@ -21,6 +21,9 @@ export async function getOiaaData(url: string) {
       .split("\n")
       .map((e) => e.trim())
       .filter((e) => e);
+    if (!times.length) {
+      times.push(""); // ongoing meeting
+    }
     const isConferenceUrl = validConferenceUrl(row["url"]);
     const isConferencePhone = looksLikeConferencePhone(row["phone"]);
     for (const dayTime of times) {
@@ -34,6 +37,7 @@ export async function getOiaaData(url: string) {
         contact_1_name: row["primary-contact-name"],
         contact_2_email: row["alt-email"],
         contact_2_name: row["alt-contact-name"],
+        email: row["email"],
         group: row["name"],
         group_id: row["meeting-id"],
         name: row["name"],
@@ -50,6 +54,10 @@ export async function getOiaaData(url: string) {
 
 // convert Sunday 8:00 PM, America/New_York to proper day, time, timezone
 const convertDayTime = (dayTime: string, timezone: string) => {
+  if (!dayTime) {
+    return {}; // ongoing meeting
+  }
+
   dayTime = dayTime
     .split(" ")
     .filter((e) => e)
