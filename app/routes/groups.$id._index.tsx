@@ -105,13 +105,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   // save feed
   try {
     await saveFeedToStorage(currentAccountID);
-    return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
       log(e);
       return json({ error: `File storage error: ${e.message}` });
     }
   }
+
+  return json({ success: strings.json_updated });
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
@@ -148,6 +149,14 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
         where: {
           archived: false,
         },
+        orderBy: [
+          {
+            day: "asc",
+          },
+          {
+            time: "asc",
+          },
+        ],
       },
     },
     where: { id },

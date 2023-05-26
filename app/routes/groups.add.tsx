@@ -6,7 +6,7 @@ import { validationError } from "remix-validated-form";
 import { Columns, Form, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, redirectWith } from "~/utils";
+import { db, getIDs, log, redirectWith, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const { id, currentAccountID } = await getIDs(request);
@@ -23,9 +23,11 @@ export const action: ActionFunction = async ({ request }) => {
   });
 
   const { data, error } = await validator.validate(await request.formData());
+
   if (error) {
     return validationError(error);
   }
+
   const group = await db.group.create({
     data: {
       ...data,
@@ -33,6 +35,7 @@ export const action: ActionFunction = async ({ request }) => {
       account: { connect: { id: currentAccountID } },
     },
   });
+
   await db.activity.create({
     data: {
       type: "create",
@@ -40,6 +43,18 @@ export const action: ActionFunction = async ({ request }) => {
       userID: id,
     },
   });
+
+  // save feed
+  try {
+    await saveFeedToStorage(currentAccountID);
+  } catch (e) {
+    if (e instanceof Error) {
+      log(e);
+      return json({ error: `File storage error: ${e.message}` });
+    }
+  }
+
+  // redirect to group page
   return redirectWith(`/groups/${group.id}`, request, {
     success: strings.group.added,
   });

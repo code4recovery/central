@@ -158,6 +158,10 @@ export const strings = {
   loading: "Loading…",
   meetings: {
     add: "Add meeting",
+    apply_changes: "Apply changes to:",
+    apply_changes_all: "all group meetings",
+    apply_changes_only_this: "only this meeting",
+    apply_changes_same_time: "all group meetings at this time",
     archive: "Archive",
     archiving: "Archiving",
     archived: "Meeting archived",

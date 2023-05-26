@@ -42,19 +42,19 @@ export async function groupify(meetings: JSONData[], currentAccountID: string) {
       : undefined;
 
     const meeting = {
-      conference_phone: entry.conference_phone,
-      conference_phone_notes: entry.conference_phone_notes,
-      conference_url: entry.conference_url,
-      conference_url_notes: entry.conference_url_notes,
+      conference_phone: entry.conference_phone?.trim(),
+      conference_phone_notes: entry.conference_phone_notes?.trim(),
+      conference_url: entry.conference_url?.trim(),
+      conference_url_notes: entry.conference_url_notes?.trim(),
       day: entry.day,
-      duration: 60,
+      duration: 60, // todo fix before there is an end time
       geocode: geo ? geo.id : undefined,
-      location: entry.location,
-      name: entry.name,
-      notes: entry.notes,
-      slug: entry.slug,
-      time: entry.time,
-      timezone: entry.timezone,
+      location: entry.location?.trim(),
+      name: entry.name?.trim(),
+      notes: entry.notes?.trim(),
+      slug: entry.slug?.trim(),
+      time: entry.time?.trim(),
+      timezone: entry.timezone?.trim(),
       types: entry.types,
     };
 
@@ -70,30 +70,30 @@ export async function groupify(meetings: JSONData[], currentAccountID: string) {
       : groups.find(({ name }) => name === entry.name);
 
     if (group) {
-      if (!group.email) group.email = entry.email;
+      if (!group.email) group.email = entry.email?.trim();
       if (!group.name) {
-        group.name = entry.group ? entry.group : entry.name;
+        group.name = entry.group ? entry.group : entry.name?.trim();
       }
-      if (!group.paypal) group.paypal = entry.paypal;
-      if (!group.notes) group.notes = entry.group_notes;
-      if (!group.square) group.square = entry.square;
-      if (!group.venmo) group.venmo = entry.venmo;
-      if (!group.website) group.website = entry.website;
+      if (!group.notes) group.notes = entry.group_notes?.trim();
+      if (!group.paypal) group.paypal = entry.paypal?.trim();
+      if (!group.square) group.square = entry.square?.trim();
+      if (!group.venmo) group.venmo = entry.venmo?.trim();
+      if (!group.website) group.website = entry.website?.trim();
       group.meetings.push(meeting);
     } else {
       const users = [];
       if (entry.contact_1_email) {
         users.push({
           currentAccountID,
-          email: entry.contact_1_email,
-          name: entry.contact_1_name ?? "No name",
+          email: entry.contact_1_email?.trim(),
+          name: entry.contact_1_name ?? entry.contact_1_email.split("@")[0],
         });
       }
       if (entry.contact_2_email) {
         users.push({
           currentAccountID,
-          email: entry.contact_2_email,
-          name: entry.contact_2_name ?? "No name",
+          email: entry.contact_2_email?.trim(),
+          name: entry.contact_2_name ?? entry.contact_2_email.split("@")[0],
         });
       }
       groups.push({

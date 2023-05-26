@@ -1,5 +1,5 @@
 import { config } from "~/helpers";
-import { db } from "./db.server";
+import { db } from "../utils/db.server";
 
 export async function getGroupCount(accountID: string) {
   return await db.group.count({ where: { accountID } });

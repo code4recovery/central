@@ -25,32 +25,28 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { email, go } = data;
 
-  const user = await db.user.findFirst({
+  const user = await db.user.findUnique({
+    select: { id: true, emailHash: true, currentAccountID: true },
     where: { email },
-    include: {
-      accounts: true,
-    },
   });
 
   if (user) {
     const loginToken = formatToken();
     await db.user.update({
-      data: {
-        loginToken,
-      },
+      data: { loginToken },
       where: { id: user.id },
     });
 
     try {
       const buttonLink = `/auth/${user.emailHash}/${loginToken}${
-        go ? `?go=${go}` : ""
+        go ? `?${new URLSearchParams({ go })}` : ""
       }`;
       await sendMail(
         email,
         "login",
         request,
         buttonLink,
-        user?.currentAccountID
+        user.currentAccountID
       );
     } catch (e) {
       if (e instanceof Error) {

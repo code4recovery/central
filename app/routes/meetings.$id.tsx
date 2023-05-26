@@ -26,10 +26,10 @@ import {
   formatUrl,
   formatValidator,
   formatValue,
-  validObjectId,
 } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
+import { getMeeting } from "~/models";
 import {
   db,
   getIDs,
@@ -92,32 +92,31 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return json({ info: strings.no_updates });
   }
 
-  // create an activity record
-  const activity = await db.activity.create({
-    data: {
-      type: "update",
-      meetingID: id,
-      userID,
-    },
-  });
-
-  // save individual changes
-  changes.forEach(
-    async ({ field, before, after }) =>
-      await db.change.create({
-        data: {
-          activityID: activity.id,
-          before: formatValue(before),
-          after: formatValue(after),
-          field,
-        },
-      })
-  );
+  // check how many meetings to update
+  const meetingIDs =
+    formData.get("save-option") === "all"
+      ? (
+          await db.meeting.findMany({
+            select: { id: true },
+            where: { groupID: meeting.groupID },
+          })
+        ).map(({ id }) => id)
+      : formData.get("save-option") === "same_time"
+      ? (
+          await db.meeting.findMany({
+            select: { id: true },
+            where: { groupID: meeting.groupID, time: meeting.time },
+          })
+        ).map(({ id }) => id)
+      : [id];
 
   // prepare checkbox updates
   const changedCheckboxFields: {
     [key: string]: {
-      connectOrCreate: { where: { code: string }; create: { code: string } }[];
+      connectOrCreate: {
+        where: { code: string };
+        create: { code: string };
+      }[];
       disconnect: { code: string }[];
     };
   } = {};
@@ -136,90 +135,79 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       }
     });
 
-  // update meeting
-  const changed = Object.fromEntries(
-    changes
-      .filter(({ type }) => type !== "checkboxes")
-      .map(({ field, after }) => [field, after])
-  );
+  for (const meetingID of meetingIDs) {
+    // create an activity record
+    const activity = await db.activity.create({
+      data: {
+        type: "update",
+        meetingID,
+        userID,
+      },
+    });
 
-  await db.meeting.update({
-    data: { ...changed, ...changedCheckboxFields, updatedAt: new Date() },
-    where: { id },
-  });
+    // save individual changes
+    changes.forEach(
+      async ({ field, before, after }) =>
+        await db.change.create({
+          data: {
+            activityID: activity.id,
+            before: formatValue(before),
+            after: formatValue(after),
+            field,
+          },
+        })
+    );
+
+    // update meeting
+    const changed = Object.fromEntries(
+      changes
+        .filter(({ type }) => type !== "checkboxes")
+        .map(({ field, after }) => [field, after])
+    );
+
+    await db.meeting.update({
+      data: { ...changed, ...changedCheckboxFields, updatedAt: new Date() },
+      where: { id: meetingID },
+    });
+  }
 
   // save feed
   try {
     await saveFeedToStorage(currentAccountID);
-    return json({ success: strings.json_updated });
   } catch (e) {
     if (e instanceof Error) {
       log(e);
       return json({ error: `File storage error: ${e.message}` });
     }
   }
-};
 
-async function getMeeting(id?: string) {
-  if (!validObjectId(id)) {
-    throw new Response(null, {
-      status: 404,
-      statusText: strings.group.notFound,
-    });
-  }
-  const meeting = await db.meeting.findUniqueOrThrow({
-    where: { id },
-    select: {
-      ...Object.keys(fields.meeting).reduce(
-        (ac, a) => ({ ...ac, [a]: true }),
-        {}
-      ),
-      activity: {
-        orderBy: [{ createdAt: "desc" }],
-        select: {
-          id: true,
-          createdAt: true,
-          changes: {
-            select: { field: true },
-          },
-          type: true,
-          user: {
-            select: {
-              name: true,
-              emailHash: true,
-            },
-          },
-        },
-        take: 5,
-      },
-      group: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      languages: {
-        select: { code: true },
-      },
-      types: {
-        select: { code: true },
-      },
-    },
-  });
-  return {
-    ...meeting,
-    languages: meeting?.languages.map(({ code }) => code),
-    types: meeting?.types.map(({ code }) => code),
-  };
-}
+  return json({ success: strings.json_updated });
+};
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
   const { currentAccountID } = await getIDs(request);
 
+  const meetings = await db.meeting.findMany({
+    where: { groupID: meeting.group.id, id: { not: id } },
+    select: { time: true },
+  });
+
+  const saveOptions = [];
+  if (meetings.length) {
+    saveOptions.push("all");
+    if (
+      meetings.length !==
+      meetings.filter(({ time }) => time === meeting.time).length
+    ) {
+      saveOptions.push("same_time");
+    }
+  }
+
   return jsonWith(request, {
     meeting,
     optionsInUse: await optionsInUse(currentAccountID),
+    saveOptions,
   });
 };
 
@@ -228,7 +216,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function EditMeeting() {
-  const { alert, meeting, optionsInUse } = useLoaderData();
+  const { alert, meeting, optionsInUse, saveOptions } = useLoaderData();
   const actionData = useActionData<typeof action>();
   const { accountUrl } = useUser();
   const alerts = { ...alert, ...actionData };
@@ -245,7 +233,12 @@ export default function EditMeeting() {
         primary={
           <>
             {alerts && <Alerts data={alerts} />}
-            <Form form="meeting" values={meeting} optionsInUse={optionsInUse} />
+            <Form
+              form="meeting"
+              optionsInUse={optionsInUse}
+              saveOptions={saveOptions}
+              values={meeting}
+            />
           </>
         }
       >

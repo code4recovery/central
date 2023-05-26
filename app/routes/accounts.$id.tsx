@@ -34,12 +34,12 @@ export const action: ActionFunction = async ({ params, request }) => {
   const { name, url, theme } = data;
 
   await db.account.update({
-    where: { id: params.id },
     data: {
       name,
       url,
       theme,
     },
+    where: { id: params.id },
   });
 
   return json({ success: strings.account.updated });

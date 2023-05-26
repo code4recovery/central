@@ -23,7 +23,8 @@ import {
 } from "~/components";
 import { formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
-import { getGroupCount, getGroups, getIDs, jsonWith } from "~/utils";
+import { getGroupCount, getGroups } from "~/models";
+import { getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(

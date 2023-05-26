@@ -54,10 +54,10 @@ export function Button({
   }
 
   const buttonClass = cx(
-    "flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
+    "border flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 font-semibold",
     "gap-2 group items-center justify-center px-4 py-2 rounded-md shadow-sm text-center text-sm",
     {
-      "text-white dark:text-black disabled:text-neutral-500 disabled:bg-neutral-300 dark:disabled:bg-neutral-700":
+      "text-white dark:text-black disabled:text-neutral-500 disabled:bg-neutral-300 disabled:border-neutral-300 dark:disabled:bg-neutral-700 dark:disabled:border-neutral-700":
         !secondary,
     },
     {
@@ -65,9 +65,9 @@ export function Button({
         secondary,
     },
     { [background]: !secondary },
-    { [text]: secondary },
-    { [border]: secondary },
     { [backgroundHover]: !secondary },
+    { [text]: secondary },
+    border,
     focusOutline,
     className
   );

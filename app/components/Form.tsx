@@ -24,11 +24,13 @@ export function Form({
   optionsInUse,
   values,
   isAdmin,
+  saveOptions,
 }: {
   form: keyof typeof fields;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
   isAdmin?: boolean;
+  saveOptions?: string[];
 }) {
   const {
     geocode: { location_type },
@@ -177,7 +179,29 @@ export function Form({
             </div>
           </div>
           <div className="bg-neutral-50 dark:bg-neutral-950 dark:border-t dark:border-neutral-900 px-4 py-3 flex justify-end sm:px-6">
-            <Submit />
+            <div className="flex gap-3 items-center text-sm">
+              {!!saveOptions?.length && (
+                <div className="flex gap-3 items-center">
+                  {strings.meetings.apply_changes}
+                  <select
+                    className="bg-transparent rounded-md text-sm"
+                    name="save-option"
+                  >
+                    <option>{strings.meetings.apply_changes_only_this}</option>
+                    {saveOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {
+                          strings.meetings[
+                            `apply_changes_${option}` as keyof typeof strings.meetings
+                          ]
+                        }
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <Submit />
+            </div>
           </div>
         </div>
       </fieldset>

@@ -100,15 +100,17 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   // save feed
   try {
     await saveFeedToStorage(currentAccountID);
-    return redirectWith(`/meetings/${meeting.id}`, request, {
-      success: strings.json_updated,
-    });
   } catch (e) {
     if (e instanceof Error) {
       log(e);
       return json({ error: `File storage error: ${e.message}` });
     }
   }
+
+  // redirect to meeting page
+  return redirectWith(`/meetings/${meeting.id}`, request, {
+    success: strings.json_updated,
+  });
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {

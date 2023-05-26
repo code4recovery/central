@@ -230,7 +230,7 @@ export const config = {
     },
     violet: {
       label: "Violet",
-      background: "bg-violet-600 dark:bg-violet-600",
+      background: "bg-violet-600 dark:bg-violet-400",
       backgroundHover: "hover:bg-violet-500",
       border: "border-violet-500",
       focusOutline:
