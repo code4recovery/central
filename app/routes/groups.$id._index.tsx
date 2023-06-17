@@ -33,6 +33,7 @@ import {
 } from "~/components";
 import { strings } from "~/i18n";
 import { db, getIDs, jsonWith, log, saveFeedToStorage } from "~/utils";
+import { DeleteUserForm } from "~/components/DeleteUserForm";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -262,6 +263,7 @@ export default function GroupEdit() {
               key={user.id}
               text={user.name}
               date={user.lastSeen?.toString()}
+              deleteForm={<DeleteUserForm userID={user.id} />}
             />
           ))}
         </Panel>

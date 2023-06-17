@@ -2,6 +2,7 @@ import {
   ArchiveBoxXMarkIcon,
   ArrowTopRightOnSquareIcon,
   DocumentDuplicateIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "@remix-run/react";
 
@@ -9,7 +10,7 @@ import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { Spinner } from "~/icons";
 
-type Icon = "archive" | "duplicate" | "external" | "spinner";
+type Icon = "archive" | "delete" | "duplicate" | "external" | "spinner";
 
 export function Button({
   children,
@@ -19,7 +20,7 @@ export function Button({
   secondary = false,
   url,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   icon?: Icon;
   onClick?: () => void;
@@ -34,6 +35,8 @@ export function Button({
     switch (icon) {
       case "archive":
         return <ArchiveBoxXMarkIcon className={iconClass} />;
+      case "delete":
+        return <XMarkIcon className={iconClass} />;
       case "duplicate":
         return <DocumentDuplicateIcon className={iconClass} />;
       case "external":
