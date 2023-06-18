@@ -13,6 +13,13 @@ export async function getOiaaData(url: string) {
       ...strings.languages,
     }).map((a) => a.reverse())
   );
+  typesLookup["ASL"] = "ASL"; // American Sign Language
+  typesLookup["BIPOC"] = "POC"; // People of Color
+  typesLookup["Deaf/Hard of Hearing"] = "D-HOH"; // Deaf / Hard of Hearing
+  typesLookup["Farsi"] = "FA"; // Persian
+  typesLookup["Newcomers"] = "BE"; // Newcomer
+  typesLookup["RSL"] = "RSL"; // Russian Sign Language
+
   const slugs: string[] = [];
 
   // loop through
@@ -97,15 +104,12 @@ function convertTypes(
         .map((e) => e.trim())
         .filter((e) => e)
         .filter((e) => {
-          if (e === "ASL") e = "American Sign Language";
-          if (e === "BIPOC") e = "People of Color";
-          if (e === "Deaf/Hard of Hearing") e = "Deaf / Hard of Hearing";
-          if (e === "Farsi") e = "Persian";
-          if (e === "Newcomers") e = "Newcomer";
           if (e in typesLookup) {
             return true;
           } else {
-            console.log(`invalid type ${e}`);
+            if (e !== "24/7") {
+              console.log(`invalid type ${e}`);
+            }
             return false;
           }
         })
