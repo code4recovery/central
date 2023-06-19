@@ -22,9 +22,11 @@ import {
   formatValue,
 } from "~/helpers";
 import {
+  AddRepForm,
   Alerts,
   Button,
   Columns,
+  DeleteButton,
   Form,
   Panel,
   PanelRow,
@@ -33,11 +35,36 @@ import {
 } from "~/components";
 import { strings } from "~/i18n";
 import { db, getIDs, jsonWith, log, saveFeedToStorage } from "~/utils";
-import { DeleteUserForm } from "~/components/DeleteUserForm";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
     return redirect("/groups"); // todo flash invalid id message to this page
+  }
+
+  const formData = await request.formData();
+  if (formData.has("subaction")) {
+    if (formData.get("subaction") === "user-remove") {
+      const targetID = formData.get("userID") as string;
+      if (targetID) {
+        await db.user.update({
+          where: { id: targetID },
+          data: {
+            groups: { disconnect: { id } },
+          },
+        });
+        await db.activity.create({
+          data: {
+            groupID: id,
+            type: "remove",
+            userID: await getIDs(request).then(({ id }) => id),
+            targetID,
+          },
+        });
+        return json({
+          success: strings.group.userRemoved,
+        });
+      }
+    }
   }
 
   const group = await db.group.findUnique({
@@ -246,7 +273,7 @@ export default function GroupEdit() {
               )}
             />
             <div className="flex justify-center pt-4">
-              <Button url={`/groups/${group.id}/add`}>
+              <Button url={`/groups/${group.id}/add`} theme="primary">
                 {strings.meetings.add}
               </Button>
             </div>
@@ -256,6 +283,7 @@ export default function GroupEdit() {
         <Panel
           title={strings.representatives.title}
           emptyText={strings.representatives.empty}
+          addForm={<AddRepForm />}
         >
           {users.map((user: User) => (
             <PanelRow
@@ -263,7 +291,7 @@ export default function GroupEdit() {
               key={user.id}
               text={user.name}
               date={user.lastSeen?.toString()}
-              deleteForm={<DeleteUserForm userID={user.id} />}
+              deleteButton={<DeleteButton userID={user.id} />}
             />
           ))}
         </Panel>

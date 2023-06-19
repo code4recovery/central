@@ -245,7 +245,7 @@ export default function EditMeeting() {
         <div className="flex gap-5 flex-wrap">
           <Button
             icon="external"
-            secondary
+            theme="secondary"
             url={formatUrl(accountUrl, meeting.slug)}
           >
             {strings.meetings.view}

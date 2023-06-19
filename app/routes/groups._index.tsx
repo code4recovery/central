@@ -77,7 +77,11 @@ export default function Index() {
       description={formatString(strings.group.description, {
         groupCount,
       })}
-      cta={<Button url="/groups/add">{strings.group.add}</Button>}
+      cta={
+        <Button url="/groups/add" theme="primary">
+          {strings.group.add}
+        </Button>
+      }
     >
       {!groups.length && <Alert message={strings.group.empty} type="info" />}
       {alert && <Alerts data={alert} />}

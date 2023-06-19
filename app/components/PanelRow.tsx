@@ -7,19 +7,19 @@ export function PanelRow({
   user,
   text,
   date,
-  deleteForm,
+  deleteButton,
 }: {
   user: { emailHash: string; name: string };
   text?: string | null;
   date?: string | null;
-  deleteForm?: ReactNode;
+  deleteButton?: ReactNode;
 }) {
   return (
-    <div className="flex justify-between gap-3 w-full px-4 py-3">
+    <div className="flex justify-between gap-3 w-full px-4 py-3 items-center">
       <Avatar emailHash={user.emailHash} name={user.name} />
       <span className="grow">{text}</span>
       {date && <span>{formatDate(date)}</span>}
-      {deleteForm && <span>{deleteForm}</span>}
+      {deleteButton && <span>{deleteButton}</span>}
     </div>
   );
 }

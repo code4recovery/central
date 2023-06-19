@@ -35,7 +35,13 @@ export default function Users() {
   return (
     <Template
       title={strings.users.title}
-      cta={isAdmin && <Button url="/users/add">{strings.users.add}</Button>}
+      cta={
+        isAdmin && (
+          <Button url="/users/add" theme="primary">
+            {strings.users.add}
+          </Button>
+        )
+      }
     >
       {alert && <Alerts data={alert} />}
       <Table

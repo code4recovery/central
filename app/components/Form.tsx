@@ -219,6 +219,7 @@ function Submit() {
           : undefined
       }
       icon={isSubmitting ? "spinner" : undefined}
+      theme="primary"
     >
       {isSubmitting ? strings.form.saving : strings.form.save}
     </Button>

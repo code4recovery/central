@@ -17,8 +17,10 @@ export const strings = {
     description: "A log of recent site activity",
     empty: "No activity yet",
     general: {
+      add: "Added representative",
       archive: "Archived",
       create: "Created",
+      remove: "Removed representative",
       unarchive: "Unarchived",
       update: "Updated %properties%",
     },
@@ -113,6 +115,7 @@ export const strings = {
     square: "Square",
     title: "Groups",
     updated: "Group has been updated",
+    userRemoved: "Group representative removed",
     venmo: "Venmo",
     website: "Website",
   },
