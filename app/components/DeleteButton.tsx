@@ -4,15 +4,21 @@ import { z } from "zod";
 
 import { Button } from "./Button";
 
-export function DeleteButton({ userID }: { userID: string }) {
+export function DeleteButton({
+  subaction,
+  targetID,
+}: {
+  subaction: string;
+  targetID: string;
+}) {
   return (
     <ValidatedForm
       method="post"
       validator={withZod(z.object({}))}
-      subaction="user-remove"
+      subaction={subaction}
       className="flex items-center"
     >
-      <input type="hidden" name="userID" value={userID} />
+      <input type="hidden" name="targetID" value={targetID} />
       <Submit />
     </ValidatedForm>
   );

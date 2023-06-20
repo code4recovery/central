@@ -12,17 +12,6 @@ import { validationError } from "remix-validated-form";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
 import {
-  fields,
-  formatDayTime,
-  formatDate,
-  formatValidator,
-  validObjectId,
-  formatChanges,
-  formatString,
-  formatValue,
-} from "~/helpers";
-import {
-  AddRepForm,
   Alerts,
   Button,
   Columns,
@@ -33,7 +22,18 @@ import {
   Table,
   Template,
 } from "~/components";
+import {
+  fields,
+  formatDayTime,
+  formatDate,
+  formatValidator,
+  validObjectId,
+  formatChanges,
+  formatString,
+  formatValue,
+} from "~/helpers";
 import { strings } from "~/i18n";
+import { addGroupRep, removeGroupRep } from "~/models";
 import { db, getIDs, jsonWith, log, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -42,29 +42,16 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 
   const formData = await request.formData();
-  if (formData.has("subaction")) {
-    if (formData.get("subaction") === "user-remove") {
-      const targetID = formData.get("userID") as string;
-      if (targetID) {
-        await db.user.update({
-          where: { id: targetID },
-          data: {
-            groups: { disconnect: { id } },
-          },
-        });
-        await db.activity.create({
-          data: {
-            groupID: id,
-            type: "remove",
-            userID: await getIDs(request).then(({ id }) => id),
-            targetID,
-          },
-        });
-        return json({
-          success: strings.group.userRemoved,
-        });
-      }
-    }
+  const subaction = formData.get("subaction");
+
+  const { id: userID, currentAccountID } = await getIDs(request);
+
+  if (subaction === "group-rep-add") {
+    return addGroupRep(formData, id, userID, currentAccountID);
+  }
+
+  if (subaction === "group-rep-remove") {
+    return removeGroupRep(formData, id, userID);
   }
 
   const group = await db.group.findUnique({
@@ -78,7 +65,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 
   const validator = formatValidator("group");
-  const { data, error } = await validator.validate(await request.formData());
+  const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
   }
@@ -89,8 +76,6 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!changes.length) {
     return json({ info: strings.no_updates });
   }
-
-  const { id: userID, currentAccountID } = await getIDs(request);
 
   // create an activity record
   const activity = await db.activity.create({
@@ -244,7 +229,7 @@ export default function GroupEdit() {
         primary={
           <>
             {alerts && <Alerts data={alerts} />}
-            <Form form="group" values={group} />
+            <Form form="group" subaction="group-edit" values={group} />
             <Table
               columns={{
                 name: { label: strings.meetings.name },
@@ -273,7 +258,7 @@ export default function GroupEdit() {
               )}
             />
             <div className="flex justify-center pt-4">
-              <Button url={`/groups/${group.id}/add`} theme="primary">
+              <Button url={`/groups/${group.id}/add`} theme="secondary">
                 {strings.meetings.add}
               </Button>
             </div>
@@ -283,7 +268,14 @@ export default function GroupEdit() {
         <Panel
           title={strings.representatives.title}
           emptyText={strings.representatives.empty}
-          addForm={<AddRepForm />}
+          addForm={
+            <Form
+              buttonTheme="secondary"
+              form="group-rep"
+              resetAfterSubmit={true}
+              subaction="group-rep-add"
+            />
+          }
         >
           {users.map((user: User) => (
             <PanelRow
@@ -291,7 +283,9 @@ export default function GroupEdit() {
               key={user.id}
               text={user.name}
               date={user.lastSeen?.toString()}
-              deleteButton={<DeleteButton userID={user.id} />}
+              deleteButton={
+                <DeleteButton subaction="group-rep-remove" targetID={user.id} />
+              }
             />
           ))}
         </Panel>

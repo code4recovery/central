@@ -82,6 +82,21 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       span: 4,
     },
   },
+  "group-rep": {
+    name: {
+      label: strings.users.name,
+      placeholder: strings.users.name_placeholder,
+      span: 6,
+      type: "text",
+      validation: required.string,
+    },
+    email: {
+      label: strings.users.email,
+      span: 6,
+      type: "email",
+      validation: required.email,
+    },
+  },
   login: {
     email: {
       type: "email",
@@ -214,7 +229,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     },
     notes: {
       helpText: strings.meetings.notes_notes,
-      label: "Notes",
+      label: strings.meetings.notes,
       type: "textarea",
       validation: optional.string,
     },

@@ -85,7 +85,7 @@ export default function ActivityScreen() {
             when: formatDate(activity.createdAt.toString()),
             what: formatString(
               strings.activity[activity.meeting ? "meeting" : "group"][
-                activity.type as keyof typeof strings.activity.group
+                activity.type as keyof typeof strings.activity.meeting
               ],
               {
                 properties: activity.changes

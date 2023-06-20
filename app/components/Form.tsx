@@ -20,17 +20,23 @@ import { useGeocode } from "~/hooks";
 import { strings } from "~/i18n";
 
 export function Form({
+  buttonTheme = "primary",
   form,
   optionsInUse,
   values,
   isAdmin,
+  resetAfterSubmit,
   saveOptions,
+  subaction,
 }: {
+  buttonTheme?: React.ComponentProps<typeof Button>["theme"];
   form: keyof typeof fields;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
   isAdmin?: boolean;
+  resetAfterSubmit?: boolean;
   saveOptions?: string[];
+  subaction?: string;
 }) {
   const {
     geocode: { location_type },
@@ -47,6 +53,8 @@ export function Form({
           behavior: "smooth",
         })
       }
+      resetAfterSubmit={resetAfterSubmit}
+      subaction={subaction}
     >
       <fieldset>
         <div className="shadow sm:overflow-hidden sm:rounded-md">
@@ -200,7 +208,7 @@ export function Form({
                   </select>
                 </div>
               )}
-              <Submit />
+              <Submit buttonTheme={buttonTheme} />
             </div>
           </div>
         </div>
@@ -209,7 +217,11 @@ export function Form({
   );
 }
 
-function Submit() {
+function Submit({
+  buttonTheme,
+}: {
+  buttonTheme: React.ComponentProps<typeof Button>["theme"];
+}) {
   const isSubmitting = useIsSubmitting();
   return (
     <Button
@@ -219,7 +231,7 @@ function Submit() {
           : undefined
       }
       icon={isSubmitting ? "spinner" : undefined}
-      theme="primary"
+      theme={buttonTheme}
     >
       {isSubmitting ? strings.form.saving : strings.form.save}
     </Button>
