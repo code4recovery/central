@@ -7,6 +7,7 @@ import type {
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
+import { DateTime } from "luxon";
 import { useEffect, useState } from "react";
 import { validationError } from "remix-validated-form";
 import { z } from "zod";
@@ -16,6 +17,12 @@ import { Alert, LoadMore, Table, Template } from "~/components";
 import { config, formatDate, formatDayTime, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs } from "~/utils";
+
+// shared where condition
+const where = {
+  archived: false,
+  createdAt: { gte: DateTime.now().minus({ week: 1 }).toJSDate() },
+};
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -48,18 +55,13 @@ export const action: ActionFunction = async ({ request }) => {
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     skip: Number(skip),
     take: config.batchSize,
-    where: { accountID: currentAccountID, archived: true },
+    where: { ...where, accountID: currentAccountID },
   });
   return json(meetings);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
-
-  const where = {
-    archived: true,
-    accountID: currentAccountID,
-  };
 
   const loadedMeetings = await db.meeting.findMany({
     select: {
@@ -73,11 +75,11 @@ export const loader: LoaderFunction = async ({ request }) => {
       types: { select: { code: true } },
     },
     take: config.batchSize,
-    where,
+    where: { ...where, accountID: currentAccountID },
   });
 
   const meetingCount = await db.meeting.count({
-    where,
+    where: { ...where, accountID: currentAccountID },
   });
 
   return json({ loadedMeetings, meetingCount });
@@ -87,7 +89,7 @@ export const meta: MetaFunction = () => ({
   title: strings.reports.title,
 });
 
-export default function ArchivedMeetings() {
+export default function NewMeetings() {
   const { loadedMeetings, meetingCount } = useLoaderData<typeof loader>();
   const [meetings, setMeetings] =
     useState<Array<Meeting & { types: Type[]; languages: Language[] }>>(
@@ -104,14 +106,13 @@ export default function ArchivedMeetings() {
 
   return (
     <Template
-      title={strings.reports.archived.title}
-      description={formatString(strings.reports.archived.description, {
+      title={strings.reports.new.title}
+      description={formatString(strings.reports.new.description, {
         count: meetingCount,
       })}
-      breadcrumbs={[["/reports", strings.reports.title]]}
     >
       {!meetingCount && (
-        <Alert message={strings.reports.archived.empty} type="info" />
+        <Alert message={strings.reports.new.empty} type="info" />
       )}
       <Table
         columns={{

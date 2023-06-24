@@ -59,10 +59,6 @@ export async function addGroupRep(
   });
 }
 
-export async function getGroupCount(accountID: string) {
-  return await db.group.count({ where: { accountID } });
-}
-
 export async function getGroups(accountID: string, skip?: number) {
   return await db.group.findMany({
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],

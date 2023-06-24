@@ -14,7 +14,6 @@ export const strings = {
     url_placeholder: "https://example.org/meetings",
   },
   activity: {
-    description: "A log of recent site activity",
     empty: "No activity yet",
     general: {
       add: "Added representative",
@@ -102,7 +101,8 @@ export const strings = {
   group: {
     add: "Add group",
     added: "Group has been added",
-    description: "There are %groupCount% groups in your account.",
+    description:
+      "There are %groupCount% groups and %meetingCount% meetings in your account.",
     edit: "Edit group",
     email: "Email",
     empty: "No groups added yet",
@@ -158,6 +158,7 @@ export const strings = {
     RU: "Russian",
     SK: "Slovak",
     SV: "Swedish",
+    TL: "Tagalog",
     UK: "Ukrainian",
   },
   load_more: "Load %count% more",
@@ -219,11 +220,15 @@ export const strings = {
   reports: {
     archived: {
       title: "Archived",
-      description: "There are %count% archived meetings in this account.",
-      empty: "There are no archived meetings in this account.",
+      description: "%count% meetings have been archived.",
+      empty: "No archived meetings yet.",
     },
-    description: "A list of all the reports in your account",
     empty: "No reports yet",
+    new: {
+      title: "New",
+      description: "%count% meetings were added in the last week.",
+      empty: "No meetings have been added in the last week.",
+    },
     title: "Reports",
   },
   representatives: {

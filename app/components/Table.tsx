@@ -12,7 +12,7 @@ type Value = React.ReactNode | string[] | undefined | null;
 type Row = {
   id: string;
   link?: string;
-  [index: string]: Value;
+  [index: string]: unknown;
 };
 
 export function Table({
@@ -90,7 +90,7 @@ export function Table({
                           "sm:hidden": index === 1,
                         })}
                       >
-                        {showValue(row[key])}
+                        {showValue(row[key] as Value)}
                       </dd>
                     </Fragment>
                   )
@@ -111,7 +111,7 @@ export function Table({
             <tr key={row.id} {...rowProps}>
               <td className="w-2/5 max-w-0 font-medium sm:w-auto sm:max-w-none p-3">
                 <div className={row.link ? cx(text, "underline") : undefined}>
-                  {showValue(row[keys[0]])}
+                  {showValue(row[keys[0]] as Value)}
                 </div>
                 {stack}
               </td>
@@ -126,7 +126,7 @@ export function Table({
                     "text-right": columns[key].align === "right",
                   })}
                 >
-                  {showValue(row[key])}
+                  {showValue(row[key] as Value)}
                 </td>
               ))}
             </tr>

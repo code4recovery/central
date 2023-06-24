@@ -1,45 +1,48 @@
 import type { Activity, Change, Meeting, User } from "@prisma/client";
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import {
+  json,
+  type ActionFunction,
+  type LoaderFunction,
+  type MetaFunction,
+} from "@remix-run/node";
+import { useActionData, useLoaderData } from "@remix-run/react";
+import { withZod } from "@remix-validated-form/with-zod";
+import { useEffect, useState } from "react";
+import { validationError } from "remix-validated-form";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
 
-import { Alert, Avatar, Table, Template } from "~/components";
+import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { fields, formatDate, formatString } from "~/helpers";
 import { strings } from "~/i18n";
-import { db } from "~/utils";
+import { getActivity, getActivityCount } from "~/models";
+import { getIDs, jsonWith } from "~/utils";
 
-export const loader: LoaderFunction = async () => {
-  const activities = await db.activity.findMany({
-    orderBy: [{ createdAt: "desc" }],
-    select: {
-      id: true,
-      createdAt: true,
-      changes: {
-        select: { field: true },
-      },
-      meeting: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      group: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      type: true,
-      user: {
-        select: {
-          name: true,
-          emailHash: true,
-        },
-      },
-    },
-    take: 25,
-  });
-  return json({ activities });
+export const action: ActionFunction = async ({ request }) => {
+  const validator = withZod(
+    z.object({
+      skip: zfd.numeric(),
+    })
+  );
+
+  const { data, error } = await validator.validate(await request.formData());
+
+  if (error) {
+    return validationError(error);
+  }
+
+  const { currentAccountID } = await getIDs(request);
+
+  const activity = await getActivity(currentAccountID, data.skip);
+
+  return json(activity);
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const { currentAccountID } = await getIDs(request);
+  const activityCount = await getActivityCount(currentAccountID);
+  const loadedActivity = await getActivity(currentAccountID);
+  return jsonWith(request, { loadedActivity, activityCount });
 };
 
 export const meta: MetaFunction = () => ({
@@ -47,13 +50,28 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function ActivityScreen() {
-  const { activities } = useLoaderData();
-  return (
-    <Template
-      title={strings.activity.title}
-      description={strings.activity.description}
+  const { loadedActivity, activityCount } = useLoaderData();
+  const actionData = useActionData();
+  const [activity, setActivity] = useState<
+    Array<
+      Activity & {
+        changes: Change[];
+        group?: Meeting;
+        meeting?: Meeting;
+        user: User;
+      }
     >
-      {!activities.length && (
+  >(loadedActivity);
+
+  useEffect(() => {
+    if (actionData) {
+      setActivity((activity) => [...activity, ...actionData]);
+    }
+  }, [actionData]);
+
+  return (
+    <Template title={strings.activity.title}>
+      {!activity.length && (
         <Alert message={strings.activity.empty} type="info" />
       )}
       <Table
@@ -63,52 +81,46 @@ export default function ActivityScreen() {
           what: { label: strings.activity.what },
           when: { label: strings.activity.when, align: "right" },
         }}
-        rows={activities.map(
-          (
-            activity: Activity & {
-              changes: Change[];
-              group?: Meeting;
-              meeting?: Meeting;
-              user: User;
-            }
-          ) => ({
-            ...activity,
-            ...(activity.meeting
-              ? {
-                  name: activity.meeting.name,
-                  link: `/meetings/${activity.meeting.id}`,
-                }
-              : {
-                  name: activity.group?.name,
-                  link: `/groups/${activity.group?.id}`,
-                }),
-            when: formatDate(activity.createdAt.toString()),
-            what: formatString(
-              strings.activity[activity.meeting ? "meeting" : "group"][
-                activity.type as keyof typeof strings.activity.meeting
-              ],
-              {
-                properties: activity.changes
-                  .map(({ field }) =>
-                    fields[activity.meeting ? "meeting" : "group"][
-                      field
-                    ].label?.toLocaleLowerCase()
-                  )
-                  .join(", "),
+        rows={activity.map((activity) => ({
+          ...activity,
+          ...(activity.meeting
+            ? {
+                name: activity.meeting.name,
+                link: `/meetings/${activity.meeting.id}`,
               }
-            ),
-            user: (
-              <div className="flex gap-2 items-center">
-                <Avatar
-                  emailHash={activity.user.emailHash}
-                  name={activity.user.name}
-                />
-                {activity.user.name}
-              </div>
-            ),
-          })
-        )}
+            : {
+                name: activity.group?.name,
+                link: `/groups/${activity.group?.id}`,
+              }),
+          when: formatDate(activity.createdAt.toString()),
+          what: formatString(
+            strings.activity[activity.meeting ? "meeting" : "group"][
+              activity.type as keyof typeof strings.activity.meeting
+            ],
+            {
+              properties: activity.changes
+                .map(({ field }) =>
+                  fields[activity.meeting ? "meeting" : "group"][
+                    field
+                  ].label?.toLocaleLowerCase()
+                )
+                .join(", "),
+            }
+          ),
+          user: (
+            <div className="flex gap-2 items-center">
+              <Avatar
+                emailHash={activity.user.emailHash}
+                name={activity.user.name}
+              />
+              {activity.user.name}
+            </div>
+          ),
+        }))}
       />
+      {activity.length < activityCount && (
+        <LoadMore loadedCount={activity.length} totalCount={activityCount} />
+      )}
     </Template>
   );
 }

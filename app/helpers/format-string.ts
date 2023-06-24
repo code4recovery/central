@@ -13,7 +13,7 @@ function getString(unk: string | number | undefined): string {
     case "undefined":
       return "";
     case "number":
-      return unk.toString();
+      return unk.toLocaleString();
     default:
       return unk;
   }
