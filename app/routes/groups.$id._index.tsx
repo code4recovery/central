@@ -12,6 +12,17 @@ import { validationError } from "remix-validated-form";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
 import {
+  Alerts,
+  Button,
+  Columns,
+  DeleteButton,
+  Form,
+  Panel,
+  PanelRow,
+  Table,
+  Template,
+} from "~/components";
+import {
   fields,
   formatDayTime,
   formatDate,
@@ -21,22 +32,26 @@ import {
   formatString,
   formatValue,
 } from "~/helpers";
-import {
-  Alerts,
-  Button,
-  Columns,
-  Form,
-  Panel,
-  PanelRow,
-  Table,
-  Template,
-} from "~/components";
 import { strings } from "~/i18n";
+import { addGroupRep, removeGroupRep } from "~/models";
 import { db, getIDs, jsonWith, log, saveFeedToStorage } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
     return redirect("/groups"); // todo flash invalid id message to this page
+  }
+
+  const formData = await request.formData();
+  const subaction = formData.get("subaction");
+
+  const { id: userID, currentAccountID } = await getIDs(request);
+
+  if (subaction === "group-rep-add") {
+    return addGroupRep(formData, id, userID, currentAccountID);
+  }
+
+  if (subaction === "group-rep-remove") {
+    return removeGroupRep(formData, id, userID);
   }
 
   const group = await db.group.findUnique({
@@ -50,7 +65,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 
   const validator = formatValidator("group");
-  const { data, error } = await validator.validate(await request.formData());
+  const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
   }
@@ -61,8 +76,6 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!changes.length) {
     return json({ info: strings.no_updates });
   }
-
-  const { id: userID, currentAccountID } = await getIDs(request);
 
   // create an activity record
   const activity = await db.activity.create({
@@ -216,7 +229,7 @@ export default function GroupEdit() {
         primary={
           <>
             {alerts && <Alerts data={alerts} />}
-            <Form form="group" values={group} />
+            <Form form="group" subaction="group-edit" values={group} />
             <Table
               columns={{
                 name: { label: strings.meetings.name },
@@ -245,7 +258,7 @@ export default function GroupEdit() {
               )}
             />
             <div className="flex justify-center pt-4">
-              <Button url={`/groups/${group.id}/add`}>
+              <Button url={`/groups/${group.id}/add`} theme="secondary">
                 {strings.meetings.add}
               </Button>
             </div>
@@ -255,6 +268,14 @@ export default function GroupEdit() {
         <Panel
           title={strings.representatives.title}
           emptyText={strings.representatives.empty}
+          addForm={
+            <Form
+              buttonTheme="secondary"
+              form="group-rep"
+              resetAfterSubmit={true}
+              subaction="group-rep-add"
+            />
+          }
         >
           {users.map((user: User) => (
             <PanelRow
@@ -262,6 +283,9 @@ export default function GroupEdit() {
               key={user.id}
               text={user.name}
               date={user.lastSeen?.toString()}
+              deleteButton={
+                <DeleteButton subaction="group-rep-remove" targetID={user.id} />
+              }
             />
           ))}
         </Panel>

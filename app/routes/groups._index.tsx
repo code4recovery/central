@@ -23,7 +23,7 @@ import {
 } from "~/components";
 import { formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
-import { getGroupCount, getGroups } from "~/models";
+import { getAccountCounts, getGroups } from "~/models";
 import { getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
@@ -48,9 +48,9 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   const { currentAccountID } = await getIDs(request);
-  const groupCount = await getGroupCount(currentAccountID);
+  const { meetingCount, groupCount } = await getAccountCounts(currentAccountID);
   const loadedGroups = await getGroups(currentAccountID);
-  return jsonWith(request, { loadedGroups, groupCount });
+  return jsonWith(request, { loadedGroups, meetingCount, groupCount });
 };
 
 export const meta: MetaFunction = () => ({
@@ -58,7 +58,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
-  const { alert, loadedGroups, groupCount } = useLoaderData<typeof loader>();
+  const { alert, loadedGroups, groupCount, meetingCount } =
+    useLoaderData<typeof loader>();
   const [groups, setGroups] =
     useState<Array<Group & { meetings: Meeting[]; users: User[] }>>(
       loadedGroups
@@ -76,8 +77,13 @@ export default function Index() {
       title={strings.group.title}
       description={formatString(strings.group.description, {
         groupCount,
+        meetingCount,
       })}
-      cta={<Button url="/groups/add">{strings.group.add}</Button>}
+      cta={
+        <Button url="/groups/add" theme="primary">
+          {strings.group.add}
+        </Button>
+      }
     >
       {!groups.length && <Alert message={strings.group.empty} type="info" />}
       {alert && <Alerts data={alert} />}

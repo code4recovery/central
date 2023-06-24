@@ -96,7 +96,7 @@ export default function Index() {
               />
               <Label htmlFor="email">{strings.users.email}</Label>
               <Input autoFocus name="email" required type="email" />
-              <Button className="mt-4 w-full">
+              <Button className="mt-4 w-full" theme="primary">
                 {!idle ? strings.loading : strings.auth.submit}
               </Button>
             </fieldset>

@@ -72,7 +72,11 @@ export default function User() {
       >
         <p>{strings.users.edit_description}</p>
         <p>
-          <Button url="https://gravatar.com/" className="inline-flex mt-3">
+          <Button
+            url="https://gravatar.com/"
+            className="inline-flex mt-3"
+            theme="primary"
+          >
             Gravatar
           </Button>
         </p>

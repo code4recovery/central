@@ -1,78 +1,8 @@
-import { z } from "zod";
-import { zfd } from "zod-form-data";
-
 import { strings } from "~/i18n";
 import type { Field } from "~/types";
 
 import { config } from "./config";
-import {
-  validConferenceProvider,
-  validConferenceUrl,
-  validPayPal,
-  validPhone,
-} from "./format-valid";
-
-const optional = {
-  array: zfd.repeatable(),
-  boolean: zfd.checkbox(),
-  conference_url: zfd.text(
-    z
-      .string()
-      .url(strings.form.invalidUrl)
-      .superRefine((val, ctx) => {
-        if (!validConferenceProvider(val))
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: strings.form.invalidConferenceProvider,
-          });
-        if (!validConferenceUrl(val))
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: strings.form.invalidConferenceUrl,
-          });
-      })
-      .optional()
-  ),
-  email: zfd.text(
-    z.string().email({ message: strings.form.invalidEmail }).optional()
-  ),
-  number: zfd.numeric(z.number().optional()),
-  paypal: zfd.text(
-    z
-      .string()
-      .refine((val) => validPayPal(val), {
-        message: strings.form.invalidPayPal,
-      })
-      .optional()
-  ),
-  phone: zfd.text(
-    z
-      .string()
-      .refine((val) => validPhone(val), {
-        message: strings.form.invalidPhone,
-      })
-      .optional()
-  ),
-  square: zfd.text(
-    z.string().startsWith("$", strings.form.invalidSquare).optional()
-  ),
-  string: zfd.text(z.string().optional()),
-  venmo: zfd.text(
-    z.string().startsWith("@", strings.form.invalidVenmo).optional()
-  ),
-  url: zfd.text(z.string().url().optional()),
-};
-
-const required = {
-  array: zfd.repeatable(z.array(zfd.text()).min(1)),
-  email: zfd.text(
-    z
-      .string({ required_error: strings.form.required })
-      .email({ message: strings.form.invalidEmail })
-  ),
-  string: zfd.text(),
-  url: zfd.text(z.string().url()),
-};
+import { required, optional } from "./validators";
 
 export const fields: { [index: string]: { [index: string]: Field } } = {
   account: {
@@ -150,6 +80,21 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       type: "text",
       validation: optional.square,
       span: 4,
+    },
+  },
+  "group-rep": {
+    name: {
+      label: strings.users.name,
+      placeholder: strings.users.name_placeholder,
+      span: 6,
+      type: "text",
+      validation: required.string,
+    },
+    email: {
+      label: strings.users.email,
+      span: 6,
+      type: "email",
+      validation: required.email,
     },
   },
   login: {
@@ -284,7 +229,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     },
     notes: {
       helpText: strings.meetings.notes_notes,
-      label: "Notes",
+      label: strings.meetings.notes,
       type: "textarea",
       validation: optional.string,
     },

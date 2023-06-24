@@ -19,11 +19,11 @@ export function ArchiveForm({ archived }: { archived: boolean }) {
 
 function Submit({ archived }: { archived: boolean }) {
   return useIsSubmitting() ? (
-    <Button icon="spinner" secondary>
+    <Button icon="spinner" theme="secondary">
       {archived ? strings.meetings.unarchiving : strings.meetings.archiving}
     </Button>
   ) : (
-    <Button icon="archive" secondary>
+    <Button icon="archive" theme="secondary">
       {archived ? strings.meetings.unarchive : strings.meetings.archive}
     </Button>
   );

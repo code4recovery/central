@@ -43,7 +43,7 @@ export function Template({
                 </div>
               </h1>
               {description && (
-                <p className="mt-2 text-sm text-neutral-700 dark:text-neutral-300">
+                <p className="mt-3 text-sm text-neutral-700 dark:text-neutral-300">
                   {description}
                 </p>
               )}
