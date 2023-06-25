@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
       types: { select: { code: true } },
     },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    skip: Number(skip),
+    skip,
     take: config.batchSize,
     where: { accountID: currentAccountID, archived: true },
   });
@@ -98,9 +98,9 @@ export default function ArchivedMeetings() {
 
   useEffect(() => {
     if (actionData) {
-      setMeetings([...meetings, ...actionData]);
+      setMeetings((meetings) => [...meetings, ...actionData]);
     }
-  }, [meetings, actionData]);
+  }, [actionData]);
 
   return (
     <Template

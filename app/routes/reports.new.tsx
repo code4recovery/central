@@ -53,7 +53,7 @@ export const action: ActionFunction = async ({ request }) => {
       types: { select: { code: true } },
     },
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    skip: Number(skip),
+    skip,
     take: config.batchSize,
     where: { ...where, accountID: currentAccountID },
   });
@@ -100,9 +100,9 @@ export default function NewMeetings() {
 
   useEffect(() => {
     if (actionData) {
-      setMeetings([...meetings, ...actionData]);
+      setMeetings((meetings) => [...meetings, ...actionData]);
     }
-  }, [meetings, actionData]);
+  }, [actionData]);
 
   return (
     <Template
