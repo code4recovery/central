@@ -12,9 +12,13 @@ export const meta: MetaFunction = () => ({
 export default function Reports() {
   const iconClass = "h-10 w-10 mx-auto";
   const reports = {
-    new: {
+    "new-groups": {
       icon: <SparklesIcon className={iconClass} />,
-      title: strings.reports.new.title,
+      title: strings.reports.new_groups.title,
+    },
+    "new-meetings": {
+      icon: <SparklesIcon className={iconClass} />,
+      title: strings.reports.new_meetings.title,
     },
     archived: {
       icon: <ArchiveBoxIcon className={iconClass} />,

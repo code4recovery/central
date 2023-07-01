@@ -47,7 +47,7 @@ export const action: ActionFunction = async ({ request }) => {
       time: true,
       timezone: true,
       name: true,
-      updatedAt: true,
+      createdAt: true,
       id: true,
       languages: { select: { code: true } },
       types: { select: { code: true } },
@@ -70,7 +70,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       day: true,
       time: true,
       timezone: true,
-      updatedAt: true,
+      createdAt: true,
       languages: { select: { code: true } },
       types: { select: { code: true } },
     },
@@ -106,28 +106,29 @@ export default function NewMeetings() {
 
   return (
     <Template
-      title={strings.reports.new.title}
-      description={formatString(strings.reports.new.description, {
+      title={strings.reports.new_meetings.title}
+      description={formatString(strings.reports.new_meetings.description, {
         count: meetingCount,
       })}
+      breadcrumbs={[["/reports", strings.reports.title]]}
     >
       {!meetingCount && (
-        <Alert message={strings.reports.new.empty} type="info" />
+        <Alert message={strings.reports.new_meetings.empty} type="info" />
       )}
       <Table
         columns={{
           name: { label: strings.meetings.name },
           when: { label: strings.meetings.when },
           types: { label: strings.meetings.types },
-          updatedAt: { label: strings.updated, align: "right" },
+          createdAt: { label: strings.created, align: "right" },
         }}
         rows={meetings.map(
-          ({ name, id, updatedAt, day, languages, time, timezone, types }) => ({
+          ({ name, id, createdAt, day, languages, time, timezone, types }) => ({
             name,
             id,
             link: `/meetings/${id}`,
             types: [...languages, ...types].map(({ code }) => code),
-            updatedAt: formatDate(updatedAt.toString()),
+            createdAt: formatDate(createdAt.toString()),
             when: formatDayTime(day, time, timezone),
           })
         )}

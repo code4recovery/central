@@ -91,7 +91,7 @@ export default function Index() {
         columns={{
           name: { label: strings.group.name },
           meetings: { label: strings.meetings.title },
-          reps: { label: "Representatives" },
+          reps: { label: strings.representatives.title },
           updatedAt: { label: strings.updated, align: "right" },
         }}
         rows={groups.map(({ id, meetings, name, updatedAt, users }) => ({

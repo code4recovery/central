@@ -1,6 +1,7 @@
 import { validationError } from "remix-validated-form";
 import md5 from "blueimp-md5";
 import { json } from "@remix-run/node";
+import type { Prisma } from "@prisma/client";
 
 import { config, formatValidator } from "~/helpers";
 import { db } from "../utils/db.server";
@@ -59,12 +60,26 @@ export async function addGroupRep(
   });
 }
 
-export async function getGroups(accountID: string, skip?: number) {
+export async function countGroups(
+  accountID: string,
+  where?: Prisma.GroupWhereInput
+) {
+  return await db.group.count({
+    where: { ...where, accountID },
+  });
+}
+
+export async function getGroups(
+  accountID: string,
+  skip?: number,
+  where?: Prisma.GroupWhereInput
+) {
   return await db.group.findMany({
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: {
       id: true,
       name: true,
+      createdAt: true,
       updatedAt: true,
       meetings: {
         select: {
@@ -78,10 +93,24 @@ export async function getGroups(accountID: string, skip?: number) {
           name: true,
         },
       },
+      activity: {
+        select: {
+          user: {
+            select: {
+              name: true,
+              emailHash: true,
+            },
+          },
+        },
+        where: {
+          type: "add",
+        },
+        take: 1,
+      },
     },
     skip,
     take: config.batchSize,
-    where: { accountID },
+    where: { ...where, accountID },
   });
 }
 

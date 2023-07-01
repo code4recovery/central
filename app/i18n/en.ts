@@ -52,6 +52,7 @@ export const strings = {
     title: "Sign in to your account",
     out: "Sign out",
   },
+  created: "Created",
   days: {
     friday: "Friday",
     monday: "Monday",
@@ -224,8 +225,13 @@ export const strings = {
       empty: "No archived meetings yet.",
     },
     empty: "No reports yet",
-    new: {
-      title: "New",
+    new_groups: {
+      title: "New Groups",
+      description: "%count% groups were added in the last week.",
+      empty: "No groups have been added in the last week.",
+    },
+    new_meetings: {
+      title: "New Meetings",
       description: "%count% meetings were added in the last week.",
       empty: "No meetings have been added in the last week.",
     },
