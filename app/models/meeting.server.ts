@@ -65,3 +65,44 @@ export async function getMeeting(id?: string) {
     types: meeting?.types.map(({ code }) => code),
   };
 }
+
+export async function getAllMeetingsForJson(accountID: string) {
+  return await db.meeting.findMany({
+    select: {
+      slug: true,
+      id: true,
+      name: true,
+      languages: { select: { code: true } },
+      types: { select: { code: true } },
+      timezone: true,
+      notes: true,
+      day: true,
+      time: true,
+      conference_url: true,
+      conference_url_notes: true,
+      conference_phone: true,
+      conference_phone_notes: true,
+      updatedAt: true,
+      group: {
+        select: {
+          name: true,
+          recordID: true,
+          notes: true,
+          email: true,
+          phone: true,
+          website: true,
+          venmo: true,
+          paypal: true,
+          square: true,
+          updatedAt: true,
+        },
+      },
+    },
+    where: {
+      archived: false,
+      group: {
+        accountID,
+      },
+    },
+  });
+}

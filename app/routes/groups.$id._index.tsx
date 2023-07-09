@@ -34,7 +34,7 @@ import {
 } from "~/helpers";
 import { strings } from "~/i18n";
 import { addGroupRep, removeGroupRep } from "~/models";
-import { db, getIDs, jsonWith, log, saveFeedToStorage } from "~/utils";
+import { db, getIDs, jsonWith, log, publishDataToFtp } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -117,7 +117,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await saveFeedToStorage(currentAccountID);
+    await publishDataToFtp(currentAccountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);

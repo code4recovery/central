@@ -1,5 +1,17 @@
 import { db } from "../utils/db.server";
 
+export async function getAccount(accountID: string) {
+  return await db.account.findUnique({
+    where: { id: accountID },
+    select: {
+      id: true,
+      name: true,
+      url: true,
+      updatedAt: true,
+    },
+  });
+}
+
 // todo think about naming
 export async function getAccountCounts(accountID: string) {
   const result = await db.account.findFirst({

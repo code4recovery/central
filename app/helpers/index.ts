@@ -4,6 +4,7 @@ export * from "./format-changes";
 export * from "./format-classes";
 export * from "./format-date";
 export * from "./format-day-time";
+export * from "./format-json";
 export * from "./format-slug";
 export * from "./format-string";
 export * from "./format-token";

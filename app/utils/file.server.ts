@@ -1,21 +1,69 @@
+import SFTPClient from "ssh2-sftp-client";
+import { Buffer } from "buffer";
 import { Storage } from "@google-cloud/storage";
 
-import { db } from "./db.server";
 import { log } from "./log.server";
-import { config, formatUrl } from "~/helpers";
+import { formatJson } from "~/helpers";
+import { getAccount, getAllMeetingsForJson } from "~/models";
 
-export async function saveFeedToStorage(accountID: string) {
+export async function publishDataToFtp(accountID: string) {
+  const { FTP_HOST, FTP_USER, FTP_PASSWORD, FTP_DIRECTORY } = process.env;
+
+  if (!FTP_HOST) {
+    throw Error("need FTP_HOST env var");
+  }
+
+  const account = await getAccount(accountID);
+  if (!account) {
+    throw Error("could not find account");
+  }
+
+  const meetings = await getAllMeetingsForJson(account.id);
+  const data = formatJson(meetings, account.url);
+  const filename = `${FTP_DIRECTORY}/${account.id}.json`;
+
+  const client = new SFTPClient();
+  try {
+    await client.connect({
+      host: FTP_HOST,
+      username: FTP_USER,
+      password: FTP_PASSWORD,
+    });
+  } catch (e) {
+    const reason = e instanceof Error ? e.message : "unknown";
+    console.error(`could not connect: ${reason}`);
+  }
+
+  try {
+    const content = Buffer.from(JSON.stringify(data));
+    await client.put(content, filename);
+  } catch (e) {
+    const reason = e instanceof Error ? e.message : "unknown";
+    console.error(`could not put: ${reason}`);
+  }
+
+  await client.end();
+
+  log(`wrote ${meetings.length} entries to ${filename}`);
+
+  return filename;
+}
+
+export async function publishDataToStorage(accountID: string) {
   const projectId = process.env.GOOGLE_CLOUD_BUCKET ?? "";
   const private_key = process.env.GOOGLE_CLOUD_PRIVATE_KEY?.split(
     String.raw`\n`
   ).join("\n");
   const client_email = process.env.GOOGLE_CLOUD_CLIENT_EMAIL ?? "";
 
-  const account = await db.account.findUnique({ where: { id: accountID } });
+  const account = await getAccount(accountID);
   if (!account) {
     throw Error("could not find account");
   }
 
+  const meetings = await getAllMeetingsForJson(account.id);
+  const json = formatJson(meetings, account.url);
+  const contents = JSON.stringify(json);
   const filename = `${account.id}.json`;
 
   if (!projectId || !private_key || !client_email) {
@@ -31,113 +79,6 @@ export async function saveFeedToStorage(accountID: string) {
       client_email,
     },
   });
-
-  const meetings = (
-    await db.meeting.findMany({
-      select: {
-        slug: true,
-        id: true,
-        name: true,
-        languages: { select: { code: true } },
-        types: { select: { code: true } },
-        timezone: true,
-        notes: true,
-        day: true,
-        time: true,
-        conference_url: true,
-        conference_url_notes: true,
-        conference_phone: true,
-        conference_phone_notes: true,
-        updatedAt: true,
-        group: {
-          select: {
-            name: true,
-            recordID: true,
-            notes: true,
-            email: true,
-            phone: true,
-            website: true,
-            venmo: true,
-            paypal: true,
-            square: true,
-            updatedAt: true,
-          },
-        },
-      },
-      where: {
-        archived: false,
-        group: {
-          accountID,
-        },
-      },
-    })
-  )
-    .map(
-      ({
-        slug,
-        id,
-        name,
-        timezone,
-        notes,
-        languages,
-        types,
-        day,
-        time,
-        conference_url,
-        conference_url_notes,
-        conference_phone,
-        conference_phone_notes,
-        updatedAt,
-        group,
-      }) => ({
-        slug,
-        name,
-        timezone,
-        notes,
-        types: [
-          ...languages
-            .map(({ code }) => code)
-            .map((code) =>
-              code in config.languageSubstitutions
-                ? config.languageSubstitutions[
-                    code as keyof typeof config.languageSubstitutions
-                  ]
-                : code
-            ),
-          ...types.map(({ code }) => code),
-        ],
-        day,
-        time,
-        conference_url,
-        conference_url_notes,
-        conference_phone,
-        conference_phone_notes,
-        group: group.name,
-        group_id: group.recordID,
-        group_notes: group.notes,
-        email: group.email,
-        phone: group.phone,
-        website: group.website,
-        venmo: group.venmo,
-        paypal: group.paypal,
-        square: group.square,
-        edit_url: `${process.env.BASE_URL}/meetings/${id}`,
-        url: formatUrl(account.url, slug),
-        updated: updatedAt
-          .toISOString()
-          .split("T")
-          .join(" ")
-          .split("Z")
-          .join(""), // todo use group and meeting whichever is later
-      })
-    )
-    .map((entry) =>
-      Object.entries(entry)
-        .filter(([_, v]) => v !== null && v !== "") // remove null / empty values
-        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {})
-    );
-
-  const contents = JSON.stringify(meetings);
 
   await storage.bucket(projectId).file(filename).save(contents);
 

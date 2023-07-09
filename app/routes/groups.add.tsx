@@ -6,7 +6,7 @@ import { validationError } from "remix-validated-form";
 import { Columns, Form, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, log, redirectWith, saveFeedToStorage } from "~/utils";
+import { db, getIDs, log, redirectWith, publishDataToFtp } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const { id, currentAccountID } = await getIDs(request);
@@ -46,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   // save feed
   try {
-    await saveFeedToStorage(currentAccountID);
+    await publishDataToFtp(currentAccountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);

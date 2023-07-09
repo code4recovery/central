@@ -31,6 +31,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remix-validated-form": "^4.6.11",
+    "ssh2-sftp-client": "^9.1.0",
     "zod": "^3.21.4",
     "zod-form-data": "^2.0.1"
   },
@@ -44,6 +45,7 @@
     "@types/luxon": "^3.2.0",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
+    "@types/ssh2-sftp-client": "^9.0.0",
     "dotenv": "^16.0.3",
     "esbuild-register": "^3.4.2",
     "eslint": "^8.27.0",

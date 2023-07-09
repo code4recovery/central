@@ -36,7 +36,7 @@ import {
   jsonWith,
   log,
   optionsInUse,
-  saveFeedToStorage,
+  publishDataToFtp,
 } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       },
     });
     try {
-      await saveFeedToStorage(currentAccountID);
+      await publishDataToFtp(currentAccountID);
       return json({ success: strings.meetings.archived });
     } catch (e) {
       if (e instanceof Error) {
@@ -173,7 +173,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await saveFeedToStorage(currentAccountID);
+    await publishDataToFtp(currentAccountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);
