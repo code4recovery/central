@@ -23,24 +23,16 @@ export async function publishDataToFtp(accountID: string) {
   const filename = `${FTP_DIRECTORY}/${account.id}.json`;
 
   const client = new SFTPClient();
-  try {
-    await client.connect({
-      host: FTP_HOST,
-      username: FTP_USER,
-      password: FTP_PASSWORD,
-    });
-  } catch (e) {
-    const reason = e instanceof Error ? e.message : "unknown";
-    console.error(`could not connect: ${reason}`);
-  }
 
-  try {
-    const content = Buffer.from(JSON.stringify(data));
-    await client.put(content, filename);
-  } catch (e) {
-    const reason = e instanceof Error ? e.message : "unknown";
-    console.error(`could not put: ${reason}`);
-  }
+  await client.connect({
+    host: FTP_HOST,
+    username: FTP_USER,
+    password: FTP_PASSWORD,
+    readyTimeout: 5000,
+  });
+
+  const content = Buffer.from(JSON.stringify(data));
+  await client.put(content, filename);
 
   await client.end();
 

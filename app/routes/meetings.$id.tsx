@@ -177,7 +177,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   } catch (e) {
     if (e instanceof Error) {
       log(e);
-      return json({ error: `File storage error: ${e.message}` });
+      return json({ error: `FTP error: ${e.message}` });
     }
   }
 

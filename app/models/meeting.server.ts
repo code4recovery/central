@@ -12,6 +12,7 @@ export async function getMeeting(id?: string) {
   const meeting = await db.meeting.findUniqueOrThrow({
     where: { id },
     select: {
+      slug: true,
       name: true,
       conference_url: true,
       conference_url_notes: true,
