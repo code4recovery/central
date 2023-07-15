@@ -98,7 +98,7 @@ export default function NewGroups() {
           link: `/groups/${id}`,
           meetings: meetings.length,
           name,
-          user: (
+          user: !!activity.length && (
             <div className="flex gap-2 items-center">
               <Avatar
                 emailHash={activity[0].user.emailHash}
