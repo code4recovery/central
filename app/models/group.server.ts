@@ -103,7 +103,7 @@ export async function getGroups(
           },
         },
         where: {
-          type: "add",
+          type: "create",
         },
         take: 1,
       },

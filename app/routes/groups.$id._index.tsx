@@ -182,6 +182,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     select: {
       id: true,
       name: true,
+      email: true,
       emailHash: true,
       lastSeen: true,
     },
@@ -281,7 +282,7 @@ export default function GroupEdit() {
             <PanelRow
               user={user}
               key={user.id}
-              text={user.name}
+              text={`${user.name} • ${user.email}`}
               date={user.lastSeen?.toString()}
               deleteButton={
                 <DeleteButton subaction="group-rep-remove" targetID={user.id} />

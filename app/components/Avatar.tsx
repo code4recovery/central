@@ -14,6 +14,7 @@ export function Avatar({
   return (
     <img
       alt={name ? name : undefined}
+      title={name ? name : undefined}
       className={cx("rounded-full", className, {
         "h-10 w-10": size === "lg",
         "h-8 w-8": size === "md",
