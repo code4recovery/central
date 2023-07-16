@@ -5,6 +5,7 @@ export * from "./Button";
 export * from "./Checkbox";
 export * from "./Checkboxes";
 export * from "./Chiclet";
+export * from "./Collapse";
 export * from "./Columns";
 export * from "./DeleteButton";
 export * from "./Footer";

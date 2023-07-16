@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type {
   Activity,
   Change,
@@ -19,6 +19,7 @@ import { useActionData, useLoaderData } from "@remix-run/react";
 import {
   Alerts,
   Button,
+  Collapse,
   Columns,
   DeleteButton,
   Form,
@@ -287,41 +288,44 @@ export default function GroupEdit() {
           emptyText={strings.representatives.empty}
           title={strings.representatives.title}
         >
-          {repForm === true && (
+          <Collapse showing={repForm === true}>
             <Form
               buttonTheme="secondary"
               form="group-rep"
               resetAfterSubmit={true}
               subaction="group-rep-add"
             />
-          )}
-          {users.map((user: User) =>
-            repForm === user.id ? (
-              <Form
-                buttonTheme="secondary"
-                cancel={() => setRepForm(false)}
-                form="group-rep"
-                key={user.id}
-                resetAfterSubmit={true}
-                subaction="group-rep-edit"
-                values={{ name: user.name, email: user.email, id: user.id }}
-              />
-            ) : (
-              <PanelRow
-                date={user.lastSeen?.toString()}
-                deleteButton={
-                  <DeleteButton
-                    subaction="group-rep-remove"
-                    targetID={user.id}
-                  />
-                }
-                key={user.id}
-                onClick={() => setRepForm(user.id)}
-                text={`${user.name} • ${user.email}`}
-                user={user}
-              />
-            )
-          )}
+          </Collapse>
+          {users.map((user: User) => (
+            <Fragment key={user.id}>
+              <Collapse showing={repForm === user.id}>
+                <Form
+                  buttonTheme="secondary"
+                  cancel={() => setRepForm(false)}
+                  form="group-rep"
+                  key={user.id}
+                  resetAfterSubmit={true}
+                  subaction="group-rep-edit"
+                  values={{ name: user.name, email: user.email, id: user.id }}
+                />
+              </Collapse>
+              <Collapse showing={repForm !== user.id}>
+                <PanelRow
+                  date={user.lastSeen?.toString()}
+                  deleteButton={
+                    <DeleteButton
+                      subaction="group-rep-remove"
+                      targetID={user.id}
+                    />
+                  }
+                  key={user.id}
+                  onClick={() => setRepForm(user.id)}
+                  text={`${user.name} • ${user.email}`}
+                  user={user}
+                />
+              </Collapse>
+            </Fragment>
+          ))}
         </Panel>
         <Panel
           emptyText={strings.activity.empty}
