@@ -13,7 +13,7 @@ export async function addGroupRep(
   userID: string,
   currentAccountID: string
 ) {
-  const validator = formatValidator("group");
+  const validator = formatValidator("group-rep");
   const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
@@ -49,9 +49,73 @@ export async function addGroupRep(
   await db.activity.create({
     data: {
       groupID: groupID,
-      type: "add",
+      type: "add", // todo change this to "addUser" - also change the activity type in the db
       userID,
       targetID: user.id,
+    },
+  });
+
+  return json({
+    success: strings.group.userAdded,
+  });
+}
+
+export async function editGroupRep(
+  formData: FormData,
+  groupID: string,
+  userID: string,
+  currentAccountID: string
+) {
+  const validator = formatValidator("group-rep");
+  const { data, error } = await validator.validate(formData);
+  if (error) {
+    return validationError(error);
+  }
+  const { id, name, email } = data;
+
+  // if changing email, make sure it doesn't already exist
+  const user = await db.user.findUniqueOrThrow({ where: { id } });
+  if (user.email !== email) {
+    const existingUser = await db.user.findUnique({ where: { email } });
+    if (existingUser) {
+      // swap users
+      await db.group.update({
+        where: { id: groupID },
+        data: {
+          users: {
+            disconnect: { id },
+            connect: { id: existingUser.id },
+          },
+        },
+      });
+      // update name if it's different
+      if (existingUser.name !== name) {
+        await db.user.update({
+          where: { id: existingUser.id },
+          data: {
+            name,
+          },
+        });
+      }
+    }
+  } else {
+    await db.user.update({
+      where: { id },
+      data: {
+        name,
+        email,
+        emailHash: md5(email),
+      },
+    });
+    // todo notify user
+  }
+
+  await db.activity.create({
+    data: {
+      groupID: groupID,
+      type: "editUser",
+      userID,
+      targetID: id,
     },
   });
 

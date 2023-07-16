@@ -21,6 +21,7 @@ import { strings } from "~/i18n";
 
 export function Form({
   buttonTheme = "primary",
+  cancel,
   form,
   optionsInUse,
   values,
@@ -30,6 +31,7 @@ export function Form({
   subaction,
 }: {
   buttonTheme?: React.ComponentProps<typeof Button>["theme"];
+  cancel?: () => void;
   form: keyof typeof fields;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
@@ -207,6 +209,11 @@ export function Form({
                     ))}
                   </select>
                 </div>
+              )}
+              {cancel && (
+                <Button onClick={cancel} theme="secondary">
+                  Cancel
+                </Button>
               )}
               <Submit buttonTheme={buttonTheme} />
             </div>

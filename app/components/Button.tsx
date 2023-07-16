@@ -5,19 +5,21 @@ import {
   UserPlusIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { UserPlusIcon as UserPlusIconSolid } from "@heroicons/react/24/solid";
 import { Link } from "@remix-run/react";
 
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { Spinner } from "~/icons";
 
-type Icon =
+export type Icon =
   | "archive"
   | "delete"
   | "duplicate"
   | "external"
   | "spinner"
-  | "user";
+  | "user"
+  | "user-solid";
 
 export function Button({
   children,
@@ -62,6 +64,8 @@ export function Button({
         );
       case "user":
         return <UserPlusIcon className={iconClass} />;
+      case "user-solid":
+        return <UserPlusIconSolid className={iconClass} />;
     }
     return null;
   }

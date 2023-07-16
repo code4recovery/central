@@ -1,4 +1,4 @@
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { useState } from "react";
 import type {
   Activity,
   Change,
@@ -7,7 +7,12 @@ import type {
   Type,
   User,
 } from "@prisma/client";
-import { json, redirect } from "@remix-run/node";
+import {
+  json,
+  redirect,
+  type ActionFunction,
+  type LoaderFunction,
+} from "@remix-run/node";
 import { validationError } from "remix-validated-form";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
@@ -33,7 +38,7 @@ import {
   formatValue,
 } from "~/helpers";
 import { strings } from "~/i18n";
-import { addGroupRep, removeGroupRep } from "~/models";
+import { addGroupRep, editGroupRep, removeGroupRep } from "~/models";
 import { db, getIDs, jsonWith, log, publishDataToFtp } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -48,6 +53,10 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   if (subaction === "group-rep-add") {
     return addGroupRep(formData, id, userID, currentAccountID);
+  }
+
+  if (subaction === "group-rep-edit") {
+    return editGroupRep(formData, id, userID, currentAccountID);
   }
 
   if (subaction === "group-rep-remove") {
@@ -221,6 +230,7 @@ export default function GroupEdit() {
   const { activities, alert, group, users } = useLoaderData();
   const actionData = useActionData();
   const alerts = { ...actionData, ...alert };
+  const [repForm, setRepForm] = useState<string | boolean>(false);
   return (
     <Template
       breadcrumbs={[["/groups", strings.group.title]]}
@@ -267,32 +277,55 @@ export default function GroupEdit() {
         }
       >
         <Panel
-          title={strings.representatives.title}
+          button={
+            <Button
+              className="float-right opacity-50 hover:opacity-100"
+              icon={repForm === true ? "user-solid" : "user"}
+              onClick={() => setRepForm(repForm === true ? false : true)}
+            />
+          }
           emptyText={strings.representatives.empty}
-          addForm={
+          title={strings.representatives.title}
+        >
+          {repForm === true && (
             <Form
               buttonTheme="secondary"
               form="group-rep"
               resetAfterSubmit={true}
               subaction="group-rep-add"
             />
-          }
-        >
-          {users.map((user: User) => (
-            <PanelRow
-              user={user}
-              key={user.id}
-              text={`${user.name} • ${user.email}`}
-              date={user.lastSeen?.toString()}
-              deleteButton={
-                <DeleteButton subaction="group-rep-remove" targetID={user.id} />
-              }
-            />
-          ))}
+          )}
+          {users.map((user: User) =>
+            repForm === user.id ? (
+              <Form
+                buttonTheme="secondary"
+                cancel={() => setRepForm(false)}
+                form="group-rep"
+                key={user.id}
+                resetAfterSubmit={true}
+                subaction="group-rep-edit"
+                values={{ name: user.name, email: user.email, id: user.id }}
+              />
+            ) : (
+              <PanelRow
+                date={user.lastSeen?.toString()}
+                deleteButton={
+                  <DeleteButton
+                    subaction="group-rep-remove"
+                    targetID={user.id}
+                  />
+                }
+                key={user.id}
+                onClick={() => setRepForm(user.id)}
+                text={`${user.name} • ${user.email}`}
+                user={user}
+              />
+            )
+          )}
         </Panel>
         <Panel
-          title={strings.activity.title}
           emptyText={strings.activity.empty}
+          title={strings.activity.title}
         >
           {activities.map(
             ({
