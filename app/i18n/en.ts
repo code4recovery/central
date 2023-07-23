@@ -231,6 +231,9 @@ export const strings = {
       empty: "No archived meetings yet.",
       title: "Archived",
     },
+    downloadContacts: {
+      title: "Download contacts",
+    },
     empty: "No reports yet",
     new_groups: {
       description: "{count} groups were added in the last week.",

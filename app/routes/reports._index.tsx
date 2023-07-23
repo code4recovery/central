@@ -1,6 +1,10 @@
 import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
-import { ArchiveBoxIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import {
+  ArchiveBoxIcon,
+  ArrowDownOnSquareStackIcon,
+  SparklesIcon,
+} from "@heroicons/react/24/outline";
 
 import { Template } from "~/components";
 import { strings } from "~/i18n";
@@ -24,6 +28,10 @@ export default function Reports() {
       icon: <ArchiveBoxIcon className={iconClass} />,
       title: strings.reports.archived.title,
     },
+    "download-contacts": {
+      icon: <ArrowDownOnSquareStackIcon className={iconClass} />,
+      title: strings.reports.downloadContacts.title,
+    },
   };
 
   return (
@@ -33,6 +41,7 @@ export default function Reports() {
           <Link
             className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-950 shadow rounded text-center px-5 py-10 space-y-2"
             key={report}
+            reloadDocument={report.startsWith("download-")}
             to={`/reports/${report}`}
           >
             {reports[report as keyof typeof reports].icon}
