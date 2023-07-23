@@ -82,7 +82,26 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       span: 4,
     },
   },
-  "group-rep": {
+  "group-rep-add": {
+    name: {
+      label: strings.users.name,
+      placeholder: strings.users.name_placeholder,
+      span: 6,
+      type: "text",
+      validation: required.string,
+    },
+    email: {
+      label: strings.users.email,
+      span: 6,
+      type: "email",
+      validation: required.email,
+    },
+  },
+  "group-rep-edit": {
+    id: {
+      type: "hidden",
+      validation: required.string,
+    },
     name: {
       label: strings.users.name,
       placeholder: strings.users.name_placeholder,

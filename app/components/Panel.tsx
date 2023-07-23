@@ -16,12 +16,15 @@ export function Panel({
   rows,
 }: {
   add?: {
-    form: string;
     subaction: string;
   };
   emptyText: string;
   title: string;
-  rows: React.ComponentProps<typeof PanelRow>[];
+  rows: Array<
+    {
+      id: string;
+    } & React.ComponentProps<typeof PanelRow>
+  >;
 }) {
   const [form, setForm] = useState<string | boolean>(false);
   return (
@@ -39,9 +42,10 @@ export function Panel({
         <Collapse showing={form === true}>
           <Form
             {...add}
-            resetAfterSubmit={true}
             cancel={() => setForm(false)}
+            form={add.subaction}
             onSubmit={() => setForm(false)}
+            resetAfterSubmit={true}
           />
         </Collapse>
       )}
@@ -54,7 +58,7 @@ export function Panel({
             cancel={() => setForm(false)}
             formShowing={row.id === form}
             key={i}
-            onClick={() => setForm(row.id)}
+            onClick={row.edit ? () => setForm(row.id) : undefined}
           />
         ))
       )}
@@ -67,7 +71,6 @@ function PanelRow({
   date,
   edit,
   formShowing,
-  id,
   onClick,
   remove,
   text,
@@ -77,7 +80,6 @@ function PanelRow({
   date?: string | null;
   edit?: React.ComponentProps<typeof Form>;
   formShowing: boolean;
-  id: string;
   remove?: { subaction: string; targetID: string };
   onClick?: () => void;
   text?: string | null;

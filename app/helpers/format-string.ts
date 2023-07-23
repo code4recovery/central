@@ -1,5 +1,5 @@
 export function formatString(
-  str: string,
+  str = "",
   replacements: { [id: string]: string | number | undefined }
 ) {
   Object.keys(replacements).forEach((key) => {

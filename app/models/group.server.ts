@@ -13,7 +13,7 @@ export async function addGroupRep(
   userID: string,
   currentAccountID: string
 ) {
-  const validator = formatValidator("group-rep");
+  const validator = formatValidator("group-rep-add");
   const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
@@ -66,15 +66,17 @@ export async function editGroupRep(
   userID: string,
   currentAccountID: string
 ) {
-  const validator = formatValidator("group-rep");
+  const validator = formatValidator("group-rep-edit");
   const { data, error } = await validator.validate(formData);
   if (error) {
     return validationError(error);
   }
   const { id, name, email } = data;
 
-  // if changing email, make sure it doesn't already exist
+  // user we're editing must exist
   const user = await db.user.findUniqueOrThrow({ where: { id } });
+
+  // if changing email, make sure it doesn't already exist
   if (user.email !== email) {
     const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -120,7 +122,7 @@ export async function editGroupRep(
   });
 
   return json({
-    success: strings.group.userAdded,
+    success: strings.group.userEdited,
   });
 }
 

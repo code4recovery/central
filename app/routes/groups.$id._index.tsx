@@ -284,7 +284,6 @@ export default function GroupEdit() {
       >
         <Panel
           add={{
-            form: "group-rep",
             subaction: "group-rep-add",
           }}
           emptyText={strings.representatives.empty}
@@ -292,9 +291,10 @@ export default function GroupEdit() {
           rows={users.map((user: User) => ({
             date: user.lastSeen?.toString(),
             edit: {
-              form: "group-rep",
+              form: "group-rep-edit",
               subaction: "group-rep-edit",
-              values: { name: user.name, email: user.email, id: user.id },
+              legend: strings.representatives.edit,
+              values: user,
             },
             remove: {
               subaction: "group-rep-remove",
@@ -309,7 +309,6 @@ export default function GroupEdit() {
           title={strings.activity.title}
           rows={activities.map(
             ({
-              id,
               changes,
               type,
               user,
