@@ -56,9 +56,9 @@ export function Panel({
           <PanelRow
             {...row}
             cancel={() => setForm(false)}
-            formShowing={row.id === form}
+            form={form}
+            setForm={setForm}
             key={i}
-            onClick={row.edit ? () => setForm(row.id) : undefined}
           />
         ))
       )}
@@ -70,8 +70,8 @@ function PanelRow({
   cancel,
   date,
   edit,
-  formShowing,
-  onClick,
+  form,
+  setForm,
   remove,
   text,
   user,
@@ -79,7 +79,8 @@ function PanelRow({
   cancel: () => void;
   date?: string | null;
   edit?: React.ComponentProps<typeof Form>;
-  formShowing: boolean;
+  form?: string | boolean;
+  setForm?: (form: string | boolean) => void;
   remove?: { subaction: string; targetID: string };
   onClick?: () => void;
   text?: string | null;
@@ -90,10 +91,14 @@ function PanelRow({
       className={cx(
         "flex justify-between gap-3 w-full px-4 py-3 items-center",
         {
-          "cursor-pointer": !!onClick,
+          "cursor-pointer": !!edit,
         }
       )}
-      onClick={onClick}
+      onClick={
+        setForm && edit?.values?.id
+          ? () => setForm(edit.values?.id as string)
+          : undefined
+      }
     >
       {user && <Avatar emailHash={user.emailHash} name={user.name} />}
       <span className="grow">{text}</span>
@@ -105,10 +110,10 @@ function PanelRow({
     row
   ) : (
     <>
-      <Collapse showing={formShowing}>
+      <Collapse showing={edit.values?.id === form}>
         <Form {...edit} cancel={cancel} />
       </Collapse>
-      <Collapse showing={!formShowing}>{row}</Collapse>
+      <Collapse showing={edit.values?.id !== form}>{row}</Collapse>
     </>
   );
 }

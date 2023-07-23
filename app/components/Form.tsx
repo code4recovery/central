@@ -58,7 +58,9 @@ export function Form({
       subaction={subaction}
     >
       <fieldset>
-        {legend && <legend className="px-6 pt-4 text-sm">{legend}</legend>}
+        {legend && (
+          <legend className="px-6 pt-5 -mb-2 text-sm italic">{legend}</legend>
+        )}
         <div className="shadow sm:overflow-hidden sm:rounded-md">
           <div className="space-y-6 bg-white dark:bg-neutral-950 px-4 py-5 sm:p-6">
             <div className="grid grid-cols-12 gap-5">

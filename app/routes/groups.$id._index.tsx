@@ -1,6 +1,7 @@
 import type {
   Activity,
   Change,
+  Group,
   Language,
   Meeting,
   Type,
@@ -31,6 +32,7 @@ import {
   formatValidator,
   validObjectId,
   formatChanges,
+  formatMarkdown,
   formatString,
   formatValue,
 } from "~/helpers";
@@ -191,6 +193,15 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
       email: true,
       emailHash: true,
       lastSeen: true,
+      groups: {
+        select: {
+          id: true,
+          name: true,
+        },
+        where: {
+          id: { not: id },
+        },
+      },
     },
   });
 
@@ -288,12 +299,18 @@ export default function GroupEdit() {
           }}
           emptyText={strings.representatives.empty}
           title={strings.representatives.title}
-          rows={users.map((user: User) => ({
+          rows={users.map((user: User & { groups: Group[] }) => ({
             date: user.lastSeen?.toString(),
             edit: {
               form: "group-rep-edit",
               subaction: "group-rep-edit",
-              legend: strings.representatives.edit,
+              legend: user.groups.length
+                ? formatMarkdown(strings.representatives.warning_groups, {
+                    groups: user.groups
+                      .map(({ name, id }) => `[${name}](/groups/${id})`)
+                      .join(", "),
+                  })
+                : strings.representatives.warning,
               values: user,
             },
             remove: {
