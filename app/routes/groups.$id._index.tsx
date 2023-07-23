@@ -1,13 +1,18 @@
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import type {
   Activity,
   Change,
+  Group,
   Language,
   Meeting,
   Type,
   User,
 } from "@prisma/client";
-import { json, redirect } from "@remix-run/node";
+import {
+  json,
+  redirect,
+  type ActionFunction,
+  type LoaderFunction,
+} from "@remix-run/node";
 import { validationError } from "remix-validated-form";
 import { useActionData, useLoaderData } from "@remix-run/react";
 
@@ -15,10 +20,8 @@ import {
   Alerts,
   Button,
   Columns,
-  DeleteButton,
   Form,
   Panel,
-  PanelRow,
   Table,
   Template,
 } from "~/components";
@@ -29,11 +32,12 @@ import {
   formatValidator,
   validObjectId,
   formatChanges,
+  formatMarkdown,
   formatString,
   formatValue,
 } from "~/helpers";
 import { strings } from "~/i18n";
-import { addGroupRep, removeGroupRep } from "~/models";
+import { addGroupRep, editGroupRep, removeGroupRep } from "~/models";
 import { db, getIDs, jsonWith, log, publishDataToFtp } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -48,6 +52,10 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   if (subaction === "group-rep-add") {
     return addGroupRep(formData, id, userID, currentAccountID);
+  }
+
+  if (subaction === "group-rep-edit") {
+    return editGroupRep(formData, id, userID, currentAccountID);
   }
 
   if (subaction === "group-rep-remove") {
@@ -185,6 +193,15 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
       email: true,
       emailHash: true,
       lastSeen: true,
+      groups: {
+        select: {
+          id: true,
+          name: true,
+        },
+        where: {
+          id: { not: id },
+        },
+      },
     },
   });
 
@@ -230,7 +247,17 @@ export default function GroupEdit() {
         primary={
           <>
             {alerts && <Alerts data={alerts} />}
-            <Form form="group" subaction="group-edit" values={group} />
+            <Form
+              form="group"
+              onSubmit={() =>
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                })
+              }
+              subaction="group-edit"
+              values={group}
+            />
             <Table
               columns={{
                 name: { label: strings.meetings.name },
@@ -267,61 +294,60 @@ export default function GroupEdit() {
         }
       >
         <Panel
-          title={strings.representatives.title}
+          add={{
+            subaction: "group-rep-add",
+          }}
           emptyText={strings.representatives.empty}
-          addForm={
-            <Form
-              buttonTheme="secondary"
-              form="group-rep"
-              resetAfterSubmit={true}
-              subaction="group-rep-add"
-            />
-          }
-        >
-          {users.map((user: User) => (
-            <PanelRow
-              user={user}
-              key={user.id}
-              text={`${user.name} • ${user.email}`}
-              date={user.lastSeen?.toString()}
-              deleteButton={
-                <DeleteButton subaction="group-rep-remove" targetID={user.id} />
-              }
-            />
-          ))}
-        </Panel>
+          title={strings.representatives.title}
+          rows={users.map((user: User & { groups: Group[] }) => ({
+            date: user.lastSeen?.toString(),
+            edit: {
+              form: "group-rep-edit",
+              subaction: "group-rep-edit",
+              legend: user.groups.length
+                ? formatMarkdown(strings.representatives.warning_groups, {
+                    groups: user.groups
+                      .map(({ name, id }) => `[${name}](/groups/${id})`)
+                      .join(", "),
+                  })
+                : strings.representatives.warning,
+              values: user,
+            },
+            remove: {
+              subaction: "group-rep-remove",
+              targetID: user.id,
+            },
+            text: `${user.name} • ${user.email}`,
+            user,
+          }))}
+        />
         <Panel
-          title={strings.activity.title}
           emptyText={strings.activity.empty}
-        >
-          {activities.map(
+          title={strings.activity.title}
+          rows={activities.map(
             ({
-              id,
               changes,
               type,
               user,
               createdAt,
-            }: Activity & { changes: Change[]; user: User }) => (
-              <PanelRow
-                key={id}
-                user={user}
-                date={createdAt.toString()}
-                text={formatString(
-                  strings.activity.general[
-                    type as keyof typeof strings.activity.general
-                  ],
-                  {
-                    properties: changes
-                      .map(({ field }) =>
-                        fields.group[field].label?.toLocaleLowerCase()
-                      )
-                      .join(", "),
-                  }
-                )}
-              />
-            )
+            }: Activity & { changes: Change[]; user: User }) => ({
+              user,
+              date: createdAt.toString(),
+              text: formatString(
+                strings.activity.general[
+                  type as keyof typeof strings.activity.general
+                ],
+                {
+                  properties: changes
+                    .map(({ field }) =>
+                      fields.group[field].label?.toLocaleLowerCase()
+                    )
+                    .join(", "),
+                }
+              ),
+            })
           )}
-        </Panel>
+        />
       </Columns>
     </Template>
   );

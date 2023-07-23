@@ -21,16 +21,22 @@ import { strings } from "~/i18n";
 
 export function Form({
   buttonTheme = "primary",
+  cancel,
   form,
+  legend,
   optionsInUse,
   values,
   isAdmin,
+  onSubmit,
   resetAfterSubmit,
   saveOptions,
   subaction,
 }: {
   buttonTheme?: React.ComponentProps<typeof Button>["theme"];
+  cancel?: () => void;
   form: keyof typeof fields;
+  legend?: string;
+  onSubmit?: () => void;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
   isAdmin?: boolean;
@@ -47,16 +53,14 @@ export function Form({
       autoComplete="off"
       method="post"
       validator={formatValidator(form)}
-      onSubmit={() =>
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-      }
+      onSubmit={onSubmit}
       resetAfterSubmit={resetAfterSubmit}
       subaction={subaction}
     >
       <fieldset>
+        {legend && (
+          <legend className="px-6 pt-5 -mb-2 text-sm italic">{legend}</legend>
+        )}
         <div className="shadow sm:overflow-hidden sm:rounded-md">
           <div className="space-y-6 bg-white dark:bg-neutral-950 px-4 py-5 sm:p-6">
             <div className="grid grid-cols-12 gap-5">
@@ -207,6 +211,11 @@ export function Form({
                     ))}
                   </select>
                 </div>
+              )}
+              {cancel && (
+                <Button onClick={cancel} theme="secondary">
+                  {strings.cancel}
+                </Button>
               )}
               <Submit buttonTheme={buttonTheme} />
             </div>

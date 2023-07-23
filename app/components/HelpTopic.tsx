@@ -1,8 +1,8 @@
-import { Transition } from "@headlessui/react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
 import { formatClasses as cx } from "~/helpers";
+import { Collapse } from "./Collapse";
 
 export function HelpTopic({
   title,
@@ -31,17 +31,9 @@ export function HelpTopic({
       >
         {title}
       </h3>
-      <Transition
-        show={showing}
-        enter="transition-all ease-out duration-600"
-        enterFrom="opacity-0 -mt-10"
-        enterTo="opacity-100 mt-0"
-        leave="transition ease-out duration-300"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
-      >
+      <Collapse showing={showing}>
         <p className="pt-3">{content}</p>
-      </Transition>
+      </Collapse>
     </div>
   );
 }

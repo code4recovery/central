@@ -5,7 +5,7 @@ export const strings = {
     name: "Service entity name",
     name_description: "Used in emails",
     notFound: "Could not find account.",
-    switched: "Switched account to %name%",
+    switched: "Switched account to {name}",
     theme: "Color theme",
     title: "Account Settings",
     updated: "Account updated.",
@@ -19,23 +19,25 @@ export const strings = {
       add: "Added representative",
       archive: "Archived",
       create: "Created",
+      editUser: "Edited representative",
       remove: "Removed representative",
       unarchive: "Unarchived",
-      update: "Updated %properties%",
+      update: "Updated {properties}",
     },
     group: {
       add: "Added group representative",
       archive: "Archived group",
       create: "Created group",
+      editUser: "Edited group representative",
       remove: "Removed group representative",
       unarchive: "Unarchived group",
-      update: "Updated %properties%",
+      update: "Updated {properties}",
     },
     meeting: {
       archive: "Archived meeting",
       create: "Created meeting",
       unarchive: "Unarchived meeting",
-      update: "Updated %properties%",
+      update: "Updated {properties}",
     },
     name: "Name",
     title: "Activity",
@@ -52,6 +54,7 @@ export const strings = {
     title: "Sign in to your account",
     out: "Sign out",
   },
+  cancel: "Cancel",
   created: "Created",
   days: {
     friday: "Friday",
@@ -65,18 +68,18 @@ export const strings = {
   email: {
     disclaimer:
       "If you didn’t request this email, there’s nothing to worry about — you can safely ignore it.",
-    footer: "This email was sent by %app% on behalf of %accountName%.",
+    footer: "This email was sent by {app} on behalf of {accountName}.",
     invite: {
       buttonText: "Accept invitation",
       headline:
-        "You have been invited to help administer the listings on our website at %accountUrl%.",
+        "You have been invited to help administer the listings on our website at {accountUrl}.",
       instructions: "Tap the button below to accept:",
-      subject: "Welcome to %accountName%",
+      subject: "Welcome to {accountName}",
     },
     login: {
       buttonText: "Confirm email",
       headline:
-        "Once you’ve confirmed that %email% is your email address, you’ll be logged in to the site.",
+        "Once you’ve confirmed that {email} is your email address, you’ll be logged in to the site.",
       instructions: "Tap the button below to confirm:",
       subject: "Confirm your email address to log in",
     },
@@ -103,11 +106,11 @@ export const strings = {
     add: "Add group",
     added: "Group has been added",
     description:
-      "There are %groupCount% groups and %meetingCount% meetings in your account.",
+      "There are {groupCount} groups and {meetingCount} meetings in your account.",
     edit: "Edit group",
     email: "Email",
     empty: "No groups added yet",
-    empty_search: "No groups matched “%search%”",
+    empty_search: "No groups matched “{search}”",
     name: "Group name",
     notes: "Group notes",
     notFound: "Could not find group.",
@@ -119,19 +122,23 @@ export const strings = {
     title: "Groups",
     updated: "Group has been updated",
     userAdded: "Group representative added",
+    userEdited: "Group representative edited",
     userRemoved: "Group representative removed",
     venmo: "Venmo",
     website: "Website",
   },
   help: {
-    conference_providers_title: "What makes a good conference URL?",
+    conference_providers: "What makes a good conference URL?",
     conference_providers_content:
       "Conference URLs should be links that the user can click to join the meeting directly. They should be links to widely-recognized services, and should go straight in to the meeting. Other types of URLs should go in the group website field.",
-    online_location_title: "Can online meetings have a location?",
-    online_location_description:
+    record_id: "What is a record ID?",
+    record_id_content:
+      "Record IDs are used to identify groups in Central. They can be any string of letters, numbers, or symbols, but they must be unique within your account. The Record ID suggested here is one number higher than the current max.",
+    online_location: "Can online meetings have a location?",
+    online_location_content:
       "Yes, online meetings can have approximate locations, such as Philadelphia, PA. These can be thought of as places of origin or affinity for the meeting. Specifying this will also set the meeting timezone.",
-    phone_format_title: "What's the recommended format for Zoom phone numbers?",
-    phone_format_description:
+    phone_format: "What's the recommended format for Zoom phone numbers?",
+    phone_format_content:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
   },
   json_updated: "JSON updated",
@@ -162,7 +169,7 @@ export const strings = {
     TL: "Tagalog",
     UK: "Ukrainian",
   },
-  load_more: "Load %count% more",
+  load_more: "Load {count} more",
   loading: "Loading…",
   meetings: {
     add: "Add meeting",
@@ -182,12 +189,12 @@ export const strings = {
     conference_url_notes: "Conference URL notes",
     conference_url_notes_help: "Meeting ID and password, if any",
     day: "Day",
-    description: "There are %meetingCount% meetings in your account.",
+    description: "There are {meetingCount} meetings in your account.",
     duplicate: "Duplicate",
     duration: "Duration",
     edit: "Edit meeting",
     empty: "No meetings added yet",
-    empty_search: "No meetings matched “%search%”",
+    empty_search: "No meetings matched “{search}”",
     geocode: "Location",
     geocode_help:
       "Online meetings can have approximate locations, eg neighborhood, city, state/province",
@@ -212,34 +219,37 @@ export const strings = {
   },
   no_updates: "Nothing was updated.",
   search: {
-    description_none: "No results match “%search%”",
-    description_one: "One result matches “%search%”",
-    description_many: "%meetingCount% results match “%search%”",
+    description_many: "{meetingCount} results match “{search}”",
+    description_none: "No results match “{search}”",
+    description_one: "One result matches “{search}”",
     placeholder: "Search",
     title: "Search Results",
   },
   reports: {
     archived: {
-      title: "Archived",
-      description: "%count% meetings have been archived.",
+      description: "{count} meetings have been archived.",
       empty: "No archived meetings yet.",
+      title: "Archived",
     },
     empty: "No reports yet",
     new_groups: {
-      title: "New Groups",
-      description: "%count% groups were added in the last week.",
+      description: "{count} groups were added in the last week.",
       empty: "No groups have been added in the last week.",
+      title: "New Groups",
     },
     new_meetings: {
-      title: "New Meetings",
-      description: "%count% meetings were added in the last week.",
+      description: "{count} meetings were added in the last week.",
       empty: "No meetings have been added in the last week.",
+      title: "New Meetings",
     },
     title: "Reports",
   },
   representatives: {
     empty: "No representatives yet",
     title: "Representatives",
+    warning: "Editing this information will edit the user's profile.",
+    warning_groups:
+      "Editing this information will edit the user's profile. This user also represents: {groups}.",
   },
   types: {
     "11": "11th Step Meditation",

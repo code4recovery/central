@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
-import { Columns, Form, Template } from "~/components";
+import { Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs, log, redirectWith, publishDataToFtp } from "~/utils";
@@ -71,8 +71,24 @@ export default function AddGroup() {
   const loaderData = useLoaderData();
   return (
     <Template>
-      <Columns primary={<Form form="group" values={loaderData} />}>
-        Record ID is one higher than the current max.
+      <Columns
+        primary={
+          <Form
+            form="group"
+            onSubmit={() =>
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              })
+            }
+            values={loaderData}
+          />
+        }
+      >
+        <HelpTopic
+          title={strings.help.record_id}
+          content={strings.help.record_id_content}
+        />
       </Columns>
     </Template>
   );

@@ -15,7 +15,6 @@ import {
   Form,
   HelpTopic,
   Panel,
-  PanelRow,
   Template,
 } from "~/components";
 import { ArchiveForm } from "~/components/ArchiveForm";
@@ -253,52 +252,44 @@ export default function EditMeeting() {
           <ArchiveForm archived={meeting.archived} />
         </div>
         <HelpTopic
-          title={strings.help.conference_providers_title}
+          title={strings.help.conference_providers}
           content={strings.help.conference_providers_content}
         />
         <HelpTopic
-          title={strings.help.online_location_title}
-          content={strings.help.online_location_description}
+          title={strings.help.online_location}
+          content={strings.help.online_location_content}
         />
         <HelpTopic
-          title={strings.help.phone_format_title}
-          content={strings.help.phone_format_description}
+          title={strings.help.phone_format}
+          content={strings.help.phone_format_content}
         />
         <Panel
           title={strings.activity.title}
           emptyText={strings.activity.empty}
-        >
-          {meeting.activity.map(
+          rows={meeting.activity.map(
             ({
               id,
               changes,
               type,
               user,
               createdAt,
-            }: Activity & { changes: Change[]; user: User }) => (
-              <PanelRow
-                key={id}
-                user={user}
-                date={createdAt.toString()}
-                text={formatString(
-                  strings.activity.general[
-                    type as keyof typeof strings.activity.general
-                  ],
-                  {
-                    properties: changes
-                      .map(({ field }) =>
-                        fields.meeting[field].label?.toLocaleLowerCase()
-                      )
-                      .join(", "),
-                  }
-                )}
-              />
-            )
+            }: Activity & { changes: Change[]; user: User }) => ({
+              user,
+              date: createdAt.toString(),
+              text: formatString(
+                strings.activity.general[
+                  type as keyof typeof strings.activity.general
+                ],
+                {
+                  properties: changes
+                    .map(({ field }) =>
+                      fields.meeting[field].label?.toLocaleLowerCase()
+                    )
+                    .join(", "),
+                }
+              ),
+            })
           )}
-        </Panel>
-        <Panel
-          title={strings.feedback.title}
-          emptyText={strings.feedback.empty}
         />
       </Columns>
     </Template>

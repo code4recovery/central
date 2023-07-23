@@ -2,22 +2,24 @@ import {
   ArchiveBoxXMarkIcon,
   ArrowTopRightOnSquareIcon,
   DocumentDuplicateIcon,
-  UserPlusIcon,
+  PlusCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { PlusCircleIcon as PlusCircleIconSolid } from "@heroicons/react/24/solid";
 import { Link } from "@remix-run/react";
 
 import { formatClasses as cx } from "~/helpers";
 import { useUser } from "~/hooks";
 import { Spinner } from "~/icons";
 
-type Icon =
+export type Icon =
   | "archive"
   | "delete"
   | "duplicate"
   | "external"
-  | "spinner"
-  | "user";
+  | "plus-circle"
+  | "plus-circle-solid"
+  | "spinner";
 
 export function Button({
   children,
@@ -48,6 +50,10 @@ export function Button({
         return <DocumentDuplicateIcon className={iconClass} />;
       case "external":
         return <ArrowTopRightOnSquareIcon className={iconClass} />;
+      case "plus-circle":
+        return <PlusCircleIcon className={iconClass} />;
+      case "plus-circle-solid":
+        return <PlusCircleIconSolid className={iconClass} />;
       case "spinner":
         return (
           <Spinner
@@ -60,8 +66,6 @@ export function Button({
             )}
           />
         );
-      case "user":
-        return <UserPlusIcon className={iconClass} />;
     }
     return null;
   }
@@ -91,7 +95,7 @@ export function Button({
   const external = url?.startsWith("https://");
 
   return onClick ? (
-    <button className={buttonClass} onClick={onClick}>
+    <button className={buttonClass} onClick={onClick} type="button">
       {renderIcon(icon)}
       {children}
     </button>
