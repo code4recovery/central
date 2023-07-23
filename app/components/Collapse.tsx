@@ -10,17 +10,14 @@ export function Collapse({
   timing?: number;
 }) {
   const [maxHeight, setMaxHeight] = useState<string>(showing ? "none" : "0");
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!showing && maxHeight === "none") {
-      // console.log("hiding");
       setMaxHeight(`${ref.current?.scrollHeight}px`);
-      timer.current = setTimeout(() => setMaxHeight("0"), 20);
+      setTimeout(() => setMaxHeight("0"), 20);
     } else if (showing && maxHeight !== "none") {
-      // console.log("showing");
       setMaxHeight(`${ref.current?.scrollHeight}px`);
-      timer.current = setTimeout(() => setMaxHeight("none"), timing);
+      setTimeout(() => setMaxHeight("none"), timing);
     }
   }, [maxHeight, showing, timing]);
   return (
@@ -28,8 +25,9 @@ export function Collapse({
       ref={ref}
       style={{
         maxHeight,
+        opacity: showing ? 1 : 0,
         overflow: "hidden",
-        transition: maxHeight === "none" ? undefined : `max-height ${timing}ms`,
+        transition: `all ${timing}ms`,
       }}
     >
       {children}

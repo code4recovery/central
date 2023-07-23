@@ -1,4 +1,3 @@
-import { Fragment, useState } from "react";
 import type {
   Activity,
   Change,
@@ -19,12 +18,9 @@ import { useActionData, useLoaderData } from "@remix-run/react";
 import {
   Alerts,
   Button,
-  Collapse,
   Columns,
-  DeleteButton,
   Form,
   Panel,
-  PanelRow,
   Table,
   Template,
 } from "~/components";
@@ -231,7 +227,6 @@ export default function GroupEdit() {
   const { activities, alert, group, users } = useLoaderData();
   const actionData = useActionData();
   const alerts = { ...actionData, ...alert };
-  const [repForm, setRepForm] = useState<string | boolean>(false);
   return (
     <Template
       breadcrumbs={[["/groups", strings.group.title]]}
@@ -241,7 +236,17 @@ export default function GroupEdit() {
         primary={
           <>
             {alerts && <Alerts data={alerts} />}
-            <Form form="group" subaction="group-edit" values={group} />
+            <Form
+              form="group"
+              onSubmit={() =>
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                })
+              }
+              subaction="group-edit"
+              values={group}
+            />
             <Table
               columns={{
                 name: { label: strings.meetings.name },
@@ -278,87 +283,55 @@ export default function GroupEdit() {
         }
       >
         <Panel
-          button={
-            <Button
-              className="float-right opacity-50 hover:opacity-100"
-              icon={repForm === true ? "user-solid" : "user"}
-              onClick={() => setRepForm(repForm === true ? false : true)}
-            />
-          }
+          add={{
+            form: "group-rep",
+            subaction: "group-rep-add",
+          }}
           emptyText={strings.representatives.empty}
           title={strings.representatives.title}
-        >
-          <Collapse showing={repForm === true}>
-            <Form
-              buttonTheme="secondary"
-              form="group-rep"
-              resetAfterSubmit={true}
-              subaction="group-rep-add"
-            />
-          </Collapse>
-          {users.map((user: User) => (
-            <Fragment key={user.id}>
-              <Collapse showing={repForm === user.id}>
-                <Form
-                  buttonTheme="secondary"
-                  cancel={() => setRepForm(false)}
-                  form="group-rep"
-                  key={user.id}
-                  resetAfterSubmit={true}
-                  subaction="group-rep-edit"
-                  values={{ name: user.name, email: user.email, id: user.id }}
-                />
-              </Collapse>
-              <Collapse showing={repForm !== user.id}>
-                <PanelRow
-                  date={user.lastSeen?.toString()}
-                  deleteButton={
-                    <DeleteButton
-                      subaction="group-rep-remove"
-                      targetID={user.id}
-                    />
-                  }
-                  key={user.id}
-                  onClick={() => setRepForm(user.id)}
-                  text={`${user.name} • ${user.email}`}
-                  user={user}
-                />
-              </Collapse>
-            </Fragment>
-          ))}
-        </Panel>
+          rows={users.map((user: User) => ({
+            date: user.lastSeen?.toString(),
+            edit: {
+              form: "group-rep",
+              subaction: "group-rep-edit",
+              values: { name: user.name, email: user.email, id: user.id },
+            },
+            remove: {
+              subaction: "group-rep-remove",
+              targetID: user.id,
+            },
+            text: `${user.name} • ${user.email}`,
+            user,
+          }))}
+        />
         <Panel
           emptyText={strings.activity.empty}
           title={strings.activity.title}
-        >
-          {activities.map(
+          rows={activities.map(
             ({
               id,
               changes,
               type,
               user,
               createdAt,
-            }: Activity & { changes: Change[]; user: User }) => (
-              <PanelRow
-                key={id}
-                user={user}
-                date={createdAt.toString()}
-                text={formatString(
-                  strings.activity.general[
-                    type as keyof typeof strings.activity.general
-                  ],
-                  {
-                    properties: changes
-                      .map(({ field }) =>
-                        fields.group[field].label?.toLocaleLowerCase()
-                      )
-                      .join(", "),
-                  }
-                )}
-              />
-            )
+            }: Activity & { changes: Change[]; user: User }) => ({
+              user,
+              date: createdAt.toString(),
+              text: formatString(
+                strings.activity.general[
+                  type as keyof typeof strings.activity.general
+                ],
+                {
+                  properties: changes
+                    .map(({ field }) =>
+                      fields.group[field].label?.toLocaleLowerCase()
+                    )
+                    .join(", "),
+                }
+              ),
+            })
           )}
-        </Panel>
+        />
       </Columns>
     </Template>
   );

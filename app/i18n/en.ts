@@ -52,6 +52,7 @@ export const strings = {
     title: "Sign in to your account",
     out: "Sign out",
   },
+  cancel: "Cancel",
   created: "Created",
   days: {
     friday: "Friday",
@@ -124,14 +125,17 @@ export const strings = {
     website: "Website",
   },
   help: {
-    conference_providers_title: "What makes a good conference URL?",
+    conference_providers: "What makes a good conference URL?",
     conference_providers_content:
       "Conference URLs should be links that the user can click to join the meeting directly. They should be links to widely-recognized services, and should go straight in to the meeting. Other types of URLs should go in the group website field.",
-    online_location_title: "Can online meetings have a location?",
-    online_location_description:
+    record_id: "What is a record ID?",
+    record_id_content:
+      "Record IDs are used to identify groups in Central. They can be any string of letters, numbers, or symbols, but they must be unique within your account. The Record ID suggested here is one number higher than the current max.",
+    online_location: "Can online meetings have a location?",
+    online_location_content:
       "Yes, online meetings can have approximate locations, such as Philadelphia, PA. These can be thought of as places of origin or affinity for the meeting. Specifying this will also set the meeting timezone.",
-    phone_format_title: "What's the recommended format for Zoom phone numbers?",
-    phone_format_description:
+    phone_format: "What's the recommended format for Zoom phone numbers?",
+    phone_format_content:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
   },
   json_updated: "JSON updated",

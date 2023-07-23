@@ -26,6 +26,7 @@ export function Form({
   optionsInUse,
   values,
   isAdmin,
+  onSubmit,
   resetAfterSubmit,
   saveOptions,
   subaction,
@@ -33,6 +34,7 @@ export function Form({
   buttonTheme?: React.ComponentProps<typeof Button>["theme"];
   cancel?: () => void;
   form: keyof typeof fields;
+  onSubmit?: () => void;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
   isAdmin?: boolean;
@@ -49,12 +51,7 @@ export function Form({
       autoComplete="off"
       method="post"
       validator={formatValidator(form)}
-      onSubmit={() =>
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        })
-      }
+      onSubmit={onSubmit}
       resetAfterSubmit={resetAfterSubmit}
       subaction={subaction}
     >
@@ -212,7 +209,7 @@ export function Form({
               )}
               {cancel && (
                 <Button onClick={cancel} theme="secondary">
-                  Cancel
+                  {strings.cancel}
                 </Button>
               )}
               <Submit buttonTheme={buttonTheme} />
