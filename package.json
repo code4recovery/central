@@ -16,6 +16,8 @@
     "@google-cloud/storage": "^6.9.4",
     "@googlemaps/google-maps-services-js": "^3.3.28",
     "@prisma/client": "^4.14.0",
+    "@react-email/components": "^0.0.7",
+    "@react-email/render": "^0.0.7",
     "@remix-run/express": "^1.14.1",
     "@remix-run/node": "^1.14.1",
     "@remix-run/react": "^1.14.1",
