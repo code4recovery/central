@@ -66,15 +66,13 @@ export async function getSession(request: Request) {
 export async function getUserOrRedirect(request: Request) {
   const { pathname } = new URL(request.url);
 
-  // stop processing if it's the favicon
-  const routeIsStatic = pathname.endsWith(".svg");
-  if (routeIsStatic) {
+  // stop processing if it's the favicon or the request form
+  if (pathname.endsWith(".svg") || pathname.startsWith("/request")) {
     return;
   }
 
   // limited number of public routes on the site
   const routeIsPublic = pathname === "/" || pathname.startsWith("/auth");
-
   // get user
   const { id } = await getIDs(request);
   const user = id
