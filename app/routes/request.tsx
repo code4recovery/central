@@ -2,6 +2,7 @@ const classes = {
   input:
     "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border-neutral-400 dark:border-neutral-600 rounded w-full sm:text-sm sm:leading-6",
   help: "text-sm text-neutral-500",
+  label: "block text-sm font-medium leading-6",
 };
 
 export default function Request() {
@@ -56,6 +57,19 @@ export default function Request() {
           />
         </Field>
         <Field
+          label="Group website"
+          name="website"
+          help="Optional link to your group website. If your group does not have a website, please leave this section blank."
+        >
+          <input
+            type="url"
+            placeholder="https://"
+            name="website"
+            id="website"
+            className={classes.input}
+          />
+        </Field>
+        <Field
           label="Group notes"
           name="group_notes"
           help="This should be general information about the group and not make reference to individual meetings (that will come next)."
@@ -75,6 +89,52 @@ export default function Request() {
       >
         <Field label="Meeting name" name="group">
           <input type="text" name="name" id="name" className={classes.input} />
+        </Field>
+        <Field name="time" help="Leave these blank if the meeting is ongoing">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="grid gap-2">
+              <label className={classes.label}>Start Time</label>
+              <input
+                type="time"
+                name="time"
+                id="time"
+                className={classes.input}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className={classes.label}>End Time</label>
+              <input
+                type="time"
+                name="end_time"
+                id="end_time"
+                className={classes.input}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className={classes.label}>Timezone</label>
+              <select name="timezone" id="timezone" className={classes.input}>
+                <option>Time</option>
+              </select>
+            </div>
+          </div>
+        </Field>
+        <Field label="Day(s) of the week" name="group">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            {[
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+            ].map((day, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input type="checkbox" className="rounded" />
+                <span>{day}</span>
+              </div>
+            ))}
+          </div>
         </Field>
         <Field
           label="Meeting notes"
@@ -109,15 +169,17 @@ function Field({
   help,
 }: {
   children: React.ReactNode;
-  label: string;
+  label?: string;
   name: string;
   help?: string;
 }) {
   return (
     <div className="grid gap-y-2">
-      <label htmlFor={name} className="block text-sm font-medium leading-6">
-        {label}
-      </label>
+      {label && (
+        <label htmlFor={name} className={classes.label}>
+          {label}
+        </label>
+      )}
       {children}
       {help && <p className={classes.help}>{help}</p>}
     </div>
