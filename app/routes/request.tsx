@@ -1,44 +1,54 @@
+import { Select } from "~/components";
+import { config } from "~/helpers";
+
 const classes = {
   input:
-    "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border-neutral-400 dark:border-neutral-600 rounded w-full sm:text-sm sm:leading-6",
+    "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border-neutral-400 dark:border-neutral-600 rounded w-full sm:text-sm sm:leading-6 placeholder:text-neutral-500 focus:ring-indigo-500 focus:border-indigo-500",
   help: "text-sm text-neutral-500",
   label: "block text-sm font-medium leading-6",
 };
 
 export default function Request() {
   return (
-    <form className="p-5 xl:pt-8 max-w-5xl w-full mx-auto">
-      <legend className="font-bold text-xl">
+    <form className="p-5 max-w-5xl w-full mx-auto">
+      <legend className="font-semibold text-xl block w-full text-center mt-7 xl:mt-10 xl:mb-6 xl:text-3xl">
         New Meeting / Change Request Form
       </legend>
 
       <Fieldset
         title="Hi there 👋"
-        description="Please start by idenitifying yourself. These details will be kept confidential."
+        description="Please start by confirming your identity. We will keep this information confidential."
       >
         <Field
-          label="Your Email Address"
+          label="Your email address"
           name="email"
-          help="We will send you an email to confirm."
+          help="We will never share your email address."
         >
-          <input
-            type="email"
-            name="email"
-            id="email"
-            className={classes.input}
-            placeholder="you@email.com"
-            autoFocus
-          />
+          <div className="relative">
+            <input
+              type="email"
+              name="email"
+              id="email"
+              className={classes.input}
+              value="you@email.com"
+              disabled={true}
+              autoFocus
+            />
+            <button className="absolute px-2 text-sm top-1 right-1 bottom-1 rounded ">
+              Sign out
+            </button>
+          </div>
         </Field>
         <Field
-          label="Your Name"
+          label="Your name"
           name="your_name"
-          help="It's ok to use a last initial. Should be recognizable to other members of the group. They will be notified of updates."
+          help="It's ok to use a last initial. Your name may be seen by other members of your group, if they request updates."
         >
           <input
             type="text"
             name="your_name"
             id="your_name"
+            placeholder="John D"
             className={classes.input}
           />
         </Field>
@@ -46,8 +56,34 @@ export default function Request() {
 
       <Fieldset
         title="Group info 🤝"
-        description="Now tell us about your group. This information will be included in each meeting listing."
+        description="Now tell us about your group. This information will be included with each meeting listing."
       >
+        <Field
+          label="Does your group list meetings on the website now?"
+          name="group"
+        >
+          <label className="flex gap-2 items-center cursor-pointer">
+            <input
+              name="group-exists"
+              value="add"
+              type="radio"
+              defaultChecked={true}
+            />
+            <span>Yes</span>
+          </label>
+          <label className="flex gap-2 items-center cursor-pointer">
+            <input name="group-exists" value="edit" type="radio" />
+            <span>No</span>
+          </label>
+        </Field>
+        <Field label="Search for group" name="search">
+          <input
+            type="search"
+            name="search"
+            id="search"
+            className={classes.input}
+          />
+        </Field>
         <Field label="Group name" name="group">
           <input
             type="text"
@@ -57,15 +93,28 @@ export default function Request() {
           />
         </Field>
         <Field
-          label="Group website"
+          label="Group website, if any"
           name="website"
-          help="Optional link to your group website. If your group does not have a website, please leave this section blank."
+          help="Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)"
         >
           <input
             type="url"
             placeholder="https://"
             name="website"
             id="website"
+            className={classes.input}
+          />
+        </Field>
+        <Field
+          label="Group email, if any"
+          name="website"
+          help="Optional group email address. This will be displayed publicly on the meeting listing."
+        >
+          <input
+            type="email"
+            placeholder="group.name@email.com"
+            name="email"
+            id="email"
             className={classes.input}
           />
         </Field>
@@ -90,10 +139,25 @@ export default function Request() {
         <Field label="Meeting name" name="group">
           <input type="text" name="name" id="name" className={classes.input} />
         </Field>
+        <Field label="Does this meeting meet at a specific time?" name="group">
+          <label className="flex gap-2 items-center cursor-pointer">
+            <input
+              name="meeting-ongoing"
+              value="no"
+              type="radio"
+              defaultChecked={true}
+            />
+            <span>Yes</span>
+          </label>
+          <label className="flex gap-2 items-center cursor-pointer">
+            <input name="meeting-ongoing" value="yes" type="radio" />
+            <span>No</span>
+          </label>
+        </Field>
         <Field name="time" help="Leave these blank if the meeting is ongoing">
           <div className="grid grid-cols-3 gap-3">
             <div className="grid gap-2">
-              <label className={classes.label}>Start Time</label>
+              <label className={classes.label}>Start time</label>
               <input
                 type="time"
                 name="time"
@@ -102,7 +166,7 @@ export default function Request() {
               />
             </div>
             <div className="grid gap-2">
-              <label className={classes.label}>End Time</label>
+              <label className={classes.label}>End time</label>
               <input
                 type="time"
                 name="end_time"
@@ -112,9 +176,15 @@ export default function Request() {
             </div>
             <div className="grid gap-2">
               <label className={classes.label}>Timezone</label>
-              <select name="timezone" id="timezone" className={classes.input}>
-                <option>Time</option>
-              </select>
+              <Select
+                name="timezone"
+                className={classes.input}
+                options={config.timezones.map((value) => {
+                  const [group, ...rest] = value.split("/");
+                  const label = rest.join(" • ").split("_").join(" ");
+                  return { value, label, group };
+                })}
+              />
             </div>
           </div>
         </Field>
@@ -137,6 +207,30 @@ export default function Request() {
           </div>
         </Field>
         <Field
+          label="Conference URL"
+          name="conference_url"
+          help="Should be a URL to join a meeting directly."
+        >
+          <input
+            type="url"
+            name="conference_url"
+            placeholder="https://zoom.us/j/123456789?pwd=abcdefghi123456789"
+            className={classes.input}
+          />
+        </Field>
+        <Field
+          label="Conference phone"
+          name="conference_phone"
+          help="Should be a phone number to join a meeting, and not contain letters."
+        >
+          <input
+            type="tel"
+            name="conference_url"
+            placeholder="+16469313860,,123456789#"
+            className={classes.input}
+          />
+        </Field>
+        <Field
           label="Meeting notes"
           name="notes"
           help="No need to mention the meeting time here."
@@ -150,13 +244,36 @@ export default function Request() {
         </Field>
       </Fieldset>
 
-      <div className="flex justify-center p-8">
-        <input
-          type="submit"
-          value="Submit"
-          className="bg-indigo-500 rounded-md px-5 py-2 text-neutral-900 text-lg"
-          disabled
-        />
+      <div className="grid gap-8 pt-8 pb-10 max-w-md text-center mx-auto">
+        <p>
+          By clicking Submit I agree to the Online Intergroup of A.A.{" "}
+          <a
+            href="https://aa-intergroup.org/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-sky-500 underline"
+          >
+            Privacy Policy
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://aa-intergroup.org/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-sky-500 underline"
+          >
+            Rules of Conduct
+          </a>
+          .
+        </p>
+        <p>
+          <input
+            type="submit"
+            value="Submit"
+            className="bg-indigo-500 rounded-md px-5 py-2 text-neutral-100 text-lg mb-3 dark:bg-indigo-300 dark:text-neutral-900"
+            disabled
+          />
+        </p>
       </div>
     </form>
   );
@@ -196,7 +313,7 @@ function Fieldset({
   children: React.ReactNode;
 }) {
   return (
-    <fieldset className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-neutral-200 dark:border-neutral-800 py-12 md:grid-cols-5">
+    <fieldset className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-neutral-300 dark:border-neutral-800 py-12 md:grid-cols-5">
       <div className=" md:col-span-2">
         <h2 className="text-base font-semibold mb-2">{title}</h2>
         <p className={classes.help}>{description}</p>

@@ -66,13 +66,16 @@ export async function getSession(request: Request) {
 export async function getUserOrRedirect(request: Request) {
   const { pathname } = new URL(request.url);
 
-  // stop processing if it's the favicon or the request form
+  // return default user if it's a public route
   if (pathname.endsWith(".svg") || pathname.startsWith("/request")) {
-    return;
+    return {
+      theme: config.themes[config.defaultTheme as keyof typeof config.themes],
+    };
   }
 
   // limited number of public routes on the site
-  const routeIsPublic = pathname === "/" || pathname.startsWith("/auth");
+  const routeIsOnlyForLoggedOut =
+    pathname === "/" || pathname.startsWith("/auth");
   // get user
   const { id } = await getIDs(request);
   const user = id
@@ -101,10 +104,10 @@ export async function getUserOrRedirect(request: Request) {
       data: { lastSeen: new Date() },
       where: { id },
     });
-    if (routeIsPublic) {
+    if (routeIsOnlyForLoggedOut) {
       throw redirect(config.home);
     }
-  } else if (!routeIsPublic) {
+  } else if (!routeIsOnlyForLoggedOut) {
     throw unauthorized(request);
   }
 
