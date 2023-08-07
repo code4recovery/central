@@ -26,11 +26,16 @@ export const action: ActionFunction = async ({ request }) => {
   const { email, go } = data;
 
   const user = await db.user.findUnique({
-    select: { id: true, emailHash: true, currentAccountID: true },
+    select: {
+      id: true,
+      emailHash: true,
+      currentAccountID: true,
+      accountIDs: true,
+    },
     where: { email },
   });
 
-  if (user) {
+  if (user && user.accountIDs.length) {
     const loginToken = formatToken();
     await db.user.update({
       data: { loginToken },

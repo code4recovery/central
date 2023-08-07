@@ -4,8 +4,11 @@ import { redirect } from "@remix-run/node";
 import { config } from "~/helpers";
 import { createUserSession, db } from "~/utils";
 
-export const loader: LoaderFunction = async ({ params }) => {
-  const { loginToken, emailHash, go } = params;
+export const loader: LoaderFunction = async ({ request, params }) => {
+  const { loginToken, emailHash } = params;
+
+  const url = new URL(request.url);
+  const go = url.searchParams.get("go") || undefined;
 
   const user = await db.user.findFirst({
     select: {

@@ -253,6 +253,11 @@ export const strings = {
     warning_groups:
       "Editing this information will edit the user's profile. This user also represents: {groups}.",
   },
+  request: {
+    email_sent:
+      "Thanks! Now check your email. You will receive a link to confirm your identity.",
+    title: "New Meeting / Change Request Form",
+  },
   types: {
     "11": "11th Step Meditation",
     "12x12": "12 Steps & 12 Traditions",

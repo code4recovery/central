@@ -152,9 +152,9 @@ export async function jsonWith(request: Request, payload: object) {
   );
 }
 
-export async function logout(request: Request) {
+export async function logout(request: Request, go = "/") {
   const session = await getSession(request);
-  return redirect("/", {
+  return redirect(go, {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },
