@@ -256,6 +256,8 @@ export const strings = {
   request: {
     email_sent:
       "Thanks! Now check your email. You will receive a link to confirm your identity.",
+    request_sent:
+      "Great! An email has been sent to {users}. Once they confirm, you will receive an email to continue.",
     title: "New Meeting / Change Request Form",
   },
   types: {

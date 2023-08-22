@@ -92,7 +92,7 @@ model Group {
   meetings  Meeting[]
   name      String
   notes     String?
-  recordID  String?
+  recordID  String
   email     String?
   website   String?
   phone     String?
@@ -107,7 +107,7 @@ model Group {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  @@unique([accountID, name, recordID])
+  @@unique([accountID, recordID])
   @@fulltext([name, notes, website, recordID])
 }
 

@@ -13,7 +13,7 @@ import md5 from "blueimp-md5";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Button, Select } from "~/components";
-import { config, formatToken, formatValidator } from "~/helpers";
+import { config, formatSearch, formatToken, formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs, sendMail } from "~/utils";
 
@@ -89,19 +89,10 @@ export const action: ActionFunction = async ({ request }) => {
     const search = formData.get("group-search");
 
     if (search) {
-      const searchString = search
-        .toString()
-        .split('"')
-        .join("")
-        .split(" ")
-        .filter((e) => e)
-        .map((e) => `"${e}"`)
-        .join(" ");
-
       const result = await db.group.findRaw({
         filter: {
           $text: {
-            $search: searchString,
+            $search: formatSearch(search),
           },
           accountID: { $oid: account.id },
         },
@@ -111,13 +102,23 @@ export const action: ActionFunction = async ({ request }) => {
         return [];
       }
 
-      const groupSearchResults = result.map((result) => ({
-        id: result._id.$oid,
-        ...result,
-      }));
-
-      return json(groupSearchResults);
+      return json(result);
     }
+  } else if (formData.get("subaction") === "request") {
+    const recordID = formData.get("groupID")?.toString() ?? "";
+    const group = await db.group.findFirstOrThrow({
+      where: { accountID: account.id, recordID },
+      include: { users: true },
+    });
+    const userID = formData.get("userID")?.toString() ?? "";
+    const user = await db.user.findUniqueOrThrow({ where: { id: userID } });
+
+    // send email to group reps
+    group.users.forEach(async (rep) => {
+      console.log(`send email to ${rep.email} about ${user.email}`);
+    });
+
+    return json({ info: strings.request.request_sent });
   }
   return null;
 };
@@ -126,7 +127,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const { id } = await getIDs(request);
   const user = id
     ? await db.user.findUnique({
-        select: { email: true, name: true, groups: true },
+        select: { id: true, email: true, name: true, groups: true },
         where: { id },
       })
     : undefined;
@@ -136,10 +137,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Request() {
   const { user } = useLoaderData();
   const [groupExists, setGroupExists] = useState(true);
-  const [groupSearch, setGroupSearch] = useState("");
   const [groupID, setGroupID] = useState("");
+  const [requestID, setRequestID] = useState("");
   const actionData = useActionData();
   const groupFetcher = useFetcher();
+  const requestFetcher = useFetcher();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -157,7 +159,7 @@ export default function Request() {
       <Form method="post">
         <input type="hidden" name="subaction" value="user-login" />
         <Fieldset
-          title="Hi there 👋"
+          title="1. Hi there 👋"
           description="Please start by confirming your identity. We will keep your contact info confidential."
         >
           <Field
@@ -210,14 +212,19 @@ export default function Request() {
       {user && (
         <>
           <Fieldset
-            title="New or existing group?"
+            title="2. Group selection"
             description="Groups are responsible for meeting listings on the website."
           >
             {user.groups.length ? (
               <div>
                 {user.groups.map((group: Group) => (
                   <div key={group.id} className="flex gap-2 items-center">
-                    <input type="checkbox" className="rounded" />
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={groupID === group.recordID}
+                      onChange={() => setGroupID(group.recordID)}
+                    />
                     <span>{group.name}</span>
                   </div>
                 ))}
@@ -260,8 +267,6 @@ export default function Request() {
                       name="group-search"
                       id="group-search"
                       className={classes.input}
-                      value={groupSearch}
-                      onChange={(e) => setGroupSearch(e.target.value)}
                     />
                   </Field>
                 </groupFetcher.Form>
@@ -277,8 +282,8 @@ export default function Request() {
                         <input
                           name="group-id"
                           type="radio"
-                          checked={groupID === group.id}
-                          onChange={() => setGroupID(group.id)}
+                          checked={requestID === group.recordID}
+                          onChange={() => setRequestID(group.recordID)}
                         />
                         <span className="text-sm">
                           {group.name} ({group.recordID})
@@ -287,6 +292,25 @@ export default function Request() {
                     ))}
                   </div>
                 ) : null}
+              </>
+            )}
+            {requestID && (
+              <>
+                <requestFetcher.Form className="grid gap-2" method="post">
+                  <input type="hidden" name="subaction" value="request" />
+                  <input type="hidden" name="groupID" value={requestID} />
+                  <input type="hidden" name="userID" value={user.id} />
+                  <Button theme="primary">Request to be added</Button>
+                  <p className="text-sm">
+                    This will send a request to the current group
+                    representatives.
+                  </p>
+                </requestFetcher.Form>
+                {requestFetcher.data && (
+                  <div className="text-red-400">
+                    <Alerts data={requestFetcher.data} />
+                  </div>
+                )}
               </>
             )}
           </Fieldset>
