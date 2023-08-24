@@ -8,7 +8,12 @@ import {
 import { validationError, ValidatedForm } from "remix-validated-form";
 
 import { Alerts, Button, Footer, Input, Label } from "~/components";
-import { formatClasses as cx, formatToken, formatValidator } from "~/helpers";
+import {
+  formatClasses as cx,
+  formatString,
+  formatToken,
+  formatValidator,
+} from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
@@ -46,13 +51,16 @@ export const action: ActionFunction = async ({ request }) => {
       const buttonLink = `/auth/${user.emailHash}/${loginToken}${
         go ? `?${new URLSearchParams({ go })}` : ""
       }`;
-      await sendMail(
-        email,
-        "login",
-        request,
+      await sendMail({
         buttonLink,
-        user.currentAccountID
-      );
+        buttonText: strings.email.login.buttonText,
+        currentAccountID: user.currentAccountID,
+        headline: formatString(strings.email.login.headline, { email }),
+        instructions: strings.email.login.instructions,
+        request,
+        subject: strings.email.login.subject,
+        to: email,
+      });
     } catch (e) {
       if (e instanceof Error) {
         return json({ error: e.message });

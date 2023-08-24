@@ -82,6 +82,13 @@ export const strings = {
       instructions: "Tap the button below to confirm:",
       subject: "Confirm your email address to log in",
     },
+    request: {
+      buttonText: "Approve request",
+      headline:
+        "{name} has requested to be added as a group representative for {group}.",
+      instructions: "Tap the button below to approve:",
+      subject: "Request to add group representative",
+    },
   },
   feedback: {
     title: "Feedback",

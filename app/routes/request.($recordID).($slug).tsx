@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { Group } from "@prisma/client";
+import type { Group, Meeting } from "@prisma/client";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
@@ -13,7 +13,13 @@ import md5 from "blueimp-md5";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Button, Select } from "~/components";
-import { config, formatSearch, formatToken, formatValidator } from "~/helpers";
+import {
+  config,
+  formatSearch,
+  formatString,
+  formatToken,
+  formatValidator,
+} from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs, sendMail } from "~/utils";
 
@@ -71,13 +77,16 @@ export const action: ActionFunction = async ({ request }) => {
 
     try {
       const buttonLink = `/auth/${user.emailHash}/${loginToken}?go=/request`;
-      await sendMail(
-        email,
-        "login",
-        request,
+      await sendMail({
         buttonLink,
-        user.currentAccountID
-      );
+        buttonText: strings.email.login.buttonText,
+        currentAccountID: user.currentAccountID,
+        headline: formatString(strings.email.login.headline, { email }),
+        instructions: strings.email.login.instructions,
+        request,
+        subject: strings.email.login.subject,
+        to: email,
+      });
     } catch (e) {
       if (e instanceof Error) {
         return json({ error: e.message });
@@ -115,7 +124,19 @@ export const action: ActionFunction = async ({ request }) => {
 
     // send email to group reps
     group.users.forEach(async (rep) => {
-      console.log(`send email to ${rep.email} about ${user.email}`);
+      sendMail({
+        buttonLink: `/approve/${rep.emailHash}/${group.id}/${user.id}`,
+        buttonText: strings.email.request.buttonText,
+        currentAccountID: account.id,
+        headline: formatString(strings.email.request.headline, {
+          name: user.name,
+          group: group.name,
+        }),
+        instructions: strings.email.request.instructions,
+        request,
+        subject: strings.email.request.subject,
+        to: rep.email,
+      });
     });
 
     return json({ info: strings.request.request_sent });
@@ -123,7 +144,7 @@ export const action: ActionFunction = async ({ request }) => {
   return null;
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
   const { id } = await getIDs(request);
   const user = id
     ? await db.user.findUnique({
@@ -131,13 +152,32 @@ export const loader: LoaderFunction = async ({ request }) => {
         where: { id },
       })
     : undefined;
-  return json({ user });
+
+  const group = params.recordID
+    ? await db.group.findFirst({
+        include: {
+          meetings: {
+            orderBy: [{ day: "asc" }, { time: "asc" }],
+          },
+        },
+        where: { recordID: params.recordID },
+      })
+    : undefined;
+
+  const meeting = params.slug
+    ? await db.meeting.findFirst({
+        where: { slug: params.slug },
+      })
+    : undefined;
+
+  return json({ group, meeting, user });
 };
 
 export default function Request() {
-  const { user } = useLoaderData();
+  const { user, group, meeting } = useLoaderData();
   const [groupExists, setGroupExists] = useState(true);
-  const [groupID, setGroupID] = useState("");
+  const [groupRecordID, setGroupRecordID] = useState(group?.recordID);
+  const [meetingSlug, setMeetingSlug] = useState(meeting?.slug);
   const [requestID, setRequestID] = useState("");
   const actionData = useActionData();
   const groupFetcher = useFetcher();
@@ -145,8 +185,11 @@ export default function Request() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate(`/request${groupID ? `/${groupID}` : ""}`);
-  }, [groupID, navigate]);
+    const url = ["/request", groupRecordID, meetingSlug]
+      .filter(Boolean)
+      .join("/");
+    navigate(url, { preventScrollReset: true });
+  }, [groupRecordID, meetingSlug, navigate]);
 
   return (
     <div className="p-5 max-w-5xl w-full mx-auto">
@@ -213,51 +256,62 @@ export default function Request() {
         <>
           <Fieldset
             title="2. Group selection"
-            description="Groups are responsible for meeting listings on the website."
+            description="Groups are responsible for meeting listings on the website. The groups you have been added to will appear here."
           >
-            {user.groups.length ? (
-              <div>
-                {user.groups.map((group: Group) => (
-                  <div key={group.id} className="flex gap-2 items-center">
-                    <input
-                      type="checkbox"
-                      className="rounded"
-                      checked={groupID === group.recordID}
-                      onChange={() => setGroupID(group.recordID)}
-                    />
-                    <span>{group.name}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
+            {user.groups.map((group: Group) => (
+              <label
+                key={group.id}
+                className="flex gap-3 items-center cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  className="rounded"
+                  checked={groupRecordID === group.recordID}
+                  readOnly
+                  onChange={() =>
+                    setGroupRecordID(
+                      groupRecordID === group.recordID
+                        ? undefined
+                        : group.recordID
+                    )
+                  }
+                />
+                {group.name} ({group.recordID})
+              </label>
+            ))}
+
+            {!user.groups.length && (
               <div className="text-sm">
                 Your email address ({user.email}) is not currently associated
                 with a group in our system.
               </div>
             )}
-            <Field
-              label="Does your group list meetings on the website now?"
-              name="group"
-            >
-              {[
-                { exists: true, label: "Yes" },
-                { exists: false, label: "No" },
-              ].map(({ exists, label }) => (
-                <label
-                  key={label}
-                  className="flex gap-2 items-center cursor-pointer"
-                >
-                  <input
-                    name="group-exists"
-                    type="radio"
-                    checked={groupExists === exists}
-                    onChange={() => setGroupExists(exists)}
-                  />
-                  <span className="text-sm">{label}</span>
-                </label>
-              ))}
-            </Field>
-            {groupExists && (
+
+            {!groupRecordID && (
+              <Field
+                label="Does your group list meetings on the website now?"
+                name="group"
+              >
+                {[
+                  { exists: true, label: "Yes" },
+                  { exists: false, label: "No" },
+                ].map(({ exists, label }) => (
+                  <label
+                    key={label}
+                    className="flex gap-2 items-center cursor-pointer"
+                  >
+                    <input
+                      name="group-exists"
+                      type="radio"
+                      checked={groupExists === exists}
+                      onChange={() => setGroupExists(exists)}
+                    />
+                    <span className="text-sm">{label}</span>
+                  </label>
+                ))}
+              </Field>
+            )}
+            {!groupRecordID && groupExists && (
               <>
                 <groupFetcher.Form method="post">
                   <input type="hidden" name="subaction" value="group-search" />
@@ -314,10 +368,11 @@ export default function Request() {
               </>
             )}
           </Fieldset>
-          {(!groupExists || groupID) && (
+
+          {(!groupExists || groupRecordID) && (
             <Form method="post">
               <Fieldset
-                title="Group Information"
+                title="3. Group Information"
                 description="Now tell us about your group. This information is included on each meeting listing."
               >
                 <Field label="Group name" name="group">
@@ -326,6 +381,7 @@ export default function Request() {
                     name="group"
                     id="group"
                     className={classes.input}
+                    defaultValue={group?.name}
                   />
                 </Field>
                 <Field
@@ -339,11 +395,12 @@ export default function Request() {
                     name="website"
                     id="website"
                     className={classes.input}
+                    defaultValue={group?.website}
                   />
                 </Field>
                 <Field
                   label="Group email, if any"
-                  name="website"
+                  name="email"
                   help="Optional group email address. This will be displayed publicly on the meeting listing."
                 >
                   <input
@@ -352,6 +409,7 @@ export default function Request() {
                     name="email"
                     id="email"
                     className={classes.input}
+                    defaultValue={group?.email}
                   />
                 </Field>
                 <Field
@@ -364,9 +422,38 @@ export default function Request() {
                     id="group_notes"
                     rows={5}
                     className={classes.input}
+                    defaultValue={group?.notes}
                   />
                 </Field>
               </Fieldset>
+
+              <Fieldset
+                title="4. Meeting Selection"
+                description="Optional: pick a meeting that you want to edit."
+              >
+                {group?.meetings.map((meeting: Meeting) => (
+                  <label
+                    key={meeting.id}
+                    className="flex gap-3 items-center cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      checked={meetingSlug === meeting.slug}
+                      readOnly
+                      onChange={() =>
+                        setMeetingSlug(
+                          meetingSlug === meeting.slug
+                            ? undefined
+                            : meeting.slug
+                        )
+                      }
+                    />
+                    {meeting.name} ({meeting.day} {meeting.time})
+                  </label>
+                ))}
+              </Fieldset>
+
               <Fieldset
                 title="Meetings 🪑"
                 description="Now tell us about your meetings."
@@ -568,7 +655,9 @@ function Fieldset({
         <h2 className="text-base font-semibold mb-2">{title}</h2>
         <p className={classes.help}>{description}</p>
       </div>
-      <div className="grid gap-x-6 gap-y-8 md:col-span-3">{children}</div>
+      <div className="grid gap-x-6 gap-y-8 md:col-span-3 items-start">
+        {children}
+      </div>
     </fieldset>
   );
 }
