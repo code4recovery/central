@@ -6,20 +6,18 @@ import { Alerts, Avatar, Button, Chiclet, Table, Template } from "~/components";
 import { formatDate } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith } from "~/utils";
+import { db, jsonWith } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
   const users = await db.user.findMany({
     orderBy: { lastSeen: "desc" },
     select: {
       id: true,
-      adminAccountIDs: true,
+      canAddUsers: true,
       name: true,
       emailHash: true,
       lastSeen: true,
     },
-    where: { accountIDs: { has: currentAccountID } },
   });
   return jsonWith(request, { users });
 };
@@ -30,13 +28,13 @@ export const meta: MetaFunction = () => ({
 
 export default function Users() {
   const { alert, users } = useLoaderData();
-  const { currentAccountID, isAdmin } = useUser();
+  const { canAddUsers } = useUser();
 
   return (
     <Template
       title={strings.users.title}
       cta={
-        isAdmin && (
+        canAddUsers && (
           <Button url="/users/add" theme="primary">
             {strings.users.add}
           </Button>
@@ -58,9 +56,7 @@ export default function Users() {
               {user.name}
             </div>
           ),
-          role: user.adminAccountIDs.includes(currentAccountID) && (
-            <Chiclet>{strings.users.admin}</Chiclet>
-          ),
+          role: user.canAddUsers && <Chiclet>{strings.users.admin}</Chiclet>,
           link: `/users/${user.id}`,
           lastSeen: user.lastSeen
             ? formatDate(user.lastSeen.toString())

@@ -5,27 +5,6 @@ import { config } from "./config";
 import { required, optional } from "./validators";
 
 export const fields: { [index: string]: { [index: string]: Field } } = {
-  account: {
-    name: {
-      helpText: strings.account.name_description,
-      label: strings.account.name,
-      type: "text",
-      validation: required.string,
-    },
-    url: {
-      helpText: strings.account.url_description,
-      label: strings.account.url,
-      placeholder: strings.account.url_placeholder,
-      span: 8,
-      type: "url",
-      validation: required.url,
-    },
-    theme: {
-      label: strings.account.theme,
-      type: "colors",
-      validation: required.string,
-    },
-  },
   group: {
     name: {
       className: "text-xl font-semibold py-2",

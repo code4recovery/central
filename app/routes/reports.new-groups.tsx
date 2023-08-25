@@ -17,7 +17,6 @@ import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { formatDate, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { countGroups, getGroups } from "~/models";
-import { getIDs } from "~/utils";
 
 // shared where condition
 const where = {
@@ -39,16 +38,13 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
-  const { currentAccountID } = await getIDs(request);
-
-  return json(getGroups(currentAccountID, skip, where));
+  return json(getGroups(skip, where));
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
   return json({
-    loadedGroups: await getGroups(currentAccountID, 0, where),
-    groupCount: await countGroups(currentAccountID, where),
+    loadedGroups: await getGroups(0, where),
+    groupCount: await countGroups(where),
   });
 };
 

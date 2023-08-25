@@ -1,10 +1,7 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
-  ArrowLeftOnRectangleIcon,
   Bars3Icon,
-  CheckIcon,
-  Cog6ToothIcon,
   MagnifyingGlassIcon,
   UserGroupIcon,
   UserIcon,
@@ -19,15 +16,8 @@ import { DefaultAccountLogo as Logo } from "~/icons";
 import { Avatar } from "./Avatar";
 
 export function Header() {
-  const {
-    accounts,
-    currentAccountID,
-    emailHash,
-    id,
-    isAdmin,
-    name,
-    theme: { text, focusRing, border },
-  } = useUser();
+  const { emailHash, id, canAddUsers, name } = useUser();
+  const { text, focusRing, border } = config.theme;
   const [searchParams] = useSearchParams();
   const search = searchParams.get("search") || undefined;
 
@@ -51,13 +41,8 @@ export function Header() {
       { url: "/reports", label: strings.reports.title },
     ],
     secondary: [
-      isAdmin
+      canAddUsers
         ? [
-            {
-              url: `/accounts/${currentAccountID}`,
-              label: strings.account.title,
-              icon: <Cog6ToothIcon />,
-            },
             {
               url: "/users",
               label: strings.users.title,
@@ -71,21 +56,6 @@ export function Header() {
               icon: <UserIcon />,
             },
           ],
-      accounts.length > 1
-        ? accounts.map(({ id, name }) => ({
-            url: `/accounts/switch/${id}`,
-            label: name,
-            icon: currentAccountID === id ? <CheckIcon /> : undefined,
-            reload: true,
-          }))
-        : [],
-      [
-        {
-          url: "/auth/out",
-          label: strings.auth.out,
-          icon: <ArrowLeftOnRectangleIcon />,
-        },
-      ],
     ],
   };
 

@@ -2,14 +2,12 @@ import { render } from "@react-email/render";
 import sendgrid from "@sendgrid/mail";
 
 import { Email } from "~/components";
-import { config, formatString } from "~/helpers";
+import { formatString } from "~/helpers";
 import { strings } from "~/i18n";
-import { db } from "./db.server";
 
 export async function sendMail({
   buttonLink,
   buttonText,
-  currentAccountID,
   headline,
   instructions,
   request,
@@ -18,7 +16,6 @@ export async function sendMail({
 }: {
   buttonLink: string;
   buttonText: string;
-  currentAccountID: string;
   headline: string;
   instructions: string;
   request: Request;
@@ -36,18 +33,12 @@ export async function sendMail({
   const { protocol, host } = new URL(request.url);
   const baseUrl = `${protocol}//${host}`;
 
-  const account = await db.account.findFirst({
-    where: { id: currentAccountID },
-  });
-
   const emailProps = {
-    accentColor: (account?.theme ??
-      config.defaultTheme) as keyof typeof config.themes,
     buttonLink: `${baseUrl}${buttonLink}`,
     buttonText,
     footer: formatString(strings.email.footer, {
       app: strings.app_name,
-      accountName: account?.name,
+      accountName: process.env.ACCOUNT_NAME,
     }),
     headline,
     imageHeight: 48,

@@ -1,29 +1,15 @@
 import { db } from "./db.server";
 
-export async function optionsInUse(accountID: string) {
+export async function optionsInUse() {
   const languages = await db.language.findMany({
     select: {
       code: true,
-    },
-    where: {
-      meetings: {
-        some: {
-          accountID,
-        },
-      },
     },
   });
 
   const types = await db.type.findMany({
     select: {
       code: true,
-    },
-    where: {
-      meetings: {
-        some: {
-          accountID,
-        },
-      },
     },
   });
 

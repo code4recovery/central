@@ -15,7 +15,6 @@ import {
 import { config, formatClasses as cx } from "~/helpers";
 
 type EmailProps = {
-  accentColor: keyof typeof config.themes;
   buttonLink: string;
   buttonText: string;
   footer: string;
@@ -28,7 +27,6 @@ type EmailProps = {
 };
 
 export const Email = ({
-  accentColor,
   buttonLink,
   buttonText,
   footer,
@@ -39,7 +37,7 @@ export const Email = ({
   instructions,
   subject,
 }: EmailProps) => {
-  const { background, backgroundHover } = config.themes[accentColor];
+  const { background, backgroundHover } = config.theme;
   return (
     <Tailwind>
       <Html>

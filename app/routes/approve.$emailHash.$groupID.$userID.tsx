@@ -15,7 +15,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     select: {
       id: true,
       email: true,
-      currentAccountID: true,
     },
     where: {
       emailHash,
@@ -44,7 +43,6 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     buttonLink: "/",
     buttonText: "Go to your account",
     request,
-    currentAccountID: rep.currentAccountID,
   });
 
   return null;

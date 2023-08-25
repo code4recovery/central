@@ -6,15 +6,14 @@
     "dev": "npm-run-all build --parallel \"dev:*\"",
     "dev:node": "cross-env NODE_ENV=development nodemon --require dotenv/config ./server.js --watch ./server.js",
     "dev:remix": "remix watch",
-    "publish": "node --require esbuild-register prisma/publish.ts",
     "push": "npx prisma db push",
     "seed": "node --require esbuild-register prisma/seed.ts",
     "start": "cross-env NODE_ENV=production node ./server.js",
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@google-cloud/storage": "^6.9.4",
     "@googlemaps/google-maps-services-js": "^3.3.28",
+    "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "^5.2.0",
     "@react-email/components": "^0.0.7",
     "@react-email/render": "^0.0.7",

@@ -1,5 +1,6 @@
 import type { JSONData } from "~/types";
 import { geocode } from "~/utils";
+import { createId } from "@paralleldrive/cuid2";
 
 type Group = {
   email?: string;
@@ -7,7 +8,7 @@ type Group = {
   notes?: string;
   paypal?: string;
   phone?: string;
-  recordID?: string;
+  recordID: string;
   square?: string;
   venmo?: string;
   website?: string;
@@ -27,13 +28,12 @@ type Group = {
     types?: string[];
   }[];
   users?: {
-    currentAccountID: string;
     name: string;
     email: string;
   }[];
 };
 
-export async function groupify(meetings: JSONData[], currentAccountID: string) {
+export async function groupify(meetings: JSONData[]) {
   const groups: Group[] = [];
 
   for (const entry of meetings) {
@@ -84,14 +84,12 @@ export async function groupify(meetings: JSONData[], currentAccountID: string) {
       const users = [];
       if (entry.contact_1_email) {
         users.push({
-          currentAccountID,
           email: entry.contact_1_email?.trim(),
           name: entry.contact_1_name ?? entry.contact_1_email.split("@")[0],
         });
       }
       if (entry.contact_2_email) {
         users.push({
-          currentAccountID,
           email: entry.contact_2_email?.trim(),
           name: entry.contact_2_name ?? entry.contact_2_email.split("@")[0],
         });
@@ -102,7 +100,7 @@ export async function groupify(meetings: JSONData[], currentAccountID: string) {
         name: entry.group ? entry.group : entry.name,
         notes: entry.group_notes,
         paypal: entry.paypal,
-        recordID: entry.group_id,
+        recordID: entry.group_id ?? createId(),
         square: entry.square,
         users,
         venmo: entry.venmo,

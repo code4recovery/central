@@ -9,12 +9,12 @@ import { validationError, ValidatedForm } from "remix-validated-form";
 
 import { Alerts, Button, Footer, Input, Label } from "~/components";
 import {
+  config,
   formatClasses as cx,
   formatString,
   formatToken,
   formatValidator,
 } from "~/helpers";
-import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
 import { db, sendMail } from "~/utils";
@@ -34,13 +34,12 @@ export const action: ActionFunction = async ({ request }) => {
     select: {
       id: true,
       emailHash: true,
-      currentAccountID: true,
-      accountIDs: true,
+      canAddGroups: true,
     },
     where: { email },
   });
 
-  if (user && user.accountIDs.length) {
+  if (user && user.canAddGroups) {
     const loginToken = formatToken();
     await db.user.update({
       data: { loginToken },
@@ -54,7 +53,6 @@ export const action: ActionFunction = async ({ request }) => {
       await sendMail({
         buttonLink,
         buttonText: strings.email.login.buttonText,
-        currentAccountID: user.currentAccountID,
         headline: formatString(strings.email.login.headline, { email }),
         instructions: strings.email.login.instructions,
         request,
@@ -77,9 +75,7 @@ export const meta: MetaFunction = () => ({
 export default function Index() {
   const { state } = useNavigation();
   const idle = state === "idle";
-  const {
-    theme: { text },
-  } = useUser();
+  const { text } = config.theme;
   const [searchParams] = useSearchParams();
   const actionData = useActionData() ?? {};
   if (searchParams.get("msg") === "expired") {
