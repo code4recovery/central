@@ -202,24 +202,24 @@ export default function Request() {
       <Form method="post">
         <input type="hidden" name="subaction" value="user-login" />
         <Fieldset
-          title="1. Hi there 👋"
           description="Please start by confirming your identity. We will keep your contact info confidential."
+          title="1. Hi there 👋"
         >
           <Field
+            help="We will never share your email address."
             label="Your email address"
             name="email"
-            help="We will never share your email address."
           >
             <div className="relative">
               <input
-                type="email"
-                name="email"
-                id="email"
-                className={classes.input}
-                value={user?.email}
-                readOnly={!!user}
-                disabled={!!user}
                 autoFocus={!user}
+                className={classes.input}
+                disabled={!!user}
+                id="email"
+                name="email"
+                readOnly={!!user}
+                type="email"
+                value={user?.email}
               />
               {!!user && (
                 <Button
@@ -234,16 +234,16 @@ export default function Request() {
           </Field>
           {user ? (
             <Field
+              help="It's ok to use a last initial. Your name may be seen by other members of your group, if they request updates."
               label="Your name"
               name="your_name"
-              help="It's ok to use a last initial. Your name may be seen by other members of your group, if they request updates."
             >
               <input
-                type="text"
-                name="your_name"
-                id="your_name"
-                defaultValue={user?.name}
                 className={classes.input}
+                defaultValue={user?.name}
+                id="your_name"
+                name="your_name"
+                type="text"
               />
             </Field>
           ) : (
@@ -264,10 +264,8 @@ export default function Request() {
                 className="flex gap-3 items-center cursor-pointer"
               >
                 <input
-                  type="checkbox"
-                  className="rounded"
                   checked={groupRecordID === group.recordID}
-                  readOnly
+                  className="rounded"
                   onChange={() =>
                     setGroupRecordID(
                       groupRecordID === group.recordID
@@ -275,6 +273,8 @@ export default function Request() {
                         : group.recordID
                     )
                   }
+                  readOnly
+                  type="checkbox"
                 />
                 {group.name} ({group.recordID})
               </label>
@@ -301,10 +301,10 @@ export default function Request() {
                     className="flex gap-2 items-center cursor-pointer"
                   >
                     <input
-                      name="group-exists"
-                      type="radio"
                       checked={groupExists === exists}
+                      name="group-exists"
                       onChange={() => setGroupExists(exists)}
+                      type="radio"
                     />
                     <span className="text-sm">{label}</span>
                   </label>
@@ -317,27 +317,29 @@ export default function Request() {
                   <input type="hidden" name="subaction" value="group-search" />
                   <Field label="Find my group" name="search">
                     <input
-                      type="search"
-                      name="group-search"
-                      id="group-search"
                       className={classes.input}
+                      id="group-search"
+                      name="group-search"
+                      type="search"
                     />
                   </Field>
                 </groupFetcher.Form>
                 {groupFetcher.state === "loading" ? (
                   <div className="text-sm">Searching...</div>
+                ) : groupFetcher.data?.length === 0 ? (
+                  <div className="text-sm">No results</div>
                 ) : groupFetcher.data ? (
                   <div className="grid gap-2">
-                    {groupFetcher.data?.map((group: Group) => (
+                    {groupFetcher.data.map((group: Group) => (
                       <label
-                        key={group.id}
                         className="flex gap-2 items-center cursor-pointer"
+                        key={group.id}
                       >
                         <input
-                          name="group-id"
-                          type="radio"
                           checked={requestID === group.recordID}
-                          onChange={() => setRequestID(group.recordID)}
+                          name="group-id"
+                          onChange={() => setRequestID(group.recordID || "")}
+                          type="radio"
                         />
                         <span className="text-sm">
                           {group.name} ({group.recordID})
@@ -377,52 +379,52 @@ export default function Request() {
               >
                 <Field label="Group name" name="group">
                   <input
-                    type="text"
-                    name="group"
-                    id="group"
                     className={classes.input}
                     defaultValue={group?.name}
+                    id="group"
+                    name="group"
+                    type="text"
                   />
                 </Field>
                 <Field
+                  help="Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)"
                   label="Group website, if any"
                   name="website"
-                  help="Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)"
                 >
                   <input
-                    type="url"
-                    placeholder="https://"
-                    name="website"
-                    id="website"
                     className={classes.input}
                     defaultValue={group?.website}
+                    id="website"
+                    name="website"
+                    placeholder="https://"
+                    type="url"
                   />
                 </Field>
                 <Field
+                  help="Optional group email address. This will be displayed publicly on the meeting listing."
                   label="Group email, if any"
                   name="email"
-                  help="Optional group email address. This will be displayed publicly on the meeting listing."
                 >
                   <input
-                    type="email"
-                    placeholder="group.name@email.com"
-                    name="email"
-                    id="email"
                     className={classes.input}
                     defaultValue={group?.email}
+                    id="email"
+                    name="email"
+                    placeholder="group.name@email.com"
+                    type="email"
                   />
                 </Field>
                 <Field
+                  help="This should be general information about the group and not make reference to individual meetings (that will come next)."
                   label="Group notes"
                   name="group_notes"
-                  help="This should be general information about the group and not make reference to individual meetings (that will come next)."
                 >
                   <textarea
-                    name="group_notes"
-                    id="group_notes"
-                    rows={5}
                     className={classes.input}
                     defaultValue={group?.notes}
+                    id="group_notes"
+                    name="group_notes"
+                    rows={5}
                   />
                 </Field>
               </Fieldset>
