@@ -37,7 +37,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     recordID: {
       label: strings.group.recordID,
       type: "text",
-      validation: required.string,
+      validation: optional.string,
       span: 3,
     },
     notes: {
