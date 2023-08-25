@@ -1,5 +1,18 @@
 export const strings = {
   about: "About this software",
+  account: {
+    description: "Settings apply to all account users.",
+    name: "Service entity name",
+    name_description: "Used in emails",
+    notFound: "Could not find account.",
+    switched: "Switched account to {name}",
+    theme: "Color theme",
+    title: "Account Settings",
+    updated: "Account updated.",
+    url: "Meeting finder URL",
+    url_description: "Used to generate meeting view links",
+    url_placeholder: "https://example.org/meetings",
+  },
   activity: {
     empty: "No activity yet",
     general: {

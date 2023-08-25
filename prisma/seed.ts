@@ -15,8 +15,8 @@ async function seed() {
     !process.env.SEED_SRC ||
     !process.env.SEED_USER_NAME ||
     !process.env.SEED_USER_EMAIL ||
-    !process.env.ACCOUNT_NAME ||
-    !process.env.MEETINGS_URL
+    !process.env.SEED_ACCOUNT_NAME ||
+    !process.env.SEED_ACCOUNT_URL
   ) {
     log("ERROR: seed vars missing");
     return;
@@ -38,36 +38,64 @@ async function seed() {
 
   //meetings = meetings.slice(0, 200);
 
+  // create account if it doesnt exist yet
+  let account = await db.account.findFirst({
+    where: {
+      name: process.env.SEED_ACCOUNT_NAME,
+      url: process.env.SEED_ACCOUNT_URL,
+    },
+  });
+  if (!account) {
+    account = await db.account.create({
+      data: {
+        name: process.env.SEED_ACCOUNT_NAME,
+        url: process.env.SEED_ACCOUNT_URL,
+        theme: "sky",
+      },
+    });
+  }
+
   // delete all groups in account (cascades to activity, change, meeting)
-  await db.group.deleteMany();
-  await db.user.deleteMany();
+  await db.group.deleteMany({ where: { accountID: account.id } });
+  await db.user.deleteMany({ where: { accounts: { none: {} } } });
 
   // create user if it doesnt exist yet
   const user = await db.user.findUnique({
     where: { email: process.env.SEED_USER_EMAIL },
   });
-  if (!user) {
+  if (user) {
+    await db.user.update({
+      data: {
+        accounts: { connect: { id: account.id } },
+      },
+      where: {
+        id: user.id,
+      },
+    });
+  } else {
     await db.user.create({
       data: {
         name: process.env.SEED_USER_NAME,
         email: process.env.SEED_USER_EMAIL,
         emailHash: md5(process.env.SEED_USER_EMAIL),
-        canAddGroups: true,
-        canAddUsers: true,
-        canApproveGroups: true,
+        accounts: { connect: { id: account.id } },
+        adminAccounts: { connect: { id: account.id } },
+        currentAccountID: account.id,
       },
     });
   }
 
-  const groups = await groupify(meetings);
+  const groups = await groupify(meetings, account.id);
 
   for (const group of groups) {
     await db.group.create({
       data: {
         ...group,
+        account: { connect: { id: account.id } },
         meetings: {
           create: group.meetings.map((meeting) => ({
             ...meeting,
+            account: { connect: { id: account!.id } },
             geocode: meeting.geocode
               ? { connect: { id: meeting.geocode } }
               : undefined,
@@ -100,5 +128,5 @@ async function seed() {
 
   log(`${meetings.length} meetings imported in ${seconds} seconds`);
 
-  publishDataToFtp();
+  publishDataToFtp(account.id);
 }

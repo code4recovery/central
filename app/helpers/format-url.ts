@@ -1,5 +1,3 @@
-export function formatUrl(slug: string) {
-  const accountUrl = process.env.ACCOUNT_URL || "";
-  if (!accountUrl) return slug;
+export function formatUrl(accountUrl: string, slug: string) {
   return `${accountUrl}${accountUrl.endsWith("/") ? "" : "/"}${slug}`;
 }

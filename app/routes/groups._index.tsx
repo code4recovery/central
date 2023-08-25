@@ -23,8 +23,8 @@ import {
 } from "~/components";
 import { formatString, formatDate } from "~/helpers";
 import { strings } from "~/i18n";
-import { countGroups, countMeetings, getGroups } from "~/models";
-import { jsonWith } from "~/utils";
+import { getAccountCounts, getGroups } from "~/models";
+import { getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -39,15 +39,17 @@ export const action: ActionFunction = async ({ request }) => {
     return validationError(error);
   }
 
-  const groups = await getGroups(data.skip);
+  const { currentAccountID } = await getIDs(request);
+
+  const groups = await getGroups(currentAccountID, data.skip);
 
   return json(groups);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const groupCount = await countGroups();
-  const meetingCount = await countMeetings();
-  const loadedGroups = await getGroups();
+  const { currentAccountID } = await getIDs(request);
+  const { meetingCount, groupCount } = await getAccountCounts(currentAccountID);
+  const loadedGroups = await getGroups(currentAccountID);
   return jsonWith(request, { loadedGroups, meetingCount, groupCount });
 };
 

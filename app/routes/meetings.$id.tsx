@@ -26,6 +26,7 @@ import {
   formatValidator,
   formatValue,
 } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { getMeeting } from "~/models";
 import {
@@ -39,7 +40,7 @@ import {
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
-  const { id: userID } = await getIDs(request);
+  const { id: userID, currentAccountID } = await getIDs(request);
 
   const formData = await request.formData();
 
@@ -59,7 +60,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       },
     });
     try {
-      await publishDataToFtp();
+      await publishDataToFtp(currentAccountID);
       return json({ success: strings.meetings.archived });
     } catch (e) {
       if (e instanceof Error) {
@@ -171,7 +172,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await publishDataToFtp();
+    await publishDataToFtp(currentAccountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);
@@ -184,6 +185,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
+  const { currentAccountID } = await getIDs(request);
 
   const meetings = await db.meeting.findMany({
     where: { groupID: meeting.group.id, id: { not: id } },
@@ -203,7 +205,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
 
   return jsonWith(request, {
     meeting,
-    optionsInUse: await optionsInUse(),
+    optionsInUse: await optionsInUse(currentAccountID),
     saveOptions,
   });
 };
@@ -215,6 +217,7 @@ export const meta: MetaFunction = () => ({
 export default function EditMeeting() {
   const { alert, meeting, optionsInUse, saveOptions } = useLoaderData();
   const actionData = useActionData<typeof action>();
+  const { accountUrl } = useUser();
   const alerts = { ...alert, ...actionData };
 
   return (
@@ -242,7 +245,7 @@ export default function EditMeeting() {
           <Button
             icon="external"
             theme="secondary"
-            url={formatUrl(meeting.slug)}
+            url={formatUrl(accountUrl, meeting.slug)}
           >
             {strings.meetings.view}
           </Button>

@@ -15,7 +15,7 @@ import { zfd } from "zod-form-data";
 import { Alert, LoadMore, Table, Template } from "~/components";
 import { config, formatDate, formatDayTime, formatString } from "~/helpers";
 import { strings } from "~/i18n";
-import { db } from "~/utils";
+import { db, getIDs } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -32,6 +32,8 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
+  const { currentAccountID } = await getIDs(request);
+
   const meetings = await db.meeting.findMany({
     select: {
       day: true,
@@ -46,14 +48,17 @@ export const action: ActionFunction = async ({ request }) => {
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     skip,
     take: config.batchSize,
-    where: { archived: true },
+    where: { accountID: currentAccountID, archived: true },
   });
   return json(meetings);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
+  const { currentAccountID } = await getIDs(request);
+
   const where = {
     archived: true,
+    accountID: currentAccountID,
   };
 
   const loadedMeetings = await db.meeting.findMany({

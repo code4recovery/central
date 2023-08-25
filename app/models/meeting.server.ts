@@ -1,13 +1,6 @@
-import type { Prisma } from "@prisma/client";
 import { validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
-
-export async function countMeetings(where?: Prisma.MeetingWhereInput) {
-  return await db.meeting.count({
-    where,
-  });
-}
 
 export async function getMeeting(id?: string) {
   if (!validObjectId(id)) {
@@ -74,7 +67,7 @@ export async function getMeeting(id?: string) {
   };
 }
 
-export async function getAllMeetingsForJson() {
+export async function getAllMeetingsForJson(accountID: string) {
   return await db.meeting.findMany({
     select: {
       slug: true,
@@ -108,6 +101,9 @@ export async function getAllMeetingsForJson() {
     },
     where: {
       archived: false,
+      group: {
+        accountID,
+      },
     },
   });
 }

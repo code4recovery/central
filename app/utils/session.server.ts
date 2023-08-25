@@ -1,6 +1,8 @@
 import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
+import type { Account } from "@prisma/client";
 
-import { config } from "~/helpers";
+import { config, formatString } from "~/helpers";
+import { strings } from "~/i18n";
 import type { Alert as AlertType } from "~/types";
 import { db } from "./db.server";
 
@@ -20,9 +22,28 @@ const storage = createCookieSessionStorage({
   },
 });
 
-export async function createUserSession(id: string, redirectTo: string) {
+export async function changeAccount(request: Request, account: Account) {
+  const session = await getSession(request);
+  session.set("currentAccountID", account.id);
+  session.flash(
+    "success",
+    formatString(strings.account.switched, { name: account.name })
+  );
+  return redirect("/", {
+    headers: {
+      "Set-Cookie": await storage.commitSession(session),
+    },
+  });
+}
+
+export async function createUserSession(
+  id: string,
+  currentAccountID: string,
+  redirectTo: string
+) {
   const session = await storage.getSession();
   session.set("id", id);
+  session.set("currentAccountID", currentAccountID);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),
@@ -34,6 +55,7 @@ export async function getIDs(request: Request) {
   const session = await getSession(request);
   return {
     id: session.get("id"),
+    currentAccountID: session.get("currentAccountID"),
   };
 }
 
@@ -46,7 +68,9 @@ export async function getUserOrRedirect(request: Request) {
 
   // return default user if it's a public route
   if (pathname.endsWith(".svg") || pathname.startsWith("/request")) {
-    return {};
+    return {
+      theme: config.themes[config.defaultTheme as keyof typeof config.themes],
+    };
   }
 
   // limited number of public routes on the site
@@ -58,9 +82,18 @@ export async function getUserOrRedirect(request: Request) {
     ? await db.user.findFirst({
         select: {
           id: true,
+          currentAccountID: true,
+          adminAccountIDs: true,
           name: true,
           emailHash: true,
-          canAddGroups: true,
+          accounts: {
+            select: {
+              id: true,
+              name: true,
+              theme: true,
+              url: true,
+            },
+          },
         },
         where: { id },
       })
@@ -78,7 +111,18 @@ export async function getUserOrRedirect(request: Request) {
     throw unauthorized(request);
   }
 
-  return user;
+  const account = user?.accounts.find(({ id }) => id === user.currentAccountID);
+
+  const isAdmin = user?.adminAccountIDs.includes(user.currentAccountID);
+
+  const theme = account?.theme ?? config.defaultTheme;
+
+  return {
+    ...user,
+    isAdmin,
+    accountUrl: account?.url,
+    theme: config.themes[theme as keyof typeof config.themes],
+  };
 }
 
 export async function jsonWith(request: Request, payload: object) {

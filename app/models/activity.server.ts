@@ -1,7 +1,8 @@
 import { db } from "../utils/db.server";
 import { config } from "~/helpers";
 
-export function getActivity(skip?: number) {
+// todo restrict to account
+export function getActivity(_accountID: string, skip?: number) {
   return db.activity.findMany({
     orderBy: [{ createdAt: "desc" }],
     select: {
@@ -35,6 +36,7 @@ export function getActivity(skip?: number) {
   });
 }
 
-export function getActivityCount() {
+// todo restrict to account
+export function getActivityCount(_accountID: string) {
   return db.activity.count();
 }

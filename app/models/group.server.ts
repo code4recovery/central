@@ -10,7 +10,8 @@ import { strings } from "~/i18n";
 export async function addGroupRep(
   formData: FormData,
   groupID: string,
-  userID: string
+  userID: string,
+  currentAccountID: string
 ) {
   const validator = formatValidator("group-rep-add");
   const { data, error } = await validator.validate(formData);
@@ -30,6 +31,7 @@ export async function addGroupRep(
             email,
             name,
             emailHash: md5(email),
+            currentAccountID,
           },
         },
       },
@@ -61,7 +63,8 @@ export async function addGroupRep(
 export async function editGroupRep(
   formData: FormData,
   groupID: string,
-  userID: string
+  userID: string,
+  currentAccountID: string
 ) {
   const validator = formatValidator("group-rep-edit");
   const { data, error } = await validator.validate(formData);
@@ -123,13 +126,20 @@ export async function editGroupRep(
   });
 }
 
-export async function countGroups(where?: Prisma.GroupWhereInput) {
+export async function countGroups(
+  accountID: string,
+  where?: Prisma.GroupWhereInput
+) {
   return await db.group.count({
-    where,
+    where: { ...where, accountID },
   });
 }
 
-export async function getGroups(skip?: number, where?: Prisma.GroupWhereInput) {
+export async function getGroups(
+  accountID: string,
+  skip?: number,
+  where?: Prisma.GroupWhereInput
+) {
   return await db.group.findMany({
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: {
@@ -166,7 +176,7 @@ export async function getGroups(skip?: number, where?: Prisma.GroupWhereInput) {
     },
     skip,
     take: config.batchSize,
-    where,
+    where: { ...where, accountID },
   });
 }
 

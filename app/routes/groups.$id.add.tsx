@@ -43,11 +43,12 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     types,
   } = data;
 
-  const { id: userID } = await getIDs(request);
+  const { id: userID, currentAccountID } = await getIDs(request);
 
   const slugs = (
     await db.meeting.findMany({
       select: { slug: true },
+      where: { accountID: currentAccountID },
     })
   ).map(({ slug }) => slug);
 
@@ -83,6 +84,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
           create: { code },
         })),
       },
+      account: { connect: { id: currentAccountID } },
     },
   });
 
@@ -97,7 +99,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await publishDataToFtp();
+    await publishDataToFtp(currentAccountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);
@@ -112,12 +114,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
+  const { currentAccountID } = await getIDs(request);
+
   const group = await db.group.findUnique({
     select: { id: true, name: true },
     where: { id },
   });
 
-  return json({ group, optionsInUse: await optionsInUse() });
+  return json({ group, optionsInUse: await optionsInUse(currentAccountID) });
 };
 
 export const meta: MetaFunction = () => ({
@@ -144,16 +148,16 @@ export default function CreateMeeting() {
         }
       >
         <HelpTopic
-          title={strings.help.conference_providers}
+          title={strings.help.conference_providers_title}
           content={strings.help.conference_providers_content}
         />
         <HelpTopic
-          title={strings.help.online_location}
-          content={strings.help.online_location_content}
+          title={strings.help.online_location_title}
+          content={strings.help.online_location_description}
         />
         <HelpTopic
-          title={strings.help.phone_format}
-          content={strings.help.phone_format_content}
+          title={strings.help.phone_format_title}
+          content={strings.help.phone_format_description}
         />
       </Columns>
     </Template>

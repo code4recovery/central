@@ -16,7 +16,7 @@ import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { fields, formatDate, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { getActivity, getActivityCount } from "~/models";
-import { jsonWith } from "~/utils";
+import { getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -31,14 +31,17 @@ export const action: ActionFunction = async ({ request }) => {
     return validationError(error);
   }
 
-  const activity = await getActivity(data.skip);
+  const { currentAccountID } = await getIDs(request);
+
+  const activity = await getActivity(currentAccountID, data.skip);
 
   return json(activity);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const activityCount = await getActivityCount();
-  const loadedActivity = await getActivity();
+  const { currentAccountID } = await getIDs(request);
+  const activityCount = await getActivityCount(currentAccountID);
+  const loadedActivity = await getActivity(currentAccountID);
   return jsonWith(request, { loadedActivity, activityCount });
 };
 

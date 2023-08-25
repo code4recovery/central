@@ -9,7 +9,8 @@ export function formatJson(
       types: { code: string }[];
       group: Partial<Group>;
     }
-  >
+  >,
+  accountUrl: string
 ) {
   return meetings
     .map(
@@ -62,7 +63,7 @@ export function formatJson(
         paypal: group.paypal,
         square: group.square,
         edit_url: `${process.env.BASE_URL}/meetings/${id}`,
-        url: slug ? formatUrl(slug) : undefined,
+        url: slug ? formatUrl(accountUrl, slug) : undefined,
         updated: updatedAt
           ?.toISOString()
           .split("T")
