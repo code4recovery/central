@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Group, Meeting } from "@prisma/client";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import {
+  type ActionFunction,
+  type LoaderFunction,
+  json,
+} from "@remix-run/node";
+import { DateTime } from "luxon";
+
 import {
   Form,
   useActionData,
@@ -15,6 +20,7 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Button, Select } from "~/components";
 import {
   config,
+  formatClasses as cx,
   formatSearch,
   formatString,
   formatToken,
@@ -24,8 +30,12 @@ import { strings } from "~/i18n";
 import { db, getIDs, sendMail } from "~/utils";
 
 const classes = {
-  input:
-    "bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border-neutral-400 dark:border-neutral-600 rounded w-full sm:text-sm sm:leading-6 placeholder:text-neutral-500 focus:ring-indigo-500 focus:border-indigo-500",
+  input: cx(
+    config.fieldClassNames,
+    config.themes.indigo.focusRing,
+    "h-10 leading-7"
+  ),
+  textarea: cx(config.fieldClassNames, config.themes.indigo.focusRing),
   help: "text-sm text-neutral-500",
   label: "block text-sm font-medium leading-6",
 };
@@ -33,7 +43,7 @@ const classes = {
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
-  // todo tech debt - get account somehow
+  // todo get account somehow
   const account = await db.account.findFirst({ select: { id: true } });
   if (!account) {
     throw new Error("No account found");
@@ -41,22 +51,16 @@ export const action: ActionFunction = async ({ request }) => {
 
   if (formData.get("subaction") === "user-login") {
     const validator = formatValidator("login");
-
     const { data, error } = await validator.validate(formData);
-
     if (error) {
       return validationError(error);
     }
-
     const { email } = data;
-
     let user = await db.user.findUnique({
       select: { id: true, emailHash: true, currentAccountID: true },
       where: { email },
     });
-
     const loginToken = formatToken();
-
     if (user) {
       await db.user.update({
         data: { loginToken },
@@ -98,6 +102,8 @@ export const action: ActionFunction = async ({ request }) => {
     const search = formData.get("group-search");
 
     if (search) {
+      const { id: userID } = await getIDs(request);
+
       const result = await db.group.findRaw({
         filter: {
           $text: {
@@ -111,7 +117,13 @@ export const action: ActionFunction = async ({ request }) => {
         return [];
       }
 
-      return json(result);
+      // filter out meetings that the user is already a part of
+      const otherMeetings = result.filter(
+        (group) =>
+          !group.userIDs.some(({ $oid }: { $oid: string }) => $oid === userID)
+      );
+
+      return json(otherMeetings);
     }
   } else if (formData.get("subaction") === "request") {
     const recordID = formData.get("groupID")?.toString() ?? "";
@@ -119,7 +131,7 @@ export const action: ActionFunction = async ({ request }) => {
       where: { accountID: account.id, recordID },
       include: { users: true },
     });
-    const userID = formData.get("userID")?.toString() ?? "";
+    const { id: userID } = await getIDs(request);
     const user = await db.user.findUniqueOrThrow({ where: { id: userID } });
 
     // send email to group reps
@@ -178,18 +190,20 @@ export default function Request() {
   const [groupExists, setGroupExists] = useState(true);
   const [groupRecordID, setGroupRecordID] = useState(group?.recordID);
   const [meetingSlug, setMeetingSlug] = useState(meeting?.slug);
+  const [isOngoing, setIsOngoing] = useState(false);
   const [requestID, setRequestID] = useState("");
   const actionData = useActionData();
   const groupFetcher = useFetcher();
   const requestFetcher = useFetcher();
   const navigate = useNavigate();
 
+  // update url when selections change
   useEffect(() => {
-    const url = ["/request", groupRecordID, meetingSlug]
-      .filter(Boolean)
-      .join("/");
+    const url = groupExists
+      ? ["/request", groupRecordID, meetingSlug].filter(Boolean).join("/")
+      : "/request";
     navigate(url, { preventScrollReset: true });
-  }, [groupRecordID, meetingSlug, navigate]);
+  }, [groupRecordID, meetingSlug, groupExists, navigate]);
 
   return (
     <div className="p-5 max-w-5xl w-full mx-auto">
@@ -203,7 +217,7 @@ export default function Request() {
         <input type="hidden" name="subaction" value="user-login" />
         <Fieldset
           description="Please start by confirming your identity. We will keep your contact info confidential."
-          title="1. Hi there 👋"
+          title="Hi there 👋"
         >
           <Field
             help="We will never share your email address."
@@ -255,127 +269,157 @@ export default function Request() {
       {user && (
         <>
           <Fieldset
-            title="2. Group selection"
+            title="Group selection"
             description="Groups are responsible for meeting listings on the website. The groups you have been added to will appear here."
           >
-            {user.groups.map((group: Group) => (
-              <label
-                key={group.id}
-                className="flex gap-3 items-center cursor-pointer"
-              >
+            <label className="grid gap-1 cursor-pointer">
+              <p className="flex gap-2 items-center font-bold">
                 <input
-                  checked={groupRecordID === group.recordID}
-                  className="rounded"
-                  onChange={() =>
-                    setGroupRecordID(
-                      groupRecordID === group.recordID
-                        ? undefined
-                        : group.recordID
-                    )
-                  }
-                  readOnly
-                  type="checkbox"
+                  type="radio"
+                  name="group-exists"
+                  onChange={() => setGroupExists(true)}
+                  checked={groupExists}
+                  value="true"
                 />
-                {group.name} ({group.recordID})
-              </label>
-            ))}
+                Existing Group
+              </p>
+              <p className="text-sm">
+                Use this option if your group currently lists meetings on the
+                website.
+              </p>
+            </label>
 
-            {!user.groups.length && (
-              <div className="text-sm">
-                Your email address ({user.email}) is not currently associated
-                with a group in our system.
-              </div>
-            )}
-
-            {!groupRecordID && (
-              <Field
-                label="Does your group list meetings on the website now?"
-                name="group"
-              >
-                {[
-                  { exists: true, label: "Yes" },
-                  { exists: false, label: "No" },
-                ].map(({ exists, label }) => (
-                  <label
-                    key={label}
-                    className="flex gap-2 items-center cursor-pointer"
-                  >
+            <div className="pl-5 grid gap-5">
+              {user.groups.length ? (
+                <>
+                  {user.groups.map((group: Group) => (
+                    <label
+                      key={group.id}
+                      className="flex gap-3 items-center cursor-pointer"
+                    >
+                      <input
+                        checked={
+                          groupExists && groupRecordID === group.recordID
+                        }
+                        onChange={() => {
+                          if (!groupExists) {
+                            setGroupExists(true);
+                          }
+                          setGroupRecordID(group.recordID);
+                        }}
+                        readOnly
+                        type="radio"
+                      />
+                      {group.name} ({group.recordID})
+                    </label>
+                  ))}
+                  <label className="flex gap-3 items-center cursor-pointer">
                     <input
-                      checked={groupExists === exists}
-                      name="group-exists"
-                      onChange={() => setGroupExists(exists)}
+                      checked={groupExists && !groupRecordID}
+                      onChange={() => {
+                        if (!groupExists) {
+                          setGroupExists(true);
+                        }
+                        setGroupRecordID(undefined);
+                      }}
+                      readOnly
                       type="radio"
                     />
-                    <span className="text-sm">{label}</span>
+                    Other group
                   </label>
-                ))}
-              </Field>
-            )}
-            {!groupRecordID && groupExists && (
-              <>
-                <groupFetcher.Form method="post">
-                  <input type="hidden" name="subaction" value="group-search" />
-                  <Field label="Find my group" name="search">
+                </>
+              ) : (
+                <div className="text-sm">
+                  Your email address ({user.email}) is not currently associated
+                  with a group in our system.
+                </div>
+              )}
+
+              {!groupRecordID && groupExists && (
+                <>
+                  <groupFetcher.Form method="post">
                     <input
-                      className={classes.input}
-                      id="group-search"
-                      name="group-search"
-                      type="search"
+                      type="hidden"
+                      name="subaction"
+                      value="group-search"
                     />
-                  </Field>
-                </groupFetcher.Form>
-                {groupFetcher.state === "loading" ? (
-                  <div className="text-sm">Searching...</div>
-                ) : groupFetcher.data?.length === 0 ? (
-                  <div className="text-sm">No results</div>
-                ) : groupFetcher.data ? (
-                  <div className="grid gap-2">
-                    {groupFetcher.data.map((group: Group) => (
-                      <label
-                        className="flex gap-2 items-center cursor-pointer"
-                        key={group.id}
-                      >
-                        <input
-                          checked={requestID === group.recordID}
-                          name="group-id"
-                          onChange={() => setRequestID(group.recordID || "")}
-                          type="radio"
-                        />
-                        <span className="text-sm">
-                          {group.name} ({group.recordID})
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                ) : null}
-              </>
-            )}
-            {requestID && (
-              <>
-                <requestFetcher.Form className="grid gap-2" method="post">
-                  <input type="hidden" name="subaction" value="request" />
-                  <input type="hidden" name="groupID" value={requestID} />
-                  <input type="hidden" name="userID" value={user.id} />
-                  <Button theme="primary">Request to be added</Button>
-                  <p className="text-sm">
-                    This will send a request to the current group
-                    representatives.
-                  </p>
-                </requestFetcher.Form>
-                {requestFetcher.data && (
-                  <div className="text-red-400">
-                    <Alerts data={requestFetcher.data} />
-                  </div>
-                )}
-              </>
-            )}
+                    <Field label="Find my group" name="search">
+                      <input
+                        className={classes.input}
+                        id="group-search"
+                        name="group-search"
+                        type="search"
+                      />
+                    </Field>
+                  </groupFetcher.Form>
+                  {groupFetcher.state === "loading" ? (
+                    <div className="text-sm">Searching...</div>
+                  ) : groupFetcher.data?.length === 0 ? (
+                    <div className="text-sm">No results</div>
+                  ) : groupFetcher.data ? (
+                    <div className="grid gap-2">
+                      {groupFetcher.data.map((group: Group) => (
+                        <label
+                          className="flex gap-2 items-center cursor-pointer"
+                          key={group.id}
+                        >
+                          <input
+                            checked={requestID === group.recordID}
+                            name="group-id"
+                            onChange={() => setRequestID(group.recordID || "")}
+                            type="radio"
+                          />
+                          <span className="text-sm">
+                            {group.name} ({group.recordID})
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  ) : null}
+                </>
+              )}
+              {requestID && (
+                <>
+                  <requestFetcher.Form className="grid gap-2" method="post">
+                    <input type="hidden" name="subaction" value="request" />
+                    <input type="hidden" name="groupID" value={requestID} />
+                    <Button theme="primary">Request to be added</Button>
+                    <p className="text-sm">
+                      This will send a request to the current group
+                      representatives.
+                    </p>
+                  </requestFetcher.Form>
+                  {requestFetcher.data && (
+                    <div className="text-red-400">
+                      <Alerts data={requestFetcher.data} />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            <label className="grid gap-1 cursor-pointer">
+              <p className="flex gap-2 items-center font-bold">
+                <input
+                  type="radio"
+                  name="group-exists"
+                  checked={!groupExists}
+                  onChange={() => setGroupExists(false)}
+                  value="false"
+                />
+                New Group
+              </p>
+              <p className="text-sm">
+                New groups go through a vetting process to confirm that they
+                follow the AA 12 Traditions and are well-established.
+              </p>
+            </label>
           </Fieldset>
 
           {(!groupExists || groupRecordID) && (
             <Form method="post">
               <Fieldset
-                title="3. Group Information"
-                description="Now tell us about your group. This information is included on each meeting listing."
+                title="Group info"
+                description="Now tell us about your group. This information will be included on each meeting listing."
               >
                 <Field label="Group name" name="group">
                   <input
@@ -415,12 +459,12 @@ export default function Request() {
                   />
                 </Field>
                 <Field
-                  help="This should be general information about the group and not make reference to individual meetings (that will come next)."
+                  help="Please keep this short - it should be general information about the group and not make reference to individual meetings (that comes next)."
                   label="Group notes"
                   name="group_notes"
                 >
                   <textarea
-                    className={classes.input}
+                    className={classes.textarea}
                     defaultValue={group?.notes}
                     id="group_notes"
                     name="group_notes"
@@ -429,38 +473,44 @@ export default function Request() {
                 </Field>
               </Fieldset>
 
-              <Fieldset
-                title="4. Meeting Selection"
-                description="Optional: pick a meeting that you want to edit."
-              >
-                {group?.meetings.map((meeting: Meeting) => (
-                  <label
-                    key={meeting.id}
-                    className="flex gap-3 items-center cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      className="rounded"
-                      checked={meetingSlug === meeting.slug}
-                      readOnly
-                      onChange={() =>
-                        setMeetingSlug(
-                          meetingSlug === meeting.slug
-                            ? undefined
-                            : meeting.slug
-                        )
-                      }
-                    />
-                    {meeting.name} ({meeting.day} {meeting.time})
-                  </label>
-                ))}
-              </Fieldset>
+              {groupExists && !!group?.meetings.length && (
+                <Fieldset
+                  title="Meeting selection"
+                  description="Optional: pick a meeting that you want to edit."
+                >
+                  {group?.meetings.map((meeting: Meeting) => (
+                    <label
+                      key={meeting.id}
+                      className="flex gap-3 items-center cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        checked={meetingSlug === meeting.slug}
+                        readOnly
+                        onChange={() =>
+                          setMeetingSlug(
+                            meetingSlug === meeting.slug
+                              ? undefined
+                              : meeting.slug
+                          )
+                        }
+                      />
+                      {meeting.name} ({meeting.day} {meeting.time})
+                    </label>
+                  ))}
+                </Fieldset>
+              )}
 
               <Fieldset
-                title="Meetings 🪑"
+                title="Meetings"
                 description="Now tell us about your meetings."
               >
-                <Field label="Meeting name" name="group">
+                <Field
+                  label="Meeting name"
+                  name="group"
+                  help="Often this will be the same as the group name."
+                >
                   <input
                     type="text"
                     name="name"
@@ -471,86 +521,110 @@ export default function Request() {
                 <Field
                   label="Does this meeting meet at a specific time?"
                   name="group"
+                  help="Choose “No” if this is an ongoing meeting that can be joined at any time, such as a forum or email list."
                 >
                   <label className="flex gap-2 items-center cursor-pointer">
                     <input
                       name="meeting-ongoing"
-                      value="no"
+                      value="false"
                       type="radio"
-                      defaultChecked={true}
+                      onChange={() => setIsOngoing(false)}
+                      checked={!isOngoing}
                     />
                     <span>Yes</span>
                   </label>
                   <label className="flex gap-2 items-center cursor-pointer">
-                    <input name="meeting-ongoing" value="yes" type="radio" />
+                    <input
+                      name="meeting-ongoing"
+                      value="true"
+                      type="radio"
+                      onChange={() => setIsOngoing(true)}
+                      checked={isOngoing}
+                    />
                     <span>No</span>
                   </label>
                 </Field>
-                <Field
-                  name="time"
-                  help="Leave these blank if the meeting is ongoing"
-                >
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="grid gap-2">
-                      <label className={classes.label}>Start time</label>
-                      <input
-                        type="time"
-                        name="time"
-                        id="time"
-                        className={classes.input}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className={classes.label}>End time</label>
-                      <input
-                        type="time"
-                        name="end_time"
-                        id="end_time"
-                        className={classes.input}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className={classes.label}>Timezone</label>
-                      <Select
-                        name="timezone"
-                        className={classes.input}
-                        options={config.timezones.map((value) => {
-                          const [group, ...rest] = value.split("/");
-                          const label = rest.join(" • ").split("_").join(" ");
-                          return { value, label, group };
-                        })}
-                      />
-                    </div>
-                  </div>
-                </Field>
-                <Field label="Day(s) of the week" name="group">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                    {[
-                      "Sunday",
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                      "Saturday",
-                    ].map((day, i) => (
-                      <div key={i} className="flex gap-2 items-center">
-                        <input type="checkbox" className="rounded" />
-                        <span>{day}</span>
+                {!isOngoing && (
+                  <>
+                    <Field name="time">
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="grid gap-2">
+                          <label className={classes.label}>Start time</label>
+                          <input
+                            className={classes.input}
+                            id="time"
+                            name="time"
+                            type="time"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <label className={classes.label}>End time</label>
+                          <input
+                            className={classes.input}
+                            id="end_time"
+                            name="end_time"
+                            type="time"
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <label className={classes.label}>Timezone</label>
+                          <Select
+                            name="timezone"
+                            className={classes.input}
+                            options={config.timezones.map((value) => {
+                              const [group, ...rest] = value.split("/");
+                              const label = rest
+                                .join(" • ")
+                                .split("_")
+                                .join(" ");
+                              return { value, label, group };
+                            })}
+                            defaultValue={
+                              meeting?.timezone || DateTime.local().zoneName
+                            }
+                          />
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </Field>
+                    </Field>
+                    <Field label="Day(s) of the week" name="group">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                        {[
+                          "Sunday",
+                          "Monday",
+                          "Tuesday",
+                          "Wednesday",
+                          "Thursday",
+                          "Friday",
+                          "Saturday",
+                        ].map((day, i) => (
+                          <label
+                            key={i}
+                            className="flex gap-2 items-center cursor-pointer"
+                          >
+                            <input
+                              className="rounded"
+                              type="checkbox"
+                              value={i}
+                            />
+                            {day}
+                          </label>
+                        ))}
+                      </div>
+                    </Field>
+                  </>
+                )}
+
                 <Field
+                  help="Should be a URL to join a meeting directly."
                   label="Conference URL"
                   name="conference_url"
-                  help="Should be a URL to join a meeting directly."
                 >
                   <input
-                    type="url"
+                    className={classes.input}
+                    id="conference_url"
                     name="conference_url"
                     placeholder="https://zoom.us/j/123456789?pwd=abcdefghi123456789"
-                    className={classes.input}
+                    type="url"
                   />
                 </Field>
                 <Field
@@ -559,22 +633,23 @@ export default function Request() {
                   help="Should be a phone number to join a meeting, and not contain letters."
                 >
                   <input
-                    type="tel"
-                    name="conference_url"
-                    placeholder="+16469313860,,123456789#"
                     className={classes.input}
+                    id="conference_phone"
+                    name="conference_phone"
+                    placeholder="+16469313860,,123456789#"
+                    type="tel"
                   />
                 </Field>
                 <Field
+                  help="Please keep this short - no need to reprise information captured elsewhere, such as the meeting times or conference URL."
                   label="Meeting notes"
                   name="notes"
-                  help="No need to mention the meeting time here."
                 >
                   <textarea
-                    name="notes"
+                    className={classes.textarea}
                     id="notes"
+                    name="notes"
                     rows={5}
-                    className={classes.input}
                   />
                 </Field>
               </Fieldset>
@@ -583,19 +658,19 @@ export default function Request() {
                 <p>
                   By clicking Submit I agree to the Online Intergroup of A.A.{" "}
                   <a
+                    className="text-indigo-500 underline"
                     href="https://aa-intergroup.org/privacy-policy"
-                    target="_blank"
                     rel="noreferrer"
-                    className="text-sky-500 underline"
+                    target="_blank"
                   >
                     Privacy Policy
                   </a>
                   {" and "}
                   <a
+                    className="text-indigo-500 underline"
                     href="https://aa-intergroup.org/rules-of-conduct"
-                    target="_blank"
                     rel="noreferrer"
-                    className="text-sky-500 underline"
+                    target="_blank"
                   >
                     Rules of Conduct
                   </a>
