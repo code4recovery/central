@@ -30,14 +30,14 @@ import { strings } from "~/i18n";
 import { db, getIDs, sendMail } from "~/utils";
 
 const classes = {
+  help: "text-sm text-neutral-500",
   input: cx(
     config.fieldClassNames,
     config.themes.indigo.focusRing,
     "h-10 leading-7"
   ),
-  textarea: cx(config.fieldClassNames, config.themes.indigo.focusRing),
-  help: "text-sm text-neutral-500",
   label: "block text-sm font-medium leading-6",
+  textarea: cx(config.fieldClassNames, config.themes.indigo.focusRing),
 };
 
 export const action: ActionFunction = async ({ request }) => {
@@ -135,9 +135,23 @@ export const action: ActionFunction = async ({ request }) => {
     const user = await db.user.findUniqueOrThrow({ where: { id: userID } });
 
     // send email to group reps
-    group.users.forEach(async (rep) => {
+    group.users.forEach(async ({ email, emailHash, id, loginToken }) => {
+      // if loginToken is empty, add one
+      if (!loginToken) {
+        loginToken = formatToken();
+        await db.user.update({
+          data: { loginToken },
+          where: { id },
+        });
+      }
+
+      // form login-and-approve link
+      const go = `/approve/${group.id}/${user.id}`;
+      const params = new URLSearchParams({ go });
+      const buttonLink = `/auth/${emailHash}/${loginToken}?${params}`;
+
       sendMail({
-        buttonLink: `/approve/${rep.emailHash}/${group.id}/${user.id}`,
+        buttonLink,
         buttonText: strings.email.request.buttonText,
         currentAccountID: account.id,
         headline: formatString(strings.email.request.headline, {
@@ -147,7 +161,7 @@ export const action: ActionFunction = async ({ request }) => {
         instructions: strings.email.request.instructions,
         request,
         subject: strings.email.request.subject,
-        to: rep.email,
+        to: email,
       });
     });
 
@@ -188,7 +202,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 export default function Request() {
   const { user, group, meeting } = useLoaderData();
   const [groupExists, setGroupExists] = useState(true);
-  const [groupRecordID, setGroupRecordID] = useState(group?.recordID);
+  const [groupRecordID, setGroupRecordID] = useState(
+    group?.recordID ?? user?.groups[0]?.recordID
+  );
   const [meetingSlug, setMeetingSlug] = useState(meeting?.slug);
   const [isOngoing, setIsOngoing] = useState(false);
   const [requestID, setRequestID] = useState("");
@@ -275,10 +291,10 @@ export default function Request() {
             <label className="grid gap-1 cursor-pointer">
               <p className="flex gap-2 items-center font-bold">
                 <input
-                  type="radio"
+                  checked={groupExists}
                   name="group-exists"
                   onChange={() => setGroupExists(true)}
-                  checked={groupExists}
+                  type="radio"
                   value="true"
                 />
                 Existing Group
@@ -339,8 +355,8 @@ export default function Request() {
                 <>
                   <groupFetcher.Form method="post">
                     <input
-                      type="hidden"
                       name="subaction"
+                      type="hidden"
                       value="group-search"
                     />
                     <Field label="Find my group" name="search">
@@ -400,10 +416,10 @@ export default function Request() {
             <label className="grid gap-1 cursor-pointer">
               <p className="flex gap-2 items-center font-bold">
                 <input
-                  type="radio"
-                  name="group-exists"
                   checked={!groupExists}
+                  name="group-exists"
                   onChange={() => setGroupExists(false)}
+                  type="radio"
                   value="false"
                 />
                 New Group
@@ -418,8 +434,8 @@ export default function Request() {
           {(!groupExists || groupRecordID) && (
             <Form method="post">
               <Fieldset
-                title="Group info"
                 description="Now tell us about your group. This information will be included on each meeting listing."
+                title="Group info"
               >
                 <Field label="Group name" name="group">
                   <input
@@ -459,6 +475,20 @@ export default function Request() {
                   />
                 </Field>
                 <Field
+                  help="Optional group phone number. This will be displayed publicly on the meeting listing."
+                  label="Group phone, if any"
+                  name="phone"
+                >
+                  <input
+                    className={classes.input}
+                    defaultValue={group?.phone}
+                    id="phone"
+                    name="phone"
+                    placeholder="+1 212 555 1212"
+                    type="tel"
+                  />
+                </Field>
+                <Field
                   help="Please keep this short - it should be general information about the group and not make reference to individual meetings (that comes next)."
                   label="Group notes"
                   name="group_notes"
@@ -475,19 +505,17 @@ export default function Request() {
 
               {groupExists && !!group?.meetings.length && (
                 <Fieldset
-                  title="Meeting selection"
                   description="Optional: pick a meeting that you want to edit."
+                  title="Meeting selection"
                 >
                   {group?.meetings.map((meeting: Meeting) => (
                     <label
-                      key={meeting.id}
                       className="flex gap-3 items-center cursor-pointer"
+                      key={meeting.id}
                     >
                       <input
-                        type="checkbox"
-                        className="rounded"
                         checked={meetingSlug === meeting.slug}
-                        readOnly
+                        className="rounded"
                         onChange={() =>
                           setMeetingSlug(
                             meetingSlug === meeting.slug
@@ -495,6 +523,8 @@ export default function Request() {
                               : meeting.slug
                           )
                         }
+                        readOnly
+                        type="checkbox"
                       />
                       {meeting.name} ({meeting.day} {meeting.time})
                     </label>
@@ -503,43 +533,44 @@ export default function Request() {
               )}
 
               <Fieldset
-                title="Meetings"
                 description="Now tell us about your meetings."
+                title="Meetings"
               >
                 <Field
+                  help="Often this will be the same as the group name."
                   label="Meeting name"
                   name="group"
-                  help="Often this will be the same as the group name."
                 >
                   <input
-                    type="text"
-                    name="name"
-                    id="name"
                     className={classes.input}
+                    defaultValue={meeting?.name}
+                    id="name"
+                    name="name"
+                    type="text"
                   />
                 </Field>
                 <Field
+                  help="Choose “No” if this is an ongoing meeting that can be joined at any time, such as a forum or email list."
                   label="Does this meeting meet at a specific time?"
                   name="group"
-                  help="Choose “No” if this is an ongoing meeting that can be joined at any time, such as a forum or email list."
                 >
                   <label className="flex gap-2 items-center cursor-pointer">
                     <input
-                      name="meeting-ongoing"
-                      value="false"
-                      type="radio"
-                      onChange={() => setIsOngoing(false)}
                       checked={!isOngoing}
+                      name="meeting-ongoing"
+                      onChange={() => setIsOngoing(false)}
+                      type="radio"
+                      value="false"
                     />
                     <span>Yes</span>
                   </label>
                   <label className="flex gap-2 items-center cursor-pointer">
                     <input
-                      name="meeting-ongoing"
-                      value="true"
-                      type="radio"
-                      onChange={() => setIsOngoing(true)}
                       checked={isOngoing}
+                      name="meeting-ongoing"
+                      onChange={() => setIsOngoing(true)}
+                      type="radio"
+                      value="true"
                     />
                     <span>No</span>
                   </label>
@@ -552,25 +583,32 @@ export default function Request() {
                           <label className={classes.label}>Start time</label>
                           <input
                             className={classes.input}
+                            defaultValue={meeting?.time}
                             id="time"
                             name="time"
                             type="time"
                           />
                         </div>
                         <div className="grid gap-2">
-                          <label className={classes.label}>End time</label>
+                          <label className={classes.label}>
+                            Duration (in minutes)
+                          </label>
                           <input
                             className={classes.input}
-                            id="end_time"
-                            name="end_time"
-                            type="time"
+                            defaultValue={meeting?.duration}
+                            id="duration"
+                            name="duration"
+                            type="number"
                           />
                         </div>
                         <div className="grid gap-2">
                           <label className={classes.label}>Timezone</label>
                           <Select
-                            name="timezone"
                             className={classes.input}
+                            defaultValue={
+                              meeting?.timezone || DateTime.local().zoneName
+                            }
+                            name="timezone"
                             options={config.timezones.map((value) => {
                               const [group, ...rest] = value.split("/");
                               const label = rest
@@ -579,9 +617,6 @@ export default function Request() {
                                 .join(" ");
                               return { value, label, group };
                             })}
-                            defaultValue={
-                              meeting?.timezone || DateTime.local().zoneName
-                            }
                           />
                         </div>
                       </div>
@@ -602,6 +637,7 @@ export default function Request() {
                             className="flex gap-2 items-center cursor-pointer"
                           >
                             <input
+                              checked={meeting?.day === i}
                               className="rounded"
                               type="checkbox"
                               value={i}
@@ -621,6 +657,7 @@ export default function Request() {
                 >
                   <input
                     className={classes.input}
+                    defaultValue={meeting?.conference_url}
                     id="conference_url"
                     name="conference_url"
                     placeholder="https://zoom.us/j/123456789?pwd=abcdefghi123456789"
@@ -634,6 +671,7 @@ export default function Request() {
                 >
                   <input
                     className={classes.input}
+                    defaultValue={meeting?.conference_phone}
                     id="conference_phone"
                     name="conference_phone"
                     placeholder="+16469313860,,123456789#"
@@ -647,6 +685,7 @@ export default function Request() {
                 >
                   <textarea
                     className={classes.textarea}
+                    defaultValue={meeting?.notes}
                     id="notes"
                     name="notes"
                     rows={5}

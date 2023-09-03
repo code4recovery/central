@@ -1,7 +1,6 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 
-import { config } from "~/helpers";
 import { createUserSession, db } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -27,11 +26,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
       where: { id: user.id },
     });
 
-    return await createUserSession(
-      user.id,
-      user.currentAccountID,
-      go ?? config.home
-    );
+    return await createUserSession({
+      ...user,
+      go,
+    });
   }
 
   return redirect("/?msg=expired");

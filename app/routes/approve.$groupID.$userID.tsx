@@ -1,32 +1,30 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { db, sendMail } from "~/utils";
+import { db, getIDs, sendMail } from "~/utils";
 
 export const loader: LoaderFunction = async ({ params, request }) => {
-  const { emailHash, groupID, userID } = params;
+  const { id } = await getIDs(request);
 
-  // confirm user exists
-  await db.user.findUniqueOrThrow({
-    where: {
-      id: userID,
-    },
-  });
+  const { groupID, userID } = params;
 
-  const rep = await db.user.findFirstOrThrow({
+  // confirm rep exists
+  const rep = await db.user.findUniqueOrThrow({
     select: {
       id: true,
       email: true,
       currentAccountID: true,
     },
     where: {
-      emailHash,
+      id,
     },
   });
 
+  // this counts as "last seen"
   await db.user.update({
     data: { lastSeen: new Date() },
     where: { id: rep.id },
   });
 
+  // approve request
   await db.group.update({
     data: {
       users: {
@@ -34,6 +32,16 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       },
     },
     where: { id: groupID },
+  });
+
+  // save activity
+  await db.activity.create({
+    data: {
+      groupID: groupID,
+      type: "add", // todo change this to "addUser" - also change the activity type in the db
+      userID: rep.id,
+      targetID: userID,
+    },
   });
 
   await sendMail({
