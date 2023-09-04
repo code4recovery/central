@@ -148,16 +148,16 @@ export default function CreateMeeting() {
         }
       >
         <HelpTopic
-          title={strings.help.conference_providers_title}
+          title={strings.help.conference_providers}
           content={strings.help.conference_providers_content}
         />
         <HelpTopic
-          title={strings.help.online_location_title}
-          content={strings.help.online_location_description}
+          title={strings.help.online_location}
+          content={strings.help.online_location_content}
         />
         <HelpTopic
-          title={strings.help.phone_format_title}
-          content={strings.help.phone_format_description}
+          title={strings.help.phone_format}
+          content={strings.help.phone_format_content}
         />
       </Columns>
     </Template>

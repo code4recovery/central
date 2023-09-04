@@ -268,7 +268,6 @@ export default function EditMeeting() {
           emptyText={strings.activity.empty}
           rows={meeting.activity.map(
             ({
-              id,
               changes,
               type,
               user,

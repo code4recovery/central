@@ -4,7 +4,7 @@ import { useActionData } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, Template } from "~/components";
-import { formatToken, formatValidator } from "~/helpers";
+import { formatString, formatToken, formatValidator } from "~/helpers";
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { db, getIDs, redirectWith, sendMail } from "~/utils";
@@ -51,14 +51,26 @@ export const action: ActionFunction = async ({ request }) => {
     });
   }
 
+  const { name: accountName, url: accountUrl } =
+    await db.account.findFirstOrThrow({
+      where: { id: currentAccountID },
+    });
+
   // send invitation
-  await sendMail(
-    email,
-    "invite",
+  await sendMail({
+    buttonLink: `/auth/${emailHash}/${loginToken}`,
+    buttonText: strings.email.invite.buttonText,
+    currentAccountID,
+    headline: formatString(strings.email.invite.headline, {
+      accountUrl,
+    }),
+    instructions: strings.email.invite.instructions,
     request,
-    `/auth/${emailHash}/${loginToken}`,
-    currentAccountID
-  );
+    subject: formatString(strings.email.invite.subject, {
+      accountName,
+    }),
+    to: email,
+  });
 
   return redirectWith("/users", request, {
     success: strings.users.added,

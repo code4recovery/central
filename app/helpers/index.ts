@@ -6,6 +6,7 @@ export * from "./format-date";
 export * from "./format-day-time";
 export * from "./format-json";
 export * from "./format-markdown";
+export * from "./format-search";
 export * from "./format-slug";
 export * from "./format-string";
 export * from "./format-token";

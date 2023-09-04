@@ -82,6 +82,13 @@ export const strings = {
       instructions: "Tap the button below to confirm:",
       subject: "Confirm your email address to log in",
     },
+    request: {
+      buttonText: "Approve request",
+      headline:
+        "{name} has requested to be added as a group representative for {group}.",
+      instructions: "Tap the button below to approve:",
+      subject: "Request to add group representative",
+    },
   },
   feedback: {
     title: "Feedback",
@@ -252,6 +259,13 @@ export const strings = {
     warning: "Editing this information will edit the user's profile.",
     warning_groups:
       "Editing this information will edit the user's profile. This user also represents: {groups}.",
+  },
+  request: {
+    email_sent:
+      "Thanks! Now check your email. You will receive a link to confirm your identity.",
+    request_sent:
+      "Great! An email has been sent to {users}. Once they confirm, you will receive an email to continue.",
+    title: "New Meeting / Change Request Form",
   },
   types: {
     "11": "11th Step Meditation",

@@ -36,15 +36,19 @@ export async function changeAccount(request: Request, account: Account) {
   });
 }
 
-export async function createUserSession(
-  id: string,
-  currentAccountID: string,
-  redirectTo: string
-) {
+export async function createUserSession({
+  id,
+  currentAccountID,
+  go,
+}: {
+  id: string;
+  currentAccountID: string;
+  go?: string;
+}) {
   const session = await storage.getSession();
   session.set("id", id);
   session.set("currentAccountID", currentAccountID);
-  return redirect(redirectTo, {
+  return redirect(go ?? config.home, {
     headers: {
       "Set-Cookie": await storage.commitSession(session),
     },
@@ -66,14 +70,18 @@ export async function getSession(request: Request) {
 export async function getUserOrRedirect(request: Request) {
   const { pathname } = new URL(request.url);
 
-  // stop processing if it's the favicon
-  const routeIsStatic = pathname.endsWith(".svg");
-  if (routeIsStatic) {
-    return;
+  // return default user if it's a static route (doesn't need to be authenticated)
+  if (pathname.endsWith(".svg")) {
+    return {
+      theme: config.themes[config.defaultTheme as keyof typeof config.themes],
+    };
   }
 
   // limited number of public routes on the site
-  const routeIsPublic = pathname === "/" || pathname.startsWith("/auth");
+  const routeIsLoggedOut = pathname === "/" || pathname.startsWith("/auth");
+
+  // request form can be authenticated or not
+  const routeIsPublic = pathname.startsWith("/request") || routeIsLoggedOut;
 
   // get user
   const { id } = await getIDs(request);
@@ -99,13 +107,20 @@ export async function getUserOrRedirect(request: Request) {
     : undefined;
 
   if (user) {
+    const canLogIn = user.accounts.some(
+      (account) => account.id === user.currentAccountID
+    );
+
+    if (routeIsLoggedOut) {
+      throw redirect(canLogIn ? config.home : "/request");
+    } else if (!routeIsPublic && !canLogIn) {
+      throw unauthorized(request);
+    }
+
     await db.user.update({
       data: { lastSeen: new Date() },
       where: { id },
     });
-    if (routeIsPublic) {
-      throw redirect(config.home);
-    }
   } else if (!routeIsPublic) {
     throw unauthorized(request);
   }
@@ -151,9 +166,9 @@ export async function jsonWith(request: Request, payload: object) {
   );
 }
 
-export async function logout(request: Request) {
+export async function logout(request: Request, go = "/") {
   const session = await getSession(request);
-  return redirect("/", {
+  return redirect(go, {
     headers: {
       "Set-Cookie": await storage.destroySession(session),
     },

@@ -107,7 +107,7 @@ model Group {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
-  @@unique([accountID, name, recordID])
+  @@unique([accountID, recordID])
   @@fulltext([name, notes, website, recordID])
 }
 

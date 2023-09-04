@@ -6,13 +6,25 @@ import { config, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "./db.server";
 
-export async function sendMail(
-  to: string,
-  type: "login" | "invite",
-  request: Request,
-  buttonLink: string,
-  currentAccountID: string
-) {
+export async function sendMail({
+  buttonLink,
+  buttonText,
+  currentAccountID,
+  headline,
+  instructions,
+  request,
+  subject,
+  to,
+}: {
+  buttonLink: string;
+  buttonText: string;
+  currentAccountID: string;
+  headline: string;
+  instructions: string;
+  request: Request;
+  subject: string;
+  to: string;
+}) {
   const { SENDGRID_API_KEY, SENDGRID_SENDER } = process.env;
 
   if (!SENDGRID_API_KEY || !SENDGRID_SENDER) {
@@ -28,31 +40,27 @@ export async function sendMail(
     where: { id: currentAccountID },
   });
 
-  const stringParams = {
-    app: strings.app_name,
-    accountName: account?.name,
-    accountUrl: account?.url,
-    email: to,
-  };
-
   const emailProps = {
     accentColor: (account?.theme ??
       config.defaultTheme) as keyof typeof config.themes,
     buttonLink: `${baseUrl}${buttonLink}`,
-    buttonText: strings.email[type].buttonText,
-    footer: formatString(strings.email.footer, stringParams),
-    headline: formatString(strings.email[type].headline, stringParams),
+    buttonText,
+    footer: formatString(strings.email.footer, {
+      app: strings.app_name,
+      accountName: account?.name,
+    }),
+    headline,
     imageHeight: 48,
     imageSrc: `${baseUrl}/logo.svg`,
     imageWidth: 48.4667,
-    instructions: strings.email[type].instructions,
-    subject: formatString(strings.email[type].subject, stringParams),
+    instructions,
+    subject,
   };
 
   sendgrid.send({
     from: SENDGRID_SENDER,
     html: render(<Email {...emailProps} />),
-    subject: formatString(strings.email[type].subject, stringParams),
+    subject,
     to,
   });
 }

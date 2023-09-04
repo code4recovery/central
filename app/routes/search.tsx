@@ -13,7 +13,13 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { Alert, LoadMore, Table, Template } from "~/components";
-import { config, formatDate, formatDayTime, formatString } from "~/helpers";
+import {
+  config,
+  formatDate,
+  formatDayTime,
+  formatSearch,
+  formatString,
+} from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs, searchMeetings, searchGroups } from "~/utils";
 
@@ -54,7 +60,8 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const search = new URL(request.url).searchParams.get("search");
+  const search = formatSearch(new URL(request.url).searchParams.get("search"));
+
   const { currentAccountID } = await getIDs(request);
 
   const where = {
@@ -62,12 +69,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     OR: [
       {
         id: {
-          in: await searchMeetings(search || "", currentAccountID),
+          in: await searchMeetings(search, currentAccountID),
         },
       },
       {
         groupID: {
-          in: await searchGroups(search || "", currentAccountID),
+          in: await searchGroups(search, currentAccountID),
         },
       },
     ],

@@ -15,7 +15,7 @@
   "dependencies": {
     "@google-cloud/storage": "^6.9.4",
     "@googlemaps/google-maps-services-js": "^3.3.28",
-    "@prisma/client": "^4.14.0",
+    "@prisma/client": "^5.2.0",
     "@react-email/components": "^0.0.7",
     "@react-email/render": "^0.0.7",
     "@remix-run/express": "^1.14.1",
@@ -53,7 +53,7 @@
     "eslint": "^8.27.0",
     "nodemon": "^2.0.20",
     "npm-run-all": "^4.1.5",
-    "prisma": "^4.14.0",
+    "prisma": "^5.2.0",
     "tailwindcss": "^3.3.0",
     "typescript": "^4.8.4"
   },
