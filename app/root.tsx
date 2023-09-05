@@ -22,8 +22,18 @@ import { Template } from "./components";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
-  { rel: "icon", href: "/logo.svg", type: "image/svg+xml" },
-  { rel: "mask-icon", href: "/logo.svg", color: "#312e81" },
+  {
+    rel: "icon",
+    href: "https://code4recovery.org/wp-content/uploads/2023/09/central-logo.png",
+    media: "(prefers-color-scheme: light)",
+    type: "image/png",
+  },
+  {
+    rel: "icon",
+    href: "https://code4recovery.org/wp-content/uploads/2023/09/central-logo-white.png",
+    media: "(prefers-color-scheme: dark)",
+    type: "image/png",
+  },
 ];
 
 export async function loader({ request }: LoaderArgs) {

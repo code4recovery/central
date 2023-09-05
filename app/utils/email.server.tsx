@@ -51,7 +51,8 @@ export async function sendMail({
     }),
     headline,
     imageHeight: 48,
-    imageSrc: `${baseUrl}/logo.svg`,
+    imageSrc:
+      "https://code4recovery.org/wp-content/uploads/2023/09/central-logo.png",
     imageWidth: 48.4667,
     instructions,
     subject,
