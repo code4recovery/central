@@ -56,7 +56,7 @@ export const action: ActionFunction = async ({ request }) => {
     throw new Error("No account found");
   }
 
-  if (formData.get("subaction") === "user-login") {
+  if (formData.get("subaction") === "login") {
     const validator = formatValidator("login");
     const { data, error } = await validator.validate(formData);
     if (error) {
@@ -258,12 +258,12 @@ export default function Request() {
       {actionData && <Alerts data={actionData} />}
 
       <Form method="post">
-        <input type="hidden" name="subaction" value="user-login" />
+        <input type="hidden" name="subaction" value="login" />
         <Fieldset
-          description="Please start by confirming your identity. We will keep your contact info confidential."
-          title="Hi there 👋"
+          description={strings.request.login.description}
+          title={strings.request.login.title}
         >
-          <Field label="Your email address" name="email">
+          <Field label={strings.request.login.email} name="email">
             <div className="relative">
               <input
                 autoFocus={!user}
@@ -281,20 +281,22 @@ export default function Request() {
                   theme="primary"
                   url="/auth/out?go=/request"
                 >
-                  Sign out
+                  {strings.auth.out}
                 </Button>
               )}
             </div>
           </Field>
-          {!user && <Button theme="primary">Confirm your identity</Button>}
+          {!user && (
+            <Button theme="primary">{strings.request.login.buttonText}</Button>
+          )}
         </Fieldset>
       </Form>
 
       {user && (
         <>
           <Fieldset
-            title="Group selection"
-            description="Groups are responsible for meeting listings on the website. New groups are vetted by the Policy and Admissions Committee."
+            title={strings.request.group_select.title}
+            description={strings.request.group_select.description}
           >
             {user.groups?.map((group) => (
               <label
@@ -338,7 +340,7 @@ export default function Request() {
                   type="radio"
                   value="false"
                 />
-                New Group
+                {strings.request.group_select.new_group}
               </p>
             </label>
 
@@ -363,9 +365,13 @@ export default function Request() {
             </groupFetcher.Form>
 
             {groupFetcher.state === "loading" ? (
-              <div className="text-sm">Searching...</div>
+              <div className="text-sm">
+                {strings.request.group_select.searching}
+              </div>
             ) : groupFetcher.data?.length === 0 ? (
-              <div className="text-sm">No results</div>
+              <div className="text-sm">
+                {strings.request.group_select.no_results}
+              </div>
             ) : groupFetcher.data ? (
               <>
                 {groupFetcher.data.map((group: Group) => (
@@ -400,8 +406,8 @@ export default function Request() {
                   <input type="hidden" name="subaction" value="request" />
                   <input type="hidden" name="groupID" value={requestID} />
                   <Field
-                    help="Your name will be seen by the other members of your group."
-                    label="Your name"
+                    help={strings.request.group_select.your_name_help}
+                    label={strings.request.group_select.your_name}
                     name="your_name"
                   >
                     <input
@@ -414,10 +420,11 @@ export default function Request() {
                     />
                   </Field>
                   <div className="grid gap-y-2">
-                    <Button theme="primary">Request to be added</Button>
+                    <Button theme="primary">
+                      {strings.request.group_select.buttonText}
+                    </Button>
                     <p className="text-sm">
-                      This will send a request on your behalf to current group
-                      representatives.
+                      {strings.request.group_select.buttonTextHelp}
                     </p>
                   </div>
                 </requestFetcher.Form>
@@ -433,8 +440,8 @@ export default function Request() {
           {(!groupExists || groupRecordID) && (
             <Form method="post">
               <Fieldset
-                description="Now tell us about your group. This information will be included on each meeting listing."
-                title="Group info"
+                description={strings.request.group_info.description}
+                title={strings.request.group_info.title}
               >
                 <Field label="Group name" name="group">
                   <input
@@ -446,8 +453,8 @@ export default function Request() {
                   />
                 </Field>
                 <Field
-                  help="Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)"
-                  label="Group website, if any"
+                  help={strings.request.group_info.website_help}
+                  label={strings.request.group_info.website}
                   name="website"
                 >
                   <input
@@ -460,8 +467,8 @@ export default function Request() {
                   />
                 </Field>
                 <Field
-                  help="Optional group email address. This will be displayed publicly on the meeting listing."
-                  label="Group email, if any"
+                  help={strings.request.group_info.email_help}
+                  label={strings.request.group_info.email}
                   name="email"
                 >
                   <input
@@ -469,13 +476,13 @@ export default function Request() {
                     defaultValue={group?.email || undefined}
                     id="email"
                     name="email"
-                    placeholder="group.name@email.com"
+                    placeholder={strings.request.group_info.email_placeholder}
                     type="email"
                   />
                 </Field>
                 <Field
-                  help="Optional group phone number. This will be displayed publicly on the meeting listing."
-                  label="Group phone, if any"
+                  help={strings.request.group_info.phone_help}
+                  label={strings.request.group_info.phone}
                   name="phone"
                 >
                   <input
@@ -488,8 +495,8 @@ export default function Request() {
                   />
                 </Field>
                 <Field
-                  help="Please keep this short - it should be general information about the group and not make reference to individual meetings (that comes next)."
-                  label="Group notes"
+                  help={strings.request.group_info.notes_help}
+                  label={strings.request.group_info.notes}
                   name="group_notes"
                 >
                   <textarea
@@ -503,7 +510,10 @@ export default function Request() {
               </Fieldset>
 
               {groupExists && !!group?.meetings.length && (
-                <Fieldset title="Meeting selection">
+                <Fieldset
+                  description={strings.request.meeting_select.description}
+                  title={strings.request.meeting_select.title}
+                >
                   {group?.meetings.map((meeting) => (
                     <label
                       className={
@@ -515,7 +525,14 @@ export default function Request() {
                     >
                       <input
                         checked={meetingSlug === meeting.slug}
-                        onChange={() => setMeetingSlug(meeting.slug)}
+                        onClick={() =>
+                          setMeetingSlug(
+                            meetingSlug === meeting.slug
+                              ? undefined
+                              : meeting.slug
+                          )
+                        }
+                        readOnly
                         type="radio"
                       />
                       <span>{meeting.name}</span>
@@ -538,21 +555,24 @@ export default function Request() {
                   >
                     <input
                       checked={meetingSlug === ""}
-                      onChange={() => setMeetingSlug("")}
+                      onClick={() =>
+                        setMeetingSlug(meetingSlug === "" ? undefined : "")
+                      }
+                      readOnly
                       type="radio"
                     />
-                    New Meeting
+                    {strings.request.meeting_select.new_meeting}
                   </label>
                 </Fieldset>
               )}
 
               {typeof meetingSlug === "string" && (
                 <Fieldset
-                  description="Now tell us about your meetings."
-                  title="Meetings"
+                  description={strings.request.meeting.description}
+                  title={strings.request.meeting.title}
                 >
                   {meetingSlug && (
-                    <Field label="This meeting is active" name="active">
+                    <Field label={strings.request.meeting.active} name="active">
                       <select
                         name="active"
                         value={meetingActive}
@@ -563,16 +583,16 @@ export default function Request() {
                         }
                         className={classes.input}
                       >
-                        <option value="true">Yes</option>
-                        <option value="false">No</option>
+                        <option value="true">{strings.yes}</option>
+                        <option value="false">{strings.no}</option>
                       </select>
                     </Field>
                   )}
                   {meetingActive === "true" && (
                     <>
                       <Field
-                        help="Often this will be the same as the group name."
-                        label="Meeting name"
+                        help={strings.request.meeting.name_help}
+                        label={strings.request.meeting.name}
                         name="name"
                       >
                         <input
@@ -585,11 +605,13 @@ export default function Request() {
                       </Field>
                       <Field
                         name="time"
-                        help="Leave these fields blank if the meeting is an 'ongoing' meeting, such as an email group or forum."
+                        help={strings.request.meeting.time_help}
                       >
                         <div className="grid grid-cols-3 gap-3">
                           <div className="grid gap-2">
-                            <label className={classes.label}>Start time</label>
+                            <label className={classes.label}>
+                              {strings.request.meeting.time}
+                            </label>
                             <input
                               className={classes.input}
                               defaultValue={meeting?.time || undefined}
@@ -600,7 +622,7 @@ export default function Request() {
                           </div>
                           <div className="grid gap-2">
                             <label className={classes.label}>
-                              Duration (in minutes)
+                              {strings.request.meeting.duration}
                             </label>
                             <input
                               className={classes.input}
@@ -611,7 +633,9 @@ export default function Request() {
                             />
                           </div>
                           <div className="grid gap-2">
-                            <label className={classes.label}>Timezone</label>
+                            <label className={classes.label}>
+                              {strings.request.meeting.timezone}
+                            </label>
                             <Select
                               className={classes.input}
                               defaultValue={
@@ -649,12 +673,12 @@ export default function Request() {
 
                       <Field
                         name="conference_url"
-                        help="Should be a URL to join a meeting directly."
+                        help={strings.request.meeting.conference_url_help}
                       >
                         <div className="grid grid-cols-3 gap-3">
                           <div className="grid gap-2 col-span-2">
                             <label className={classes.label}>
-                              Conference URL
+                              {strings.request.meeting.conference_url}
                             </label>
                             <input
                               className={classes.input}
@@ -663,12 +687,14 @@ export default function Request() {
                               }
                               id="conference_url"
                               name="conference_url"
-                              placeholder="https://zoom.us/j/123456789?pwd=abcdefghi123456789"
+                              placeholder="https://zoom.us/j/123456789?pwd=abcdefghijk123456789"
                               type="url"
                             />
                           </div>
                           <div className="grid gap-2">
-                            <label className={classes.label}>Notes</label>
+                            <label className={classes.label}>
+                              {strings.request.meeting.conference_url_notes}
+                            </label>
                             <input
                               className={classes.input}
                               defaultValue={
@@ -676,7 +702,10 @@ export default function Request() {
                               }
                               id="conference_url_notes"
                               name="conference_url_notes"
-                              placeholder="Password: 123456789"
+                              placeholder={
+                                strings.request.meeting
+                                  .conference_url_notes_placeholder
+                              }
                               type="text"
                             />
                           </div>
@@ -684,12 +713,12 @@ export default function Request() {
                       </Field>
                       <Field
                         name="conference_phone"
-                        help="Should be a phone number to join a meeting, and not contain letters."
+                        help={strings.request.meeting.conference_phone_help}
                       >
                         <div className="grid grid-cols-3 gap-3">
                           <div className="grid gap-2 col-span-2">
                             <label className={classes.label}>
-                              Conference Phone
+                              {strings.request.meeting.conference_phone}
                             </label>
                             <input
                               className={classes.input}
@@ -703,7 +732,9 @@ export default function Request() {
                             />
                           </div>
                           <div className="grid gap-2">
-                            <label className={classes.label}>Notes</label>
+                            <label className={classes.label}>
+                              {strings.request.meeting.conference_phone_notes}
+                            </label>
                             <input
                               className={classes.input}
                               defaultValue={
@@ -717,8 +748,8 @@ export default function Request() {
                         </div>
                       </Field>
                       <Field
-                        label="Types"
-                        help="Should represent the actual focus of the meeting. Please check a maximum of five."
+                        label={strings.request.meeting.types}
+                        help={strings.request.meeting.types_help}
                       >
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {types
@@ -750,8 +781,8 @@ export default function Request() {
                         </div>
                       </Field>
                       <Field
-                        label="Languages"
-                        help="Languages that are typically used in the meeting. Most meetings use only one."
+                        label={strings.request.meeting.languages}
+                        help={strings.request.meeting.languages_help}
                       >
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {languages
@@ -787,8 +818,8 @@ export default function Request() {
                         </div>
                       </Field>
                       <Field
-                        help="Please keep this short - no need to repeat information captured elsewhere, such as the meeting times or conference URL."
-                        label="Meeting notes"
+                        help={strings.request.meeting.notes_help}
+                        label={strings.request.meeting.notes}
                         name="notes"
                       >
                         <textarea
@@ -804,36 +835,37 @@ export default function Request() {
                 </Fieldset>
               )}
 
-              <div className="grid gap-8 pt-8 pb-10 max-w-md text-center mx-auto">
-                <p>
-                  By clicking below I agree to the Online Intergroup of A.A.{" "}
-                  <a
-                    className="text-indigo-500 dark:text-indigo-400 underline"
-                    href="https://aa-intergroup.org/privacy-policy"
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    Privacy Policy
-                  </a>
-                  {" and "}
-                  <a
-                    className="text-indigo-500 dark:text-indigo-400 underline"
-                    href="https://aa-intergroup.org/directory-guidelines"
-                    rel="noreferrer"
-                    target="_blank"
-                  >
-                    Directory Guidelines
-                  </a>
-                  .
-                </p>
-                <p>
+              <div className="grid gap-y-10 pt-8 pb-10 max-w-md text-center mx-auto">
+                <div className="grid gap-3">
+                  <p>{strings.request.agree}</p>
+                  <nav className="flex gap-x-3 justify-center">
+                    <a
+                      className="text-indigo-500 dark:text-indigo-400 underline"
+                      href="https://aa-intergroup.org/privacy-policy"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {strings.request.privacy_policy}
+                    </a>
+                    <span>~</span>
+                    <a
+                      className="text-indigo-500 dark:text-indigo-400 underline"
+                      href="https://aa-intergroup.org/directory-guidelines"
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      {strings.request.directory_guidelines}
+                    </a>
+                  </nav>
+                </div>
+                <div>
                   <input
-                    type="submit"
-                    value="Submit"
-                    className="bg-indigo-500 rounded-md px-5 py-2 text-neutral-100 text-lg mb-3 dark:bg-indigo-300 dark:text-neutral-900"
+                    className="bg-indigo-500 rounded-md px-5 py-2 text-neutral-100 text-lg dark:bg-indigo-300 dark:text-neutral-900"
                     disabled
+                    type="submit"
+                    value={strings.request.submit}
                   />
-                </p>
+                </div>
               </div>
             </Form>
           )}

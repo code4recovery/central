@@ -89,6 +89,12 @@ export const strings = {
       instructions: "Tap the button below to approve:",
       subject: "Request to add group representative",
     },
+    request_approved: {
+      buttonText: "Continue your request",
+      headline: "You've been added to {group}.",
+      instructions: "You can now continue your request at the link below.",
+      subject: "You've been added!",
+    },
   },
   error: "Error",
   error_unknown: "An unknown error occurred.",
@@ -225,14 +231,8 @@ export const strings = {
     view: "View",
     when: "When",
   },
+  no: "No",
   no_updates: "Nothing was updated.",
-  search: {
-    description_many: "{meetingCount} results match “{search}”",
-    description_none: "No results match “{search}”",
-    description_one: "One result matches “{search}”",
-    placeholder: "Search",
-    title: "Search Results",
-  },
   reports: {
     archived: {
       description: "{count} meetings have been archived.",
@@ -263,13 +263,97 @@ export const strings = {
       "Editing this information will edit the user's profile. This user also represents: {groups}.",
   },
   request: {
+    agree: "By clicking below I agree to the Online Intergroup of A.A.:",
     approved: "Request approved ✅",
     approved_description: "{user} has been added to {group}.",
+    directory_guidelines: "Directory Guidelines",
     email_sent:
       "Thanks! Now check your email. You will receive a link to confirm your identity.",
+    group_info: {
+      description:
+        "Now tell us about your group. This information will be included on each meeting listing.",
+      email: "Group email, if any",
+      email_help:
+        "Optional group email address. This will be displayed publicly on the meeting listing.",
+      email_placeholder: "group.name@email.com",
+      notes: "Group notes",
+      notes_help:
+        "Please keep this short - it should be general information about the group and not make reference to individual meetings (that comes next).",
+      phone: "Group phone, if any",
+      phone_help:
+        "Optional group phone number. This will be displayed publicly on the meeting listing.",
+      title: "Group info",
+      website: "Group website, if any",
+      website_help:
+        "Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)",
+    },
+    group_select: {
+      buttonText: "Request to be added",
+      buttonTextHelp:
+        "This will send a request on your behalf to current group representatives.",
+      description:
+        "Groups are responsible for meeting listings on the website. New groups are vetted by the Policy and Admissions Committee.",
+      new_group: "New Group",
+      no_results: "No results",
+      searching: "Searching…",
+      title: "Group selection",
+      your_name: "Your name",
+      your_name_help:
+        "Your name will be seen by the other members of your group.",
+    },
+    login: {
+      buttonText: "Confirm your identity",
+      description:
+        "Please start by confirming your identity. We will keep your contact info confidential.",
+      email: "Your email address",
+      title: "Hi there 👋",
+    },
+    meeting: {
+      active: "This meeting is active",
+      conference_phone: "Conference phone",
+      conference_phone_help:
+        "Should be a phone number to join a meeting, and not contain letters.",
+      conference_phone_notes: "Notes",
+      conference_url: "Conference URL",
+      conference_url_help: "Should be a URL to join a meeting directly.",
+      conference_url_notes: "Notes",
+      conference_url_notes_placeholder: "Password: 123456789",
+      description: "Now tell us about your meetings.",
+      duration: "Duration, in minutes",
+      languages: "Languages",
+      languages_help:
+        "Languages that are typically used in the meeting. Most meetings use only one.",
+      name: "Meeting name",
+      name_help: "Often this will be the same as the group name.",
+      notes: "Meeting notes",
+      notes_help:
+        "Please keep this short - no need to repeat information captured elsewhere, such as the meeting times or conference URL.",
+      time: "Start time",
+      time_help:
+        "Leave these fields blank if the meeting is an 'ongoing' meeting, such as an email group or forum.",
+      timezone: "Timezone",
+      title: "Meetings",
+      types: "Types",
+      types_help:
+        "Should represent the actual focus of the meeting. Please check a maximum of five.",
+    },
+    meeting_select: {
+      description: "No need to select anything when editing just the group.",
+      new_meeting: "New Meeting",
+      title: "Meeting selection",
+    },
+    privacy_policy: "Privacy Policy",
     request_sent:
       "Great! An email has been sent to the current group reps. Once they confirm, you will receive an email to continue.",
+    submit: "Submit request",
     title: "New Listings • Changes • Removals",
+  },
+  search: {
+    description_many: "{meetingCount} results match “{search}”",
+    description_none: "No results match “{search}”",
+    description_one: "One result matches “{search}”",
+    placeholder: "Search",
+    title: "Search Results",
   },
   types: {
     "11": "11th Step Meditation",
@@ -350,4 +434,5 @@ export const strings = {
     title: "Users",
     updated: "User profile updated",
   },
+  yes: "Yes",
 };

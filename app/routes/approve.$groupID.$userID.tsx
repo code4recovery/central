@@ -57,14 +57,19 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       },
     });
 
+    const { buttonText, headline, instructions, subject } =
+      strings.email.request_approved;
+
     await sendMail({
       buttonLink: `/request/${group.recordID}`,
-      buttonText: "Continue  your request",
+      buttonText,
       currentAccountID: user.currentAccountID,
-      headline: `You've been added to ${group.name}.`,
-      instructions: "You can now continue your request at the link below.",
+      headline: formatString(headline, {
+        group: group.name,
+      }),
+      instructions,
       request,
-      subject: "You've been added!",
+      subject,
       to: user.email,
     });
   }
