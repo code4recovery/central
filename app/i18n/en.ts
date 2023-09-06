@@ -90,6 +90,8 @@ export const strings = {
       subject: "Request to add group representative",
     },
   },
+  error: "Error",
+  error_unknown: "An unknown error occurred.",
   feedback: {
     title: "Feedback",
     empty: "No feedback received yet",
@@ -261,11 +263,13 @@ export const strings = {
       "Editing this information will edit the user's profile. This user also represents: {groups}.",
   },
   request: {
+    approved: "Request approved ✅",
+    approved_description: "{user} has been added to {group}.",
     email_sent:
       "Thanks! Now check your email. You will receive a link to confirm your identity.",
     request_sent:
-      "Great! An email has been sent to {users}. Once they confirm, you will receive an email to continue.",
-    title: "New Meeting / Change Request Form",
+      "Great! An email has been sent to the current group reps. Once they confirm, you will receive an email to continue.",
+    title: "New Listings • Changes • Removals",
   },
   types: {
     "11": "11th Step Meditation",

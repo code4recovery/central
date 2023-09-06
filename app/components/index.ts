@@ -17,6 +17,7 @@ export * from "./HelpTopic";
 export * from "./Input";
 export * from "./Label";
 export * from "./LoadMore";
+export * from "./Message";
 export * from "./Panel";
 export * from "./Select";
 export * from "./Table";

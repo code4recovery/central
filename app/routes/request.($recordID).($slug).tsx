@@ -139,7 +139,13 @@ export const action: ActionFunction = async ({ request }) => {
       include: { users: true },
     });
     const { id: userID } = await getIDs(request);
-    const user = await db.user.findUniqueOrThrow({ where: { id: userID } });
+
+    // update user name
+    const name = formData.get("your_name")?.toString() || "";
+    await db.user.update({
+      data: { name },
+      where: { id: userID },
+    });
 
     // send email to group reps
     group.users.forEach(async ({ email, emailHash, id, loginToken }) => {
@@ -153,7 +159,7 @@ export const action: ActionFunction = async ({ request }) => {
       }
 
       // form login-and-approve link
-      const go = `/approve/${group.id}/${user.id}`;
+      const go = `/approve/${group.id}/${userID}`;
       const params = new URLSearchParams({ go });
       const buttonLink = `/auth/${emailHash}/${loginToken}?${params}`;
 
@@ -162,8 +168,8 @@ export const action: ActionFunction = async ({ request }) => {
         buttonText: strings.email.request.buttonText,
         currentAccountID: account.id,
         headline: formatString(strings.email.request.headline, {
-          name: user.name,
           group: group.name,
+          name,
         }),
         instructions: strings.email.request.instructions,
         request,
@@ -246,7 +252,7 @@ export default function Request() {
       style={{ paddingBottom: "100vh" }} /* no scroll when content changes */
     >
       <h1 className="font-semibold text-xl sm:text-2xl block w-full text-center my-7 xl:my-10 md:text-3xl">
-        New Listings • Changes • Removals
+        {strings.request.title}
       </h1>
 
       {actionData && <Alerts data={actionData} />}
@@ -257,11 +263,7 @@ export default function Request() {
           description="Please start by confirming your identity. We will keep your contact info confidential."
           title="Hi there 👋"
         >
-          <Field
-            help="We will never share your email address."
-            label="Your email address"
-            name="email"
-          >
+          <Field label="Your email address" name="email">
             <div className="relative">
               <input
                 autoFocus={!user}
@@ -284,23 +286,7 @@ export default function Request() {
               )}
             </div>
           </Field>
-          {user ? (
-            <Field
-              help="It's ok to use a last initial. Your name may be seen by other members of your group."
-              label="Your name"
-              name="your_name"
-            >
-              <input
-                className={classes.input}
-                defaultValue={user?.name}
-                id="your_name"
-                name="your_name"
-                type="text"
-              />
-            </Field>
-          ) : (
-            <Button theme="primary">Confirm your identity</Button>
-          )}
+          {!user && <Button theme="primary">Confirm your identity</Button>}
         </Fieldset>
       </Form>
 
@@ -308,39 +294,32 @@ export default function Request() {
         <>
           <Fieldset
             title="Group selection"
-            description="Groups are responsible for meeting listings on the website. The groups you have been added to will appear here."
+            description="Groups are responsible for meeting listings on the website. New groups are vetted by the Policy and Admissions Committee."
           >
-            {user.groups.length ? (
-              <>
-                {user.groups.map((group) => (
-                  <label
-                    key={group.id}
-                    className={
-                      groupRecordID === group.recordID
-                        ? classes.labelButtonActive
-                        : classes.labelButton
-                    }
-                  >
-                    <input
-                      checked={groupRecordID === group.recordID}
-                      onChange={() => {
-                        setGroupExists(true);
-                        setRequestID(undefined);
-                        setGroupRecordID(group.recordID);
-                      }}
-                      readOnly
-                      type="radio"
-                    />
-                    {group.name} • #{group.recordID}
-                  </label>
-                ))}
-              </>
-            ) : (
-              <div className="text-sm">
-                Your email address ({user.email}) is not currently associated
-                with a group in our system.
-              </div>
-            )}
+            {user.groups?.map((group) => (
+              <label
+                key={group.id}
+                className={
+                  groupRecordID === group.recordID
+                    ? classes.labelButtonActive
+                    : classes.labelButton
+                }
+              >
+                <input
+                  checked={groupRecordID === group.recordID}
+                  onChange={() => {
+                    setGroupExists(true);
+                    setRequestID(undefined);
+                    setGroupRecordID(group.recordID);
+                  }}
+                  readOnly
+                  type="radio"
+                />
+                <span>{group.name}</span>
+                <span>~</span>
+                <span>#{group.recordID}</span>
+              </label>
+            ))}
 
             <label className="grid gap-2 cursor-pointer">
               <p
@@ -361,15 +340,11 @@ export default function Request() {
                 />
                 New Group
               </p>
-              <p className="text-sm">
-                New groups are vetted to confirm they are well-established and
-                follow the Traditions.
-              </p>
             </label>
 
             <groupFetcher.Form method="post">
               <input name="subaction" type="hidden" value="group-search" />
-              <Field label="Find my group" name="search">
+              <Field label="Find my existing group" name="search">
                 <div className={cx(classes.input, "relative")}>
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 dark:text-white">
                     <MagnifyingGlassIcon
@@ -400,11 +375,10 @@ export default function Request() {
                         ? classes.labelButtonActive
                         : classes.labelButton
                     }
-                    key={group.id}
+                    key={group.recordID}
                   >
                     <input
                       checked={requestID === group.recordID}
-                      name="group-id"
                       onChange={() => {
                         setGroupExists(true);
                         setGroupRecordID(undefined);
@@ -412,7 +386,9 @@ export default function Request() {
                       }}
                       type="radio"
                     />
-                    {group.name} • #{group.recordID}
+                    <span>{group.name}</span>
+                    <span>~</span>
+                    <span>#{group.recordID}</span>
                   </label>
                 ))}
               </>
@@ -420,14 +396,30 @@ export default function Request() {
 
             {requestID && (
               <>
-                <requestFetcher.Form className="grid gap-2" method="post">
+                <requestFetcher.Form className="grid gap-y-8" method="post">
                   <input type="hidden" name="subaction" value="request" />
                   <input type="hidden" name="groupID" value={requestID} />
-                  <Button theme="primary">Request to be added</Button>
-                  <p className="text-sm">
-                    This will send a request on your behalf to current group
-                    representatives.
-                  </p>
+                  <Field
+                    help="Your name will be seen by the other members of your group."
+                    label="Your name"
+                    name="your_name"
+                  >
+                    <input
+                      className={classes.input}
+                      defaultValue={user?.name}
+                      id="your_name"
+                      name="your_name"
+                      required={true}
+                      type="text"
+                    />
+                  </Field>
+                  <div className="grid gap-y-2">
+                    <Button theme="primary">Request to be added</Button>
+                    <p className="text-sm">
+                      This will send a request on your behalf to current group
+                      representatives.
+                    </p>
+                  </div>
                 </requestFetcher.Form>
                 {requestFetcher.data && (
                   <div className="text-red-400">
@@ -511,10 +503,7 @@ export default function Request() {
               </Fieldset>
 
               {groupExists && !!group?.meetings.length && (
-                <Fieldset
-                  description="Optional: pick a meeting that you want to edit."
-                  title="Meeting selection"
-                >
+                <Fieldset title="Meeting selection">
                   {group?.meetings.map((meeting) => (
                     <label
                       className={
@@ -529,24 +518,27 @@ export default function Request() {
                         onChange={() => setMeetingSlug(meeting.slug)}
                         type="radio"
                       />
-                      {meeting.name} •{" "}
-                      {formatDayTime(
-                        meeting.day,
-                        meeting.time,
-                        meeting.timezone
-                      )}
+                      <span>{meeting.name}</span>
+                      <span>~</span>
+                      <span>
+                        {formatDayTime(
+                          meeting.day,
+                          meeting.time,
+                          meeting.timezone
+                        )}
+                      </span>
                     </label>
                   ))}
                   <label
                     className={
-                      !meetingSlug
+                      meetingSlug === ""
                         ? classes.labelButtonActive
                         : classes.labelButton
                     }
                   >
                     <input
-                      checked={!meetingSlug}
-                      onChange={() => setMeetingSlug(undefined)}
+                      checked={meetingSlug === ""}
+                      onChange={() => setMeetingSlug("")}
                       type="radio"
                     />
                     New Meeting
@@ -554,255 +546,263 @@ export default function Request() {
                 </Fieldset>
               )}
 
-              <Fieldset
-                description="Now tell us about your meetings."
-                title="Meetings"
-              >
-                <Field label="This meeting is active" name="active">
-                  <select
-                    name="active"
-                    value={meetingActive}
-                    onChange={(e) =>
-                      setMeetingActive(e.target.value as typeof meetingActive)
-                    }
-                    className={classes.input}
-                  >
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                  </select>
-                </Field>
-                {meetingActive === "true" && (
-                  <>
-                    <Field
-                      help="Often this will be the same as the group name."
-                      label="Meeting name"
-                      name="name"
-                    >
-                      <input
+              {typeof meetingSlug === "string" && (
+                <Fieldset
+                  description="Now tell us about your meetings."
+                  title="Meetings"
+                >
+                  {meetingSlug && (
+                    <Field label="This meeting is active" name="active">
+                      <select
+                        name="active"
+                        value={meetingActive}
+                        onChange={(e) =>
+                          setMeetingActive(
+                            e.target.value as typeof meetingActive
+                          )
+                        }
                         className={classes.input}
-                        defaultValue={meeting?.name}
-                        id="name"
+                      >
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                      </select>
+                    </Field>
+                  )}
+                  {meetingActive === "true" && (
+                    <>
+                      <Field
+                        help="Often this will be the same as the group name."
+                        label="Meeting name"
                         name="name"
-                        type="text"
-                      />
-                    </Field>
-                    <Field
-                      name="time"
-                      help="Leave these fields blank if the meeting is an 'ongoing' meeting, such as an email group or forum."
-                    >
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="grid gap-2">
-                          <label className={classes.label}>Start time</label>
-                          <input
-                            className={classes.input}
-                            defaultValue={meeting?.time || undefined}
-                            id="time"
-                            name="time"
-                            type="time"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <label className={classes.label}>
-                            Duration (in minutes)
-                          </label>
-                          <input
-                            className={classes.input}
-                            defaultValue={meeting?.duration || undefined}
-                            id="duration"
-                            name="duration"
-                            type="number"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <label className={classes.label}>Timezone</label>
-                          <Select
-                            className={classes.input}
-                            defaultValue={
-                              meeting?.timezone || DateTime.local().zoneName
-                            }
-                            name="timezone"
-                            options={config.timezones.map((value) => {
-                              const [group, ...rest] = value.split("/");
-                              const label = rest
-                                .join(" • ")
-                                .split("_")
-                                .join(" ");
-                              return { value, label, group };
-                            })}
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-5 mb-3">
-                        {config.days.map((day, i) => (
-                          <label
-                            key={i}
-                            className="flex gap-2 items-center cursor-pointer text-sm"
-                          >
+                      >
+                        <input
+                          className={classes.input}
+                          defaultValue={meeting?.name}
+                          id="name"
+                          name="name"
+                          type="text"
+                        />
+                      </Field>
+                      <Field
+                        name="time"
+                        help="Leave these fields blank if the meeting is an 'ongoing' meeting, such as an email group or forum."
+                      >
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="grid gap-2">
+                            <label className={classes.label}>Start time</label>
                             <input
-                              className="rounded"
-                              defaultChecked={meeting?.day === i}
-                              type="checkbox"
-                              value={i}
+                              className={classes.input}
+                              defaultValue={meeting?.time || undefined}
+                              id="time"
+                              name="time"
+                              type="time"
                             />
-                            {strings.days[day as keyof typeof strings.days]}
-                          </label>
-                        ))}
-                      </div>
-                    </Field>
+                          </div>
+                          <div className="grid gap-2">
+                            <label className={classes.label}>
+                              Duration (in minutes)
+                            </label>
+                            <input
+                              className={classes.input}
+                              defaultValue={meeting?.duration || undefined}
+                              id="duration"
+                              name="duration"
+                              type="number"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <label className={classes.label}>Timezone</label>
+                            <Select
+                              className={classes.input}
+                              defaultValue={
+                                meeting?.timezone || DateTime.local().zoneName
+                              }
+                              name="timezone"
+                              options={config.timezones.map((value) => {
+                                const [group, ...rest] = value.split("/");
+                                const label = rest
+                                  .join(" • ")
+                                  .split("_")
+                                  .join(" ");
+                                return { value, label, group };
+                              })}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-5 mb-3">
+                          {config.days.map((day, i) => (
+                            <label
+                              key={i}
+                              className="flex gap-2 items-center cursor-pointer text-sm"
+                            >
+                              <input
+                                className="rounded"
+                                defaultChecked={meeting?.day === i}
+                                type="checkbox"
+                                value={i}
+                              />
+                              {strings.days[day as keyof typeof strings.days]}
+                            </label>
+                          ))}
+                        </div>
+                      </Field>
 
-                    <Field
-                      name="conference_url"
-                      help="Should be a URL to join a meeting directly."
-                    >
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="grid gap-2 col-span-2">
-                          <label className={classes.label}>
-                            Conference URL
-                          </label>
-                          <input
-                            className={classes.input}
-                            defaultValue={meeting?.conference_url || undefined}
-                            id="conference_url"
-                            name="conference_url"
-                            placeholder="https://zoom.us/j/123456789?pwd=abcdefghi123456789"
-                            type="url"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <label className={classes.label}>Notes</label>
-                          <input
-                            className={classes.input}
-                            defaultValue={
-                              meeting?.conference_url_notes || undefined
-                            }
-                            id="conference_url_notes"
-                            name="conference_url_notes"
-                            placeholder="Password: 123456789"
-                            type="text"
-                          />
-                        </div>
-                      </div>
-                    </Field>
-                    <Field
-                      name="conference_phone"
-                      help="Should be a phone number to join a meeting, and not contain letters."
-                    >
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="grid gap-2 col-span-2">
-                          <label className={classes.label}>
-                            Conference Phone
-                          </label>
-                          <input
-                            className={classes.input}
-                            defaultValue={
-                              meeting?.conference_phone || undefined
-                            }
-                            id="conference_phone"
-                            name="conference_phone"
-                            placeholder="+16469313860,,123456789#"
-                            type="tel"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <label className={classes.label}>Notes</label>
-                          <input
-                            className={classes.input}
-                            defaultValue={
-                              meeting?.conference_phone || undefined
-                            }
-                            id="conference_phone_notes"
-                            name="conference_phone_notes"
-                            type="text"
-                          />
-                        </div>
-                      </div>
-                    </Field>
-                    <Field
-                      label="Types"
-                      help="Should represent the actual focus of the meeting. Please check a maximum of five."
-                    >
-                      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-                        {types
-                          .sort((a, b) =>
-                            strings.types[
-                              a as keyof typeof strings.types
-                            ].localeCompare(
-                              strings.types[b as keyof typeof strings.types]
-                            )
-                          )
-                          .map((type, i) => (
-                            <label
-                              key={i}
-                              className="flex gap-2 items-center cursor-pointer text-sm"
-                            >
-                              <input
-                                className="rounded"
-                                defaultChecked={meeting?.types.includes(type)}
-                                type="checkbox"
-                                value={i}
-                              />
-                              {
-                                strings.types[
-                                  type as keyof typeof strings.types
-                                ]
-                              }
+                      <Field
+                        name="conference_url"
+                        help="Should be a URL to join a meeting directly."
+                      >
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="grid gap-2 col-span-2">
+                            <label className={classes.label}>
+                              Conference URL
                             </label>
-                          ))}
-                      </div>
-                    </Field>
-                    <Field
-                      label="Languages"
-                      help="Languages that are typically used in the meeting. Most meetings use only one."
-                    >
-                      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
-                        {languages
-                          .sort((a, b) =>
-                            strings.languages[
-                              a as keyof typeof strings.languages
-                            ].localeCompare(
+                            <input
+                              className={classes.input}
+                              defaultValue={
+                                meeting?.conference_url || undefined
+                              }
+                              id="conference_url"
+                              name="conference_url"
+                              placeholder="https://zoom.us/j/123456789?pwd=abcdefghi123456789"
+                              type="url"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <label className={classes.label}>Notes</label>
+                            <input
+                              className={classes.input}
+                              defaultValue={
+                                meeting?.conference_url_notes || undefined
+                              }
+                              id="conference_url_notes"
+                              name="conference_url_notes"
+                              placeholder="Password: 123456789"
+                              type="text"
+                            />
+                          </div>
+                        </div>
+                      </Field>
+                      <Field
+                        name="conference_phone"
+                        help="Should be a phone number to join a meeting, and not contain letters."
+                      >
+                        <div className="grid grid-cols-3 gap-3">
+                          <div className="grid gap-2 col-span-2">
+                            <label className={classes.label}>
+                              Conference Phone
+                            </label>
+                            <input
+                              className={classes.input}
+                              defaultValue={
+                                meeting?.conference_phone || undefined
+                              }
+                              id="conference_phone"
+                              name="conference_phone"
+                              placeholder="+16469313860,,123456789#"
+                              type="tel"
+                            />
+                          </div>
+                          <div className="grid gap-2">
+                            <label className={classes.label}>Notes</label>
+                            <input
+                              className={classes.input}
+                              defaultValue={
+                                meeting?.conference_phone || undefined
+                              }
+                              id="conference_phone_notes"
+                              name="conference_phone_notes"
+                              type="text"
+                            />
+                          </div>
+                        </div>
+                      </Field>
+                      <Field
+                        label="Types"
+                        help="Should represent the actual focus of the meeting. Please check a maximum of five."
+                      >
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+                          {types
+                            .sort((a, b) =>
+                              strings.types[
+                                a as keyof typeof strings.types
+                              ].localeCompare(
+                                strings.types[b as keyof typeof strings.types]
+                              )
+                            )
+                            .map((type, i) => (
+                              <label
+                                key={i}
+                                className="flex gap-2 items-center cursor-pointer text-sm"
+                              >
+                                <input
+                                  className="rounded"
+                                  defaultChecked={meeting?.types.includes(type)}
+                                  type="checkbox"
+                                  value={i}
+                                />
+                                {
+                                  strings.types[
+                                    type as keyof typeof strings.types
+                                  ]
+                                }
+                              </label>
+                            ))}
+                        </div>
+                      </Field>
+                      <Field
+                        label="Languages"
+                        help="Languages that are typically used in the meeting. Most meetings use only one."
+                      >
+                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+                          {languages
+                            .sort((a, b) =>
                               strings.languages[
-                                b as keyof typeof strings.languages
-                              ]
-                            )
-                          )
-                          .map((language, i) => (
-                            <label
-                              key={i}
-                              className="flex gap-2 items-center cursor-pointer text-sm"
-                            >
-                              <input
-                                className="rounded"
-                                defaultChecked={meeting?.languages.includes(
-                                  language
-                                )}
-                                type="checkbox"
-                                value={i}
-                              />
-                              {
+                                a as keyof typeof strings.languages
+                              ].localeCompare(
                                 strings.languages[
-                                  language as keyof typeof strings.languages
+                                  b as keyof typeof strings.languages
                                 ]
-                              }
-                            </label>
-                          ))}
-                      </div>
-                    </Field>
-                    <Field
-                      help="Please keep this short - no need to repeat information captured elsewhere, such as the meeting times or conference URL."
-                      label="Meeting notes"
-                      name="notes"
-                    >
-                      <textarea
-                        className={classes.textarea}
-                        defaultValue={meeting?.notes || undefined}
-                        id="notes"
+                              )
+                            )
+                            .map((language, i) => (
+                              <label
+                                key={i}
+                                className="flex gap-2 items-center cursor-pointer text-sm"
+                              >
+                                <input
+                                  className="rounded"
+                                  defaultChecked={meeting?.languages.includes(
+                                    language
+                                  )}
+                                  type="checkbox"
+                                  value={i}
+                                />
+                                {
+                                  strings.languages[
+                                    language as keyof typeof strings.languages
+                                  ]
+                                }
+                              </label>
+                            ))}
+                        </div>
+                      </Field>
+                      <Field
+                        help="Please keep this short - no need to repeat information captured elsewhere, such as the meeting times or conference URL."
+                        label="Meeting notes"
                         name="notes"
-                        rows={5}
-                      />
-                    </Field>
-                  </>
-                )}
-              </Fieldset>
+                      >
+                        <textarea
+                          className={classes.textarea}
+                          defaultValue={meeting?.notes || undefined}
+                          id="notes"
+                          name="notes"
+                          rows={5}
+                        />
+                      </Field>
+                    </>
+                  )}
+                </Fieldset>
+              )}
 
               <div className="grid gap-8 pt-8 pb-10 max-w-md text-center mx-auto">
                 <p>
@@ -869,18 +869,18 @@ function Field({
 
 function Fieldset({
   children,
-  title,
   description,
+  title,
 }: {
-  title: string;
-  description: string;
   children: React.ReactNode;
+  description?: string;
+  title: string;
 }) {
   return (
     <fieldset className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-neutral-300 dark:border-neutral-800 py-12 md:grid-cols-6">
       <div className=" md:col-span-2">
         <h2 className="text-xl font-semibold mb-2">{title}</h2>
-        <p className={classes.help}>{description}</p>
+        {description && <p className={classes.help}>{description}</p>}
       </div>
       <div className="grid gap-x-6 gap-y-8 md:col-span-4 items-start">
         {children}

@@ -1,6 +1,10 @@
 import { useState } from "react";
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import {
+  json,
+  type LinksFunction,
+  type LoaderArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -14,11 +18,11 @@ import {
 } from "@remix-run/react";
 
 import styles from "./tailwind.css";
+import { Message, Template } from "~/components";
 import { GeocodeContext, UserContext } from "./hooks";
 import { strings } from "~/i18n";
 import type { Geocode } from "./types";
 import { getUserOrRedirect } from "~/utils";
-import { Template } from "./components";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -72,27 +76,20 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-
-  const { title, text, data } = isRouteErrorResponse(error)
+  const messageProps = isRouteErrorResponse(error)
     ? {
-        title: error.status,
-        text: error.statusText,
-        data: <p>{error.data}</p>,
+        heading: `${error.status}: ${error.statusText}`,
+        text: error.data,
       }
     : error instanceof Error
     ? {
-        title: "Error",
+        heading: strings.error,
         text: error.message,
-        data: (
-          <pre className="max-w-full text-left overflow-scroll">
-            {error.stack}
-          </pre>
-        ),
+        data: error.stack,
       }
     : {
-        title: "Error",
-        text: "unknown",
-        data: null,
+        heading: strings.error,
+        text: strings.error_unknown,
       };
   return (
     <html lang="en" className="h-full">
@@ -100,13 +97,9 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-neutral-200 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200 flex flex-col h-full">
+      <body className="bg-neutral-200 flex flex-col h-full dark:bg-neutral-900 text-neutral-900 dark:text-neutral-200">
         <Template>
-          <div className="text-center grid gap-3 py-12">
-            <h1 className="text-9xl font-bold">{title}</h1>
-            <p>{text}</p>
-            {data}
-          </div>
+          <Message {...messageProps} />
         </Template>
         <ScrollRestoration />
         <Scripts />

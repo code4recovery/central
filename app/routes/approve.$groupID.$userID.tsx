@@ -1,64 +1,86 @@
-import type { LoaderFunction } from "@remix-run/node";
+import { json, type LoaderFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+
+import { Message } from "~/components";
+import { formatString } from "~/helpers";
+import { strings } from "~/i18n";
 import { db, getIDs, sendMail } from "~/utils";
 
 export const loader: LoaderFunction = async ({ params, request }) => {
-  const { id } = await getIDs(request);
+  const { id: repID } = await getIDs(request);
 
   const { groupID, userID } = params;
 
-  // confirm rep exists
-  const rep = await db.user.findUniqueOrThrow({
+  // confirm requesting user exists
+  const user = await db.user.findUniqueOrThrow({
     select: {
-      id: true,
-      email: true,
       currentAccountID: true,
+      email: true,
+      id: true,
+      name: true,
     },
     where: {
-      id,
+      id: userID,
     },
   });
 
-  // this counts as "last seen"
-  await db.user.update({
-    data: { lastSeen: new Date() },
-    where: { id: rep.id },
+  // get the group name for the email and page
+  const group = await db.group.findUniqueOrThrow({
+    select: {
+      name: true,
+      recordID: true,
+      userIDs: true,
+    },
+    where: {
+      id: groupID,
+    },
   });
 
-  // approve request
-  await db.group.update({
-    data: {
-      users: {
-        connect: { id: userID },
+  if (!group.userIDs.includes(user.id)) {
+    // approve request
+    await db.group.update({
+      data: {
+        users: {
+          connect: { id: user.id },
+        },
       },
-    },
-    where: { id: groupID },
-  });
+      where: { id: groupID },
+    });
 
-  // save activity
-  await db.activity.create({
-    data: {
-      groupID: groupID,
-      type: "add", // todo change this to "addUser" - also change the activity type in the db
-      userID: rep.id,
-      targetID: userID,
-    },
-  });
+    // save activity
+    await db.activity.create({
+      data: {
+        groupID,
+        type: "add", // todo change this to "addUser" - also change the activity type in the db
+        userID: repID,
+        targetID: user.id,
+      },
+    });
 
-  await sendMail({
-    to: rep.email,
-    subject: "You've been added to a group",
-    headline: "You've been added to a group",
-    instructions: "You've been added to a group",
-    buttonLink: "/",
-    buttonText: "Go to your account",
-    request,
-    currentAccountID: rep.currentAccountID,
-  });
+    await sendMail({
+      buttonLink: `/request/${group.recordID}`,
+      buttonText: "Continue  your request",
+      currentAccountID: user.currentAccountID,
+      headline: `You've been added to ${group.name}.`,
+      instructions: "You can now continue your request at the link below.",
+      request,
+      subject: "You've been added!",
+      to: user.email,
+    });
+  }
 
-  return null;
+  return json({ group, user });
 };
 
 export default function Approve() {
-  // todo real page here
-  return <div>done thank you</div>;
+  const { group, user } = useLoaderData();
+  return (
+    <Message
+      heading={strings.request.approved}
+      text={formatString(strings.request.approved_description, {
+        group: group.name,
+        user: user.name,
+      })}
+    />
+  );
 }
