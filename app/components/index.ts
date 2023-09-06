@@ -7,6 +7,7 @@ export * from "./Checkboxes";
 export * from "./Chiclet";
 export * from "./Collapse";
 export * from "./Columns";
+export * from "./DescriptionList";
 export * from "./Email";
 export * from "./Footer";
 export * from "./Form";

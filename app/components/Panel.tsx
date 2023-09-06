@@ -8,6 +8,7 @@ import { Avatar } from "./Avatar";
 import { Button } from "./Button";
 import { Form } from "./Form";
 import { Collapse } from "./Collapse";
+import { Link } from "@remix-run/react";
 
 export function Panel({
   add,
@@ -29,7 +30,14 @@ export function Panel({
   const [form, setForm] = useState<string | boolean>(false);
   return (
     <div className="bg-white dark:bg-black rounded-md shadow overflow-hidden divide-y divide-neutral-300 dark:divide-neutral-800">
-      <h3 className="bg-neutral-50 dark:bg-neutral-800 flex items-center margin-0 px-4 py-3">
+      <h3
+        className={cx(
+          "bg-neutral-50 dark:bg-neutral-800 flex items-center m-0 px-4 py-3",
+          {
+            "mb-0.5": !add,
+          }
+        )}
+      >
         <span className="flex-grow">{title}</span>
         {add && (
           <Button
@@ -67,31 +75,38 @@ export function Panel({
 }
 
 function PanelRow({
+  active,
   cancel,
   date,
   edit,
   form,
-  setForm,
+  link,
   remove,
+  setForm,
   text,
   user,
 }: {
+  active?: boolean;
   cancel: () => void;
   date?: string | null;
   edit?: React.ComponentProps<typeof Form>;
   form?: string | boolean;
-  setForm?: (form: string | boolean) => void;
-  remove?: { subaction: string; targetID: string };
+  link?: string;
   onClick?: () => void;
+  remove?: { subaction: string; targetID: string };
+  setForm?: (form: string | boolean) => void;
   text?: string | null;
   user?: { emailHash: string; name: string };
 }) {
+  const Tag = link ? Link : "div";
   const row = (
-    <div
+    <Tag
       className={cx(
         "flex justify-between gap-3 w-full px-4 py-3 items-center",
         {
-          "cursor-pointer": !!edit,
+          "cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800":
+            !!edit || !!link,
+          "bg-neutral-50 dark:bg-neutral-800": !!active,
         }
       )}
       onClick={
@@ -99,12 +114,13 @@ function PanelRow({
           ? () => setForm(edit.values?.id as string)
           : undefined
       }
+      to={link as string}
     >
       {user && <Avatar emailHash={user.emailHash} name={user.name} />}
       <span className="grow">{text}</span>
       {date && <span>{formatDate(date)}</span>}
       {remove && <RemoveButton {...remove} />}
-    </div>
+    </Tag>
   );
   return !edit ? (
     row

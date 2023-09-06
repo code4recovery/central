@@ -327,12 +327,13 @@ export default function GroupEdit() {
           rows={activities.map(
             ({
               changes,
+              createdAt,
+              id,
               type,
               user,
-              createdAt,
             }: Activity & { changes: Change[]; user: User }) => ({
-              user,
               date: createdAt.toString(),
+              link: `/groups/${group.id}/activity/${id}`,
               text: formatString(
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
@@ -345,6 +346,7 @@ export default function GroupEdit() {
                     .join(", "),
                 }
               ),
+              user,
             })
           )}
         />

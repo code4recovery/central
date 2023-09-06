@@ -86,11 +86,11 @@ export default function ActivityScreen() {
           ...(activity.meeting
             ? {
                 name: activity.meeting.name,
-                link: `/meetings/${activity.meeting.id}`,
+                link: `/meetings/${activity.meeting.id}/activity/${activity.id}`,
               }
             : {
                 name: activity.group?.name,
-                link: `/groups/${activity.group?.id}`,
+                link: `/groups/${activity.group?.id}/activity/${activity.id}`,
               }),
           when: formatDate(activity.createdAt.toString()),
           what: formatString(

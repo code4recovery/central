@@ -40,6 +40,7 @@ export const strings = {
       update: "Updated {properties}",
     },
     name: "Name",
+    revert: "Revert this change",
     title: "Activity",
     what: "What",
     when: "When",
