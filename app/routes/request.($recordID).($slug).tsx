@@ -125,12 +125,12 @@ export const action: ActionFunction = async ({ request }) => {
       }
 
       // filter out meetings that the user is already a part of
-      const otherMeetings = result.filter(
-        (group) =>
-          !group.userIDs.some(({ $oid }: { $oid: string }) => $oid === userID)
+      return json(
+        result.filter(
+          (group) =>
+            !group.userIDs.some(({ $oid }: { $oid: string }) => $oid === userID)
+        )
       );
-
-      return json(otherMeetings);
     }
   } else if (formData.get("subaction") === "request") {
     const recordID = formData.get("groupID")?.toString() ?? "";
@@ -192,7 +192,7 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
       })
     : undefined;
 
-  const group = params.recordID
+  let group = params.recordID
     ? (await db.group.findFirst({
         include: {
           meetings: {
@@ -203,8 +203,14 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
       })) || undefined
     : undefined;
 
+  let requestedGroup;
+  if (group && !group.userIDs.includes(id)) {
+    requestedGroup = group;
+    group = undefined;
+  }
+
   const meetingID = params.slug
-    ? await db.meeting.findFirstOrThrow({
+    ? await db.meeting.findFirst({
         select: { id: true },
         where: { groupID: group?.id, slug: params.slug },
       })
@@ -218,20 +224,21 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
     group,
     languages,
     meeting,
+    requestedGroup,
     types,
     user,
   };
 };
 
 export default function Request() {
-  const { user, group, languages, meeting, types } =
+  const { user, group, languages, meeting, requestedGroup, types } =
     useLoaderData<ReturnType<typeof loader>>();
   const [groupExists, setGroupExists] = useState(true);
   const [groupRecordID, setGroupRecordID] = useState(
-    group?.recordID ?? user?.groups[0]?.recordID
+    group?.recordID ?? requestedGroup?.recordID ?? user?.groups[0]?.recordID
   );
   const [meetingSlug, setMeetingSlug] = useState(meeting?.slug);
-  const [requestID, setRequestID] = useState<string | undefined>();
+  const [requestID, setRequestID] = useState(requestedGroup?.recordID);
   const [meetingActive, setMeetingActive] = useState<"true" | "false">("true");
   const actionData = useActionData();
   const groupFetcher = useFetcher();
@@ -399,6 +406,30 @@ export default function Request() {
                 ))}
               </>
             ) : null}
+
+            {requestedGroup && (
+              <label
+                className={
+                  requestID === requestedGroup.recordID
+                    ? classes.labelButtonActive
+                    : classes.labelButton
+                }
+                key={requestedGroup.recordID}
+              >
+                <input
+                  checked={requestID === requestedGroup.recordID}
+                  onChange={() => {
+                    setGroupExists(true);
+                    setGroupRecordID(undefined);
+                    setRequestID(requestedGroup.recordID || undefined);
+                  }}
+                  type="radio"
+                />
+                <span>{requestedGroup.name}</span>
+                <span>~</span>
+                <span>#{requestedGroup.recordID}</span>
+              </label>
+            )}
 
             {requestID && (
               <>

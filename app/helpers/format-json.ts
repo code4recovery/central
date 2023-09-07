@@ -62,7 +62,7 @@ export function formatJson(
         venmo: group.venmo,
         paypal: group.paypal,
         square: group.square,
-        edit_url: `${process.env.BASE_URL}/meetings/${id}`,
+        edit_url: `${process.env.BASE_URL}/request/${group.recordID}/${slug}`,
         url: slug ? formatUrl(accountUrl, slug) : undefined,
         updated: updatedAt
           ?.toISOString()

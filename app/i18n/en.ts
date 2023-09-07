@@ -154,7 +154,7 @@ export const strings = {
       "Yes, online meetings can have approximate locations, such as Philadelphia, PA. These can be thought of as places of origin or affinity for the meeting. Specifying this will also set the meeting timezone.",
     phone_format: "What's the recommended format for Zoom phone numbers?",
     phone_format_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+      "Ideally the phone number should be in a format that can be dialed directly, such as +12125551212,,123456789#,,#,,444444# -- commas are used to add pauses, and double commas are used to add longer pauses. The commas are optional, but the # symbols are required.",
   },
   json_updated: "JSON updated",
   languages: {
@@ -339,7 +339,8 @@ export const strings = {
         "Should represent the actual focus of the meeting. Please check a maximum of five.",
     },
     meeting_select: {
-      description: "No need to select anything when editing just the group.",
+      description:
+        "No need to select anything here if you're only editing group info.",
       new_meeting: "New Meeting",
       title: "Meeting selection",
     },
