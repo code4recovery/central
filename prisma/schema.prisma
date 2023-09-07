@@ -29,18 +29,22 @@ model Account {
 }
 
 model Activity {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userID    String   @db.ObjectId
-  user      User     @relation("ActivityActor", fields: [userID], references: [id])
-  type      String
-  groupID   String?  @db.ObjectId
-  group     Group?   @relation(fields: [groupID], references: [id], onDelete: Cascade)
-  meetingID String?  @db.ObjectId
-  meeting   Meeting? @relation(fields: [meetingID], references: [id], onDelete: Cascade)
-  targetID  String?  @db.ObjectId
-  target    User?    @relation("ActivityTarget", fields: [targetID], references: [id])
-  changes   Change[]
-  createdAt DateTime @default(now())
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userID     String    @db.ObjectId
+  user       User      @relation("ActivityActor", fields: [userID], references: [id])
+  type       String
+  groupID    String?   @db.ObjectId
+  group      Group?    @relation(fields: [groupID], references: [id], onDelete: Cascade)
+  meetingID  String?   @db.ObjectId
+  meeting    Meeting?  @relation(fields: [meetingID], references: [id], onDelete: Cascade)
+  targetID   String?   @db.ObjectId
+  target     User?     @relation("ActivityTarget", fields: [targetID], references: [id])
+  changes    Change[]
+  createdAt  DateTime  @default(now())
+  approved   Boolean?
+  approverID String?   @db.ObjectId
+  approver   User?     @relation("ActivityApprover", fields: [approverID], references: [id])
+  approvedAt DateTime?
 }
 
 model Change {
@@ -161,23 +165,25 @@ model Type {
 }
 
 model User {
-  id                String     @id @default(auto()) @map("_id") @db.ObjectId
-  name              String
-  email             String     @unique
-  emailHash         String
-  lastSeen          DateTime?
-  loginToken        String?
-  currentAccountID  String
-  groupIDs          String[]   @db.ObjectId
-  groups            Group[]    @relation(fields: [groupIDs], references: [id])
-  accountIDs        String[]   @db.ObjectId
-  accounts          Account[]  @relation("AccountUsers", fields: [accountIDs], references: [id])
-  adminAccountIDs   String[]   @db.ObjectId
-  adminAccounts     Account[]  @relation("AccountAdmins", fields: [adminAccountIDs], references: [id])
-  activityIDs       String[]   @db.ObjectId
-  activities        Activity[] @relation("ActivityActor")
-  activityTargetIDs String[]   @db.ObjectId
-  activityTargets   Activity[] @relation("ActivityTarget")
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  id                  String     @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  email               String     @unique
+  emailHash           String
+  lastSeen            DateTime?
+  loginToken          String?
+  currentAccountID    String
+  groupIDs            String[]   @db.ObjectId
+  groups              Group[]    @relation(fields: [groupIDs], references: [id])
+  accountIDs          String[]   @db.ObjectId
+  accounts            Account[]  @relation("AccountUsers", fields: [accountIDs], references: [id])
+  adminAccountIDs     String[]   @db.ObjectId
+  adminAccounts       Account[]  @relation("AccountAdmins", fields: [adminAccountIDs], references: [id])
+  activityIDs         String[]   @db.ObjectId
+  activities          Activity[] @relation("ActivityActor")
+  activityTargetIDs   String[]   @db.ObjectId
+  activityTargets     Activity[] @relation("ActivityTarget")
+  activityApproverIDs String[]   @db.ObjectId
+  activityApprovers   Activity[] @relation("ActivityApprover")
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 }

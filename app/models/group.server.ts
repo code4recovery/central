@@ -49,7 +49,7 @@ export async function addGroupRep(
   await db.activity.create({
     data: {
       groupID: groupID,
-      type: "add", // todo change this to "addUser" - also change the activity type in the db
+      type: "add", // todo change this to "addGroupRep"
       userID,
       targetID: user.id,
     },
@@ -196,7 +196,7 @@ export async function removeGroupRep(
     await db.activity.create({
       data: {
         groupID: id,
-        type: "remove",
+        type: "remove", // todo change this to "removeGroupRep"
         userID,
         targetID,
       },

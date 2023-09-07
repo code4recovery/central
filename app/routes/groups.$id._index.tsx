@@ -88,7 +88,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   // create an activity record
   const activity = await db.activity.create({
     data: {
-      type: "update",
+      type: "update", // todo change this to "updateGroup" ?
       groupID: id,
       userID,
     },

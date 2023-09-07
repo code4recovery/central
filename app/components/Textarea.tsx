@@ -25,7 +25,7 @@ export function Textarea({
     <>
       <textarea
         {...getInputProps}
-        className={cx(focusRing, config.fieldClassNames, className)}
+        className={cx(focusRing, config.classes.field, className)}
         defaultValue={defaultValue}
         id={name}
         name={name}

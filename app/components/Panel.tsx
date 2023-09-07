@@ -3,7 +3,7 @@ import { ValidatedForm, useIsSubmitting } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { z } from "zod";
 
-import { formatClasses as cx, formatDate } from "~/helpers";
+import { config, formatClasses as cx, formatDate } from "~/helpers";
 import { Avatar } from "./Avatar";
 import { Button } from "./Button";
 import { Form } from "./Form";
@@ -29,10 +29,10 @@ export function Panel({
 }) {
   const [form, setForm] = useState<string | boolean>(false);
   return (
-    <div className="bg-white dark:bg-black rounded-md shadow overflow-hidden divide-y divide-neutral-300 dark:divide-neutral-800">
+    <div className={config.classes.panel}>
       <h3
         className={cx(
-          "bg-neutral-50 dark:bg-neutral-800 flex items-center m-0 px-4 py-3",
+          "bg-neutral-100 dark:bg-neutral-800 flex items-center m-0 px-4 py-3",
           {
             "mb-0.5": !add,
           }
@@ -118,7 +118,7 @@ function PanelRow({
     >
       {user && <Avatar emailHash={user.emailHash} name={user.name} />}
       <span className="grow">{text}</span>
-      {date && <span>{formatDate(date)}</span>}
+      {date && <span className="whitespace-nowrap">{formatDate(date)}</span>}
       {remove && <RemoveButton {...remove} />}
     </Tag>
   );

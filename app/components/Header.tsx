@@ -49,6 +49,7 @@ export function Header() {
         label: strings.activity.title,
       },
       { url: "/reports", label: strings.reports.title },
+      { url: "/requests", label: strings.requests.title },
     ],
     secondary: [
       isAdmin

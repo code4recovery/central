@@ -1,5 +1,9 @@
 import type { Activity, Change, User } from "@prisma/client";
-import { type LoaderFunction } from "@remix-run/node";
+import {
+  type ActionFunction,
+  json,
+  type LoaderFunction,
+} from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 
 import {
@@ -12,7 +16,45 @@ import {
 } from "~/components";
 import { fields, formatDate, validObjectId, formatString } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, jsonWith } from "~/utils";
+import { db, getIDs, jsonWith } from "~/utils";
+
+export const action: ActionFunction = async ({
+  params: { id: groupID, activityID },
+  request,
+}) => {
+  const formData = await request.formData();
+  const { id: userID } = await getIDs(request);
+
+  if (formData.get("subaction") === "approve") {
+    // get activity
+    const activity = await db.activity.findUniqueOrThrow({
+      include: { changes: true },
+      where: { id: activityID },
+    });
+
+    // apply updates
+    const data = {};
+    for (const change of activity.changes) {
+      // @ts-ignore todo
+      data[change.field as keyof typeof data] = change.after;
+    }
+    db.group.update({ data, where: { id: groupID } });
+
+    // update activity
+    await db.activity.update({
+      data: {
+        approved: true,
+        approver: { connect: userID },
+        approvedAt: new Date(),
+      },
+      where: { id: activityID },
+    });
+
+    return json({ info: strings.request.approved });
+  }
+
+  return null;
+};
 
 export const loader: LoaderFunction = async ({
   params: { id, activityID },
@@ -85,12 +127,10 @@ export const loader: LoaderFunction = async ({
     where: { id: activityID },
   });
 
-  console.log(activity);
-
   return jsonWith(request, { activities, activity, group });
 };
 
-export default function GroupEdit() {
+export default function GroupActivityDetail() {
   const { activities, activity, alert, group } = useLoaderData();
   const actionData = useActionData();
   const alerts = { ...actionData, ...alert };
@@ -115,7 +155,7 @@ export default function GroupEdit() {
     >
       <Columns
         primary={
-          <>
+          <div className="px-4 md:px-0 grid gap-y-4">
             {alerts && <Alerts data={alerts} />}
             <DescriptionList
               terms={[
@@ -139,10 +179,12 @@ export default function GroupEdit() {
                   : []),
               ]}
             />
-            <Form>
-              <Button theme="primary">{strings.activity.revert}</Button>
+            <Form className="flex justify-center gap-3">
+              <input type="hidden" name="subaction" value="approve" />
+              <Button theme="primary">{strings.activity.approve}</Button>
+              <Button theme="secondary">{strings.activity.decline}</Button>
             </Form>
-          </>
+          </div>
         }
       >
         <Panel

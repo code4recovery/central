@@ -26,6 +26,8 @@ import {
   formatString,
   formatToken,
   formatValidator,
+  formatChanges,
+  formatValue,
 } from "~/helpers";
 import { strings } from "~/i18n";
 import { getMeeting } from "~/models";
@@ -35,7 +37,7 @@ const classes = {
   help: "text-sm text-neutral-500",
   error: "text-sm text-red-500",
   input: cx(
-    config.fieldClassNames,
+    config.classes.field,
     config.themes.indigo.focusRing,
     "h-10 leading-7"
   ),
@@ -44,11 +46,12 @@ const classes = {
     "border border-indigo-400 cursor-pointer flex gap-3 items-center p-4 rounded hover:bg-indigo-200 dark:border-neutral-500 dark:hover:bg-neutral-800",
   labelButtonActive:
     "border border-indigo-400 cursor-pointer flex gap-3 items-center p-4 rounded bg-indigo-200 dark:border-neutral-500 dark:bg-neutral-800",
-  textarea: cx(config.fieldClassNames, config.themes.indigo.focusRing),
+  textarea: cx(config.classes.field, config.themes.indigo.focusRing),
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+  const { id: userID } = await getIDs(request);
 
   // todo get account in a better way
   const account = await db.account.findFirst({ select: { id: true } });
@@ -111,8 +114,6 @@ export const action: ActionFunction = async ({ request }) => {
     const search = formData.get("search");
 
     if (search) {
-      const { id: userID } = await getIDs(request);
-
       const result = await db.group.findRaw({
         filter: {
           $text: {
@@ -183,6 +184,49 @@ export const action: ActionFunction = async ({ request }) => {
 
     return json({ info: strings.request.request_sent });
   } else if (formData.get("subaction") === "edit-request") {
+    // request to edit group
+
+    const validator = formatValidator("group");
+    const { data, error } = await validator.validate(formData);
+    if (error) {
+      return validationError(error);
+    }
+
+    const { recordID } = data;
+
+    const group = await db.group.findFirstOrThrow({
+      where: { accountID: account.id, recordID },
+    });
+
+    const changes = formatChanges(fields["group-request"], group, data);
+
+    // exit if no changes
+    if (!changes.length) {
+      return json({ info: strings.no_updates });
+    }
+
+    // create an activity record
+    const activity = await db.activity.create({
+      data: {
+        type: "requestGroupUpdate",
+        groupID: group.id,
+        userID,
+      },
+    });
+
+    // save individual changes
+    changes.forEach(
+      async ({ field, before, after }) =>
+        await db.change.create({
+          data: {
+            activityID: activity.id,
+            before: formatValue(before),
+            after: formatValue(after),
+            field,
+          },
+        })
+    );
+
     return json({ info: strings.request.edit_request_sent });
   }
   return null;
@@ -363,7 +407,7 @@ export default function Request() {
               fetcher={groupFetcher}
             >
               <input name="subaction" type="hidden" value="group-search" />
-              <Field label="Find my existing group" name="search">
+              <Field label={strings.request.group_select.search} name="search">
                 <div className={cx(classes.input, "relative")}>
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 dark:text-white">
                     <MagnifyingGlassIcon

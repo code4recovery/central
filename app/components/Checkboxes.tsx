@@ -32,7 +32,7 @@ export function Checkboxes({
             <div className="flex items-top gap-2 m-0" key={optionValue}>
               <input
                 className={cx(
-                  config.checkboxClassNames,
+                  config.classes.checkbox,
                   focusRing,
                   text,
                   className

@@ -55,7 +55,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     await db.activity.create({
       data: {
         meetingID: id,
-        type: archived ? "archive" : "unarchive",
+        type: archived ? "archive" : "unarchive", // todo change this to archiveMeeting | unarchiveMeeting
         userID,
       },
     });
@@ -138,7 +138,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     // create an activity record
     const activity = await db.activity.create({
       data: {
-        type: "update",
+        type: "update", // todo change this to "updateMeeting"
         meetingID,
         userID,
       },

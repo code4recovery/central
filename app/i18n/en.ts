@@ -15,12 +15,15 @@ export const strings = {
   },
   activity: {
     empty: "No activity yet",
+    approve: "Approve this change",
+    decline: "Decline this change",
     general: {
       add: "Added representative",
       archive: "Archived",
       create: "Created",
       editUser: "Edited representative",
       remove: "Removed representative",
+      requestGroupUpdate: "Requested update",
       unarchive: "Unarchived",
       update: "Updated {properties}",
     },
@@ -30,6 +33,7 @@ export const strings = {
       create: "Created group",
       editUser: "Edited group representative",
       remove: "Removed group representative",
+      requestGroupUpdate: "Requested group info update",
       unarchive: "Unarchived group",
       update: "Updated {properties}",
     },
@@ -299,6 +303,7 @@ export const strings = {
         "Groups are responsible for meeting listings on the website. New groups are vetted by the Policy and Admissions Committee.",
       new_group: "New Group",
       no_results: "No results",
+      search: "Get added to an existing group",
       searching: "Searching…",
       title: "Group selection",
       your_name: "Your name",
@@ -352,6 +357,9 @@ export const strings = {
       "Great! An email has been sent to the current group reps. Once they confirm, you will receive an email to continue.",
     submit: "Submit request",
     title: "New Listings • Changes • Removals",
+  },
+  requests: {
+    title: "Requests",
   },
   search: {
     description_many: "{meetingCount} results match “{search}”",
