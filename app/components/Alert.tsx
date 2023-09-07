@@ -17,7 +17,7 @@ export function Alert({
   return (
     <div
       className={cx(
-        "border-l-4 flex gap-3 p-4 rounded-none md:rounded shadow",
+        "border-l-4 flex gap-3 p-4 rounded-none md:rounded shadow text-left",
         {
           "bg-red-50 dark:bg-red-950 border-red-400 dark:border-red-600 text-red-700 dark:text-red-300":
             type === "error",

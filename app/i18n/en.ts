@@ -268,6 +268,8 @@ export const strings = {
     approved: "Request approved ✅",
     approved_description: "{user} has been added to {group}.",
     directory_guidelines: "Directory Guidelines",
+    edit_request_sent:
+      "Thank you. Your request has been sent to the site administrators. You will receive an email when your request is confirmed.",
     email_sent:
       "Thanks! Now check your email. You will receive a link to confirm your identity.",
     group_info: {
@@ -277,6 +279,7 @@ export const strings = {
       email_help:
         "Optional group email address. This will be displayed publicly on the meeting listing.",
       email_placeholder: "group.name@email.com",
+      name: "Group name",
       notes: "Group notes",
       notes_help:
         "Please keep this short - it should be general information about the group and not make reference to individual meetings (that comes next).",
@@ -286,7 +289,7 @@ export const strings = {
       title: "Group info",
       website: "Group website, if any",
       website_help:
-        "Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)",
+        "Optional link to your group website. If your group does not have a website, leave this blank. Should not be a link to a meeting, that comes next.",
     },
     group_select: {
       buttonText: "Request to be added",
