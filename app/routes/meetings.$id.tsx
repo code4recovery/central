@@ -20,6 +20,7 @@ import {
 import { ArchiveForm } from "~/components/ArchiveForm";
 import {
   fields,
+  formatActivity,
   formatChanges,
   formatString,
   formatUrl,
@@ -279,13 +280,7 @@ export default function EditMeeting() {
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                {
-                  properties: changes
-                    .map(({ field }) =>
-                      fields.meeting[field].label?.toLocaleLowerCase()
-                    )
-                    .join(", "),
-                }
+                formatActivity({ type: "meeting", changes })
               ),
             })
           )}

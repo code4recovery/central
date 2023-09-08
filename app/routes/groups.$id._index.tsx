@@ -27,14 +27,15 @@ import {
 } from "~/components";
 import {
   fields,
-  formatDayTime,
-  formatDate,
-  formatValidator,
-  validObjectId,
+  formatActivity,
   formatChanges,
+  formatDate,
+  formatDayTime,
   formatMarkdown,
   formatString,
+  formatValidator,
   formatValue,
+  validObjectId,
 } from "~/helpers";
 import { strings } from "~/i18n";
 import { addGroupRep, editGroupRep, removeGroupRep } from "~/models";
@@ -210,6 +211,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     select: {
       id: true,
       createdAt: true,
+      approved: true,
       changes: {
         select: { field: true },
       },
@@ -326,6 +328,7 @@ export default function GroupEdit() {
           title={strings.activity.title}
           rows={activities.map(
             ({
+              approved,
               changes,
               createdAt,
               id,
@@ -338,13 +341,7 @@ export default function GroupEdit() {
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                {
-                  properties: changes
-                    .map(({ field }) =>
-                      fields.group[field].label?.toLocaleLowerCase()
-                    )
-                    .join(", "),
-                }
+                formatActivity({ type: "group", approved, changes })
               ),
               user,
             })

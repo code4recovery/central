@@ -14,7 +14,13 @@ import {
   Panel,
   Template,
 } from "~/components";
-import { fields, formatDate, validObjectId, formatString } from "~/helpers";
+import {
+  fields,
+  formatDate,
+  validObjectId,
+  formatString,
+  formatActivity,
+} from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs, jsonWith } from "~/utils";
 
@@ -38,13 +44,14 @@ export const action: ActionFunction = async ({
       // @ts-ignore todo
       data[change.field as keyof typeof data] = change.after;
     }
-    db.group.update({ data, where: { id: groupID } });
+
+    await db.group.update({ data, where: { id: groupID } });
 
     // update activity
     await db.activity.update({
       data: {
         approved: true,
-        approver: { connect: userID },
+        approver: { connect: { id: userID } },
         approvedAt: new Date(),
       },
       where: { id: activityID },
@@ -80,6 +87,7 @@ export const loader: LoaderFunction = async ({
     select: {
       id: true,
       createdAt: true,
+      approved: true,
       changes: {
         select: { field: true },
       },
@@ -97,7 +105,7 @@ export const loader: LoaderFunction = async ({
         },
       },
     },
-    take: 12,
+    take: 10,
     where: { groupID: id },
   });
 
@@ -106,6 +114,13 @@ export const loader: LoaderFunction = async ({
       id: true,
       type: true,
       createdAt: true,
+      approved: true,
+      approver: {
+        select: {
+          name: true,
+        },
+      },
+      approvedAt: true,
       changes: {
         select: {
           field: true,
@@ -144,18 +159,12 @@ export default function GroupActivityDetail() {
         strings.activity.general[
           activity.type as keyof typeof strings.activity.general
         ],
-        {
-          properties: activity.changes
-            .map(({ field }: Change) =>
-              fields.group[field].label?.toLocaleLowerCase()
-            )
-            .join(", "),
-        }
+        formatActivity({ ...activity, type: "group" })
       )}
     >
       <Columns
         primary={
-          <div className="px-4 md:px-0 grid gap-y-4">
+          <div className="px-4 sm:px-0 grid gap-y-4">
             {alerts && <Alerts data={alerts} />}
             <DescriptionList
               terms={[
@@ -177,9 +186,22 @@ export default function GroupActivityDetail() {
                       },
                     ]
                   : []),
+                ...(activity.type === "requestGroupUpdate"
+                  ? [
+                      {
+                        term: strings.activity.general.approved,
+                        definition:
+                          activity.approved === true
+                            ? strings.yes
+                            : activity.approved === false
+                            ? strings.no
+                            : strings.pending,
+                      },
+                    ]
+                  : []),
               ]}
             />
-            <Form className="flex justify-center gap-3">
+            <Form className="flex justify-center gap-3" method="post">
               <input type="hidden" name="subaction" value="approve" />
               <Button theme="primary">{strings.activity.approve}</Button>
               <Button theme="secondary">{strings.activity.decline}</Button>
@@ -191,6 +213,7 @@ export default function GroupActivityDetail() {
           emptyText={strings.activity.empty}
           rows={activities.map(
             ({
+              approved,
               id,
               changes,
               type,
@@ -205,13 +228,7 @@ export default function GroupActivityDetail() {
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                {
-                  properties: changes
-                    .map(({ field }) =>
-                      fields.group[field].label?.toLocaleLowerCase()
-                    )
-                    .join(", "),
-                }
+                formatActivity({ type: "group", approved, changes })
               ),
             })
           )}

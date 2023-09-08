@@ -13,7 +13,7 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
-import { fields, formatDate, formatString } from "~/helpers";
+import { formatActivity, formatDate, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { getActivity, getActivityCount } from "~/models";
 import { getIDs, jsonWith } from "~/utils";
@@ -97,15 +97,10 @@ export default function ActivityScreen() {
             strings.activity[activity.meeting ? "meeting" : "group"][
               activity.type as keyof typeof strings.activity.meeting
             ],
-            {
-              properties: activity.changes
-                .map(({ field }) =>
-                  fields[activity.meeting ? "meeting" : "group"][
-                    field
-                  ].label?.toLocaleLowerCase()
-                )
-                .join(", "),
-            }
+            formatActivity({
+              ...activity,
+              type: activity.meeting ? "meeting" : "group",
+            })
           ),
           user: (
             <div className="flex gap-2 items-center">

@@ -19,11 +19,12 @@ export const strings = {
     decline: "Decline this change",
     general: {
       add: "Added representative",
+      approved: "Approved",
       archive: "Archived",
       create: "Created",
       editUser: "Edited representative",
       remove: "Removed representative",
-      requestGroupUpdate: "Requested update",
+      requestGroupUpdate: "Requested updated {properties} {approved}",
       unarchive: "Unarchived",
       update: "Updated {properties}",
     },
@@ -238,6 +239,7 @@ export const strings = {
   },
   no: "No",
   no_updates: "Nothing was updated.",
+  pending: "Pending",
   reports: {
     archived: {
       description: "{count} meetings have been archived.",
@@ -359,7 +361,9 @@ export const strings = {
     title: "New Listings • Changes • Removals",
   },
   requests: {
+    empty: "Inbox zero! There are no pending requests.",
     title: "Requests",
+    title_full: "Pending requests",
   },
   search: {
     description_many: "{meetingCount} results match “{search}”",
