@@ -1,8 +1,6 @@
 export const config = {
-  aboutUrl: "https://code4recovery.org",
+  aboutUrl: "https://code4recovery.org/central",
   batchSize: 25,
-  checkboxClassNames:
-    "h-4 w-4 rounded border-neutral-500 m-0 mt-0.5 focus:ring-offset-transparent focus:ring-2",
   conference_providers: {
     "bluejeans.com": "Bluejeans",
     "discord.gg": "Discord",
@@ -19,6 +17,14 @@ export const config = {
     "zoho.com": "Zoho",
     "zoom.us": "Zoom",
   },
+  classes: {
+    checkbox:
+      "h-4 w-4 rounded border-neutral-500 m-0 mt-0.5 focus:ring-offset-transparent focus:ring-2",
+    field:
+      "bg-white dark:bg-black block border-0 leading-6 py-1.5 rounded-md ring-1 ring-neutral-300 dark:ring-neutral-700 ring-inset shadow-sm w-full placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:ring-2 focus:ring-inset disabled:opacity-50",
+    panel:
+      "bg-white dark:bg-black rounded-md shadow overflow-hidden divide-y divide-neutral-300 dark:divide-neutral-800",
+  },
   days: [
     "sunday",
     "monday",
@@ -29,8 +35,6 @@ export const config = {
     "saturday",
   ],
   defaultTheme: "indigo",
-  fieldClassNames:
-    "bg-white dark:bg-black block border-0 leading-6 py-1.5 rounded-md ring-1 ring-neutral-300 dark:ring-neutral-700 ring-inset shadow-sm w-full placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:ring-2 focus:ring-inset disabled:opacity-50",
   home: "/groups",
   languageSubstitutions: {
     ES: "S",

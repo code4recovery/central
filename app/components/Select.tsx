@@ -31,7 +31,7 @@ export function Select({
       <select
         name={!value ? name : undefined}
         id={name}
-        className={cx(config.fieldClassNames, focusRing, className)}
+        className={cx(config.classes.field, focusRing, className)}
         defaultValue={!value ? defaultValue : undefined}
         value={value}
         disabled={!!value}

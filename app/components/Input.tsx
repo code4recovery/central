@@ -34,7 +34,7 @@ export function Input({
         <input
           {...getInputProps()}
           autoFocus={autoFocus || undefined}
-          className={cx(config.fieldClassNames, focusRing, className, {
+          className={cx(config.classes.field, focusRing, className, {
             "ring-1 ring-inset ring-red-300 dark:ring-red-700 placeholder:text-red-300 dark:placeholder:text-red-700 focus:ring-2 focus:ring-inset focus:ring-red-500":
               !!error,
           })}

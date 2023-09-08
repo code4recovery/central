@@ -38,7 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
 
   await db.activity.create({
     data: {
-      type: "create",
+      type: "create", // todo change this to "addGroup" - also change the activity type in the db
       groupID: group.id,
       userID: id,
     },

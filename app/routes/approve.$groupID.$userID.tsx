@@ -51,7 +51,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     await db.activity.create({
       data: {
         groupID,
-        type: "add", // todo change this to "addUser" - also change the activity type in the db
+        type: "add", // todo change this to "addGroupRep"
         userID: repID,
         targetID: user.id,
       },

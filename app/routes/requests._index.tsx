@@ -1,62 +1,38 @@
-import type { Activity, Change, Meeting, User } from "@prisma/client";
-import {
-  json,
-  type ActionFunction,
-  type LoaderFunction,
-  type MetaFunction,
-} from "@remix-run/node";
+import type { Activity, Change, Group, Meeting, User } from "@prisma/client";
+import { json, type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
 import { useEffect, useState } from "react";
-import { validationError } from "remix-validated-form";
-import { z } from "zod";
-import { zfd } from "zod-form-data";
 
 import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { formatActivity, formatDate, formatString } from "~/helpers";
 import { strings } from "~/i18n";
-import { getActivity, getActivityCount } from "~/models";
-import { getIDs, jsonWith } from "~/utils";
-
-export const action: ActionFunction = async ({ request }) => {
-  const validator = withZod(
-    z.object({
-      skip: zfd.numeric(),
-    })
-  );
-
-  const { data, error } = await validator.validate(await request.formData());
-
-  if (error) {
-    return validationError(error);
-  }
-
-  const { currentAccountID } = await getIDs(request);
-
-  const activity = await getActivity(currentAccountID, data.skip);
-
-  return json(activity);
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
-  const activityCount = await getActivityCount(currentAccountID);
-  const loadedActivity = await getActivity(currentAccountID);
-  return jsonWith(request, { loadedActivity, activityCount });
-};
+import { db } from "~/utils";
 
 export const meta: MetaFunction = () => ({
-  title: strings.activity.title,
+  title: strings.requests.title,
 });
 
-export default function ActivityScreen() {
+export const loader: LoaderFunction = async () => {
+  const loadedActivity = await db.activity.findMany({
+    include: { changes: true, group: true, meeting: true, user: true },
+    where: {
+      AND: {
+        type: { startsWith: "request" },
+        OR: [{ approved: null }, { approved: { isSet: false } }],
+      },
+    },
+  });
+  return json({ loadedActivity });
+};
+
+export default function RequestsScreen() {
   const { loadedActivity, activityCount } = useLoaderData();
   const actionData = useActionData();
   const [activity, setActivity] = useState<
     Array<
       Activity & {
         changes: Change[];
-        group?: Meeting;
+        group?: Group;
         meeting?: Meeting;
         user: User;
       }
@@ -70,9 +46,9 @@ export default function ActivityScreen() {
   }, [actionData]);
 
   return (
-    <Template title={strings.activity.title}>
+    <Template title={strings.requests.title_full}>
       {!activity.length && (
-        <Alert message={strings.activity.empty} type="info" />
+        <Alert message={strings.requests.empty} type="info" />
       )}
       <Table
         columns={{

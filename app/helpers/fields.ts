@@ -116,6 +116,64 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: required.email,
     },
   },
+  "group-rep-request": {
+    id: {
+      type: "hidden",
+      validation: required.string,
+    },
+    name: {
+      label: strings.users.name,
+      placeholder: strings.users.name_placeholder,
+      span: 6,
+      type: "text",
+      validation: required.string,
+    },
+    email: {
+      label: strings.users.email,
+      span: 6,
+      type: "email",
+      validation: required.email,
+    },
+  },
+  "group-request": {
+    name: {
+      label: strings.request.group_info.name,
+      type: "text",
+      validation: required.string,
+    },
+    group_notes: {
+      helpText: strings.request.group_info.notes_help,
+      label: strings.request.group_info.notes,
+      type: "textarea",
+      validation: optional.string,
+    },
+    website: {
+      helpText: strings.request.group_info.website_help,
+      label: strings.request.group_info.website,
+      placeholder: "https://",
+      type: "url",
+      validation: optional.url,
+    },
+    email: {
+      helpText: strings.request.group_info.email_help,
+      label: strings.request.group_info.email,
+      placeholder: strings.request.group_info.email_placeholder,
+      type: "email",
+      validation: optional.email,
+    },
+    phone: {
+      helpText: strings.request.group_info.phone_help,
+      label: strings.request.group_info.phone,
+      placeholder: "+1 212 555 1212",
+      type: "tel",
+      validation: optional.phone,
+    },
+  },
+  "group-search": {
+    search: {
+      type: "text",
+    },
+  },
   login: {
     email: {
       type: "email",

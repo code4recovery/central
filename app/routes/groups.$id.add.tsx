@@ -91,7 +91,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   // create an activity record
   await db.activity.create({
     data: {
-      type: "create",
+      type: "create", // todo change this to "createMeeting"
       meetingID: meeting.id,
       userID,
     },

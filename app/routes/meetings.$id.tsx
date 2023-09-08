@@ -20,6 +20,7 @@ import {
 import { ArchiveForm } from "~/components/ArchiveForm";
 import {
   fields,
+  formatActivity,
   formatChanges,
   formatString,
   formatUrl,
@@ -55,7 +56,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     await db.activity.create({
       data: {
         meetingID: id,
-        type: archived ? "archive" : "unarchive",
+        type: archived ? "archive" : "unarchive", // todo change this to archiveMeeting | unarchiveMeeting
         userID,
       },
     });
@@ -138,7 +139,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     // create an activity record
     const activity = await db.activity.create({
       data: {
-        type: "update",
+        type: "update", // todo change this to "updateMeeting"
         meetingID,
         userID,
       },
@@ -279,13 +280,7 @@ export default function EditMeeting() {
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                {
-                  properties: changes
-                    .map(({ field }) =>
-                      fields.meeting[field].label?.toLocaleLowerCase()
-                    )
-                    .join(", "),
-                }
+                formatActivity({ type: "meeting", changes })
               ),
             })
           )}

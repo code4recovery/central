@@ -6,36 +6,38 @@ import {
   json,
 } from "@remix-run/node";
 import { DateTime } from "luxon";
-
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import {
-  Form,
   useActionData,
   useFetcher,
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
 import md5 from "blueimp-md5";
-import { validationError } from "remix-validated-form";
+import { validationError, ValidatedForm, useField } from "remix-validated-form";
 
 import { Alerts, Button, Select } from "~/components";
 import {
   config,
+  fields,
   formatClasses as cx,
   formatDayTime,
   formatSearch,
   formatString,
   formatToken,
   formatValidator,
+  formatChanges,
+  formatValue,
 } from "~/helpers";
 import { strings } from "~/i18n";
 import { getMeeting } from "~/models";
 import { db, getIDs, optionsInUse, sendMail } from "~/utils";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 const classes = {
   help: "text-sm text-neutral-500",
+  error: "text-sm text-red-500",
   input: cx(
-    config.fieldClassNames,
+    config.classes.field,
     config.themes.indigo.focusRing,
     "h-10 leading-7"
   ),
@@ -44,19 +46,21 @@ const classes = {
     "border border-indigo-400 cursor-pointer flex gap-3 items-center p-4 rounded hover:bg-indigo-200 dark:border-neutral-500 dark:hover:bg-neutral-800",
   labelButtonActive:
     "border border-indigo-400 cursor-pointer flex gap-3 items-center p-4 rounded bg-indigo-200 dark:border-neutral-500 dark:bg-neutral-800",
-  textarea: cx(config.fieldClassNames, config.themes.indigo.focusRing),
+  textarea: cx(config.classes.field, config.themes.indigo.focusRing),
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
+  const { id: userID } = await getIDs(request);
 
-  // todo get account somehow
+  // todo get account in a better way
   const account = await db.account.findFirst({ select: { id: true } });
   if (!account) {
     throw new Error("No account found");
   }
 
   if (formData.get("subaction") === "login") {
+    // user logging in - send validation email
     const validator = formatValidator("login");
     const { data, error } = await validator.validate(formData);
     if (error) {
@@ -106,11 +110,10 @@ export const action: ActionFunction = async ({ request }) => {
 
     return json({ info: strings.request.email_sent });
   } else if (formData.get("subaction") === "group-search") {
-    const search = formData.get("group-search");
+    // searching for groups
+    const search = formData.get("search");
 
     if (search) {
-      const { id: userID } = await getIDs(request);
-
       const result = await db.group.findRaw({
         filter: {
           $text: {
@@ -125,14 +128,15 @@ export const action: ActionFunction = async ({ request }) => {
       }
 
       // filter out meetings that the user is already a part of
-      const otherMeetings = result.filter(
-        (group) =>
-          !group.userIDs.some(({ $oid }: { $oid: string }) => $oid === userID)
+      return json(
+        result.filter(
+          (group) =>
+            !group.userIDs.some(({ $oid }: { $oid: string }) => $oid === userID)
+        )
       );
-
-      return json(otherMeetings);
     }
-  } else if (formData.get("subaction") === "request") {
+  } else if (formData.get("subaction") === "join-request") {
+    // requested to join a group
     const recordID = formData.get("groupID")?.toString() ?? "";
     const group = await db.group.findFirstOrThrow({
       where: { accountID: account.id, recordID },
@@ -179,6 +183,51 @@ export const action: ActionFunction = async ({ request }) => {
     });
 
     return json({ info: strings.request.request_sent });
+  } else if (formData.get("subaction") === "edit-request") {
+    // request to edit group
+
+    const validator = formatValidator("group");
+    const { data, error } = await validator.validate(formData);
+    if (error) {
+      return validationError(error);
+    }
+
+    const { recordID } = data;
+
+    const group = await db.group.findFirstOrThrow({
+      where: { accountID: account.id, recordID },
+    });
+
+    const changes = formatChanges(fields["group-request"], group, data);
+
+    // exit if no changes
+    if (!changes.length) {
+      return json({ info: strings.no_updates });
+    }
+
+    // create an activity record
+    const activity = await db.activity.create({
+      data: {
+        type: "requestGroupUpdate",
+        groupID: group.id,
+        userID,
+      },
+    });
+
+    // save individual changes
+    changes.forEach(
+      async ({ field, before, after }) =>
+        await db.change.create({
+          data: {
+            activityID: activity.id,
+            before: formatValue(before),
+            after: formatValue(after),
+            field,
+          },
+        })
+    );
+
+    return json({ info: strings.request.edit_request_sent });
   }
   return null;
 };
@@ -192,7 +241,7 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
       })
     : undefined;
 
-  const group = params.recordID
+  let group = params.recordID
     ? (await db.group.findFirst({
         include: {
           meetings: {
@@ -203,8 +252,14 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
       })) || undefined
     : undefined;
 
+  let requestedGroup;
+  if (group && !group.userIDs.includes(id)) {
+    requestedGroup = group;
+    group = undefined;
+  }
+
   const meetingID = params.slug
-    ? await db.meeting.findFirstOrThrow({
+    ? await db.meeting.findFirst({
         select: { id: true },
         where: { groupID: group?.id, slug: params.slug },
       })
@@ -218,24 +273,26 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
     group,
     languages,
     meeting,
+    requestedGroup,
     types,
     user,
   };
 };
 
 export default function Request() {
-  const { user, group, languages, meeting, types } =
+  const { user, group, languages, meeting, requestedGroup, types } =
     useLoaderData<ReturnType<typeof loader>>();
   const [groupExists, setGroupExists] = useState(true);
   const [groupRecordID, setGroupRecordID] = useState(
-    group?.recordID ?? user?.groups[0]?.recordID
+    group?.recordID ?? requestedGroup?.recordID ?? user?.groups[0]?.recordID
   );
   const [meetingSlug, setMeetingSlug] = useState(meeting?.slug);
-  const [requestID, setRequestID] = useState<string | undefined>();
+  const [requestID, setRequestID] = useState(requestedGroup?.recordID);
   const [meetingActive, setMeetingActive] = useState<"true" | "false">("true");
   const actionData = useActionData();
   const groupFetcher = useFetcher();
   const requestFetcher = useFetcher();
+  const editFetcher = useFetcher();
   const navigate = useNavigate();
 
   // update url when selections change
@@ -257,7 +314,7 @@ export default function Request() {
 
       {actionData && <Alerts data={actionData} />}
 
-      <Form method="post">
+      <ValidatedForm method="post" validator={formatValidator("login")}>
         <input type="hidden" name="subaction" value="login" />
         <Fieldset
           description={strings.request.login.description}
@@ -290,7 +347,7 @@ export default function Request() {
             <Button theme="primary">{strings.request.login.buttonText}</Button>
           )}
         </Fieldset>
-      </Form>
+      </ValidatedForm>
 
       {user && (
         <>
@@ -344,9 +401,13 @@ export default function Request() {
               </p>
             </label>
 
-            <groupFetcher.Form method="post">
+            <ValidatedForm
+              method="post"
+              validator={formatValidator("group-search")}
+              fetcher={groupFetcher}
+            >
               <input name="subaction" type="hidden" value="group-search" />
-              <Field label="Find my existing group" name="search">
+              <Field label={strings.request.group_select.search} name="search">
                 <div className={cx(classes.input, "relative")}>
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 dark:text-white">
                     <MagnifyingGlassIcon
@@ -355,14 +416,14 @@ export default function Request() {
                     />
                   </div>
                   <input
-                    id="group-search"
-                    name="group-search"
+                    id="search"
+                    name="search"
                     type="search"
                     className="absolute bg-transparent border-0 ring-0 top-0 right-0 left-7 bottom-0 focus:ring-0"
                   />
                 </div>
               </Field>
-            </groupFetcher.Form>
+            </ValidatedForm>
 
             {groupFetcher.state === "loading" ? (
               <div className="text-sm">
@@ -400,10 +461,39 @@ export default function Request() {
               </>
             ) : null}
 
+            {requestedGroup && (
+              <label
+                className={
+                  requestID === requestedGroup.recordID
+                    ? classes.labelButtonActive
+                    : classes.labelButton
+                }
+                key={requestedGroup.recordID}
+              >
+                <input
+                  checked={requestID === requestedGroup.recordID}
+                  onChange={() => {
+                    setGroupExists(true);
+                    setGroupRecordID(undefined);
+                    setRequestID(requestedGroup.recordID || undefined);
+                  }}
+                  type="radio"
+                />
+                <span>{requestedGroup.name}</span>
+                <span>~</span>
+                <span>#{requestedGroup.recordID}</span>
+              </label>
+            )}
+
             {requestID && (
               <>
-                <requestFetcher.Form className="grid gap-y-8" method="post">
-                  <input type="hidden" name="subaction" value="request" />
+                <ValidatedForm
+                  className="grid gap-y-8"
+                  fetcher={requestFetcher}
+                  method="post"
+                  validator={formatValidator("group-rep-request")}
+                >
+                  <input type="hidden" name="subaction" value="join-request" />
                   <input type="hidden" name="groupID" value={requestID} />
                   <Field
                     help={strings.request.group_select.your_name_help}
@@ -427,7 +517,7 @@ export default function Request() {
                       {strings.request.group_select.buttonTextHelp}
                     </p>
                   </div>
-                </requestFetcher.Form>
+                </ValidatedForm>
                 {requestFetcher.data && (
                   <div className="text-red-400">
                     <Alerts data={requestFetcher.data} />
@@ -438,75 +528,22 @@ export default function Request() {
           </Fieldset>
 
           {(!groupExists || groupRecordID) && (
-            <Form method="post">
+            <ValidatedForm
+              fetcher={editFetcher}
+              method="post"
+              validator={formatValidator("group-request")}
+            >
+              <input type="hidden" name="subaction" value="edit-request" />
+              <input
+                type="hidden"
+                name="recordID"
+                value={groupRecordID || ""}
+              />
               <Fieldset
                 description={strings.request.group_info.description}
                 title={strings.request.group_info.title}
               >
-                <Field label="Group name" name="group">
-                  <input
-                    className={classes.input}
-                    defaultValue={group?.name}
-                    id="group"
-                    name="group"
-                    type="text"
-                  />
-                </Field>
-                <Field
-                  help={strings.request.group_info.website_help}
-                  label={strings.request.group_info.website}
-                  name="website"
-                >
-                  <input
-                    className={classes.input}
-                    defaultValue={group?.website || undefined}
-                    id="website"
-                    name="website"
-                    placeholder="https://"
-                    type="url"
-                  />
-                </Field>
-                <Field
-                  help={strings.request.group_info.email_help}
-                  label={strings.request.group_info.email}
-                  name="email"
-                >
-                  <input
-                    className={classes.input}
-                    defaultValue={group?.email || undefined}
-                    id="email"
-                    name="email"
-                    placeholder={strings.request.group_info.email_placeholder}
-                    type="email"
-                  />
-                </Field>
-                <Field
-                  help={strings.request.group_info.phone_help}
-                  label={strings.request.group_info.phone}
-                  name="phone"
-                >
-                  <input
-                    className={classes.input}
-                    defaultValue={group?.phone || undefined}
-                    id="phone"
-                    name="phone"
-                    placeholder="+1 212 555 1212"
-                    type="tel"
-                  />
-                </Field>
-                <Field
-                  help={strings.request.group_info.notes_help}
-                  label={strings.request.group_info.notes}
-                  name="group_notes"
-                >
-                  <textarea
-                    className={classes.textarea}
-                    defaultValue={group?.notes || undefined}
-                    id="group_notes"
-                    name="group_notes"
-                    rows={5}
-                  />
-                </Field>
+                <Fields set="group-request" values={group} />
               </Fieldset>
 
               {groupExists && !!group?.meetings.length && (
@@ -748,8 +785,9 @@ export default function Request() {
                         </div>
                       </Field>
                       <Field
-                        label={strings.request.meeting.types}
                         help={strings.request.meeting.types_help}
+                        label={strings.request.meeting.types}
+                        name="types"
                       >
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {types
@@ -781,8 +819,9 @@ export default function Request() {
                         </div>
                       </Field>
                       <Field
-                        label={strings.request.meeting.languages}
                         help={strings.request.meeting.languages_help}
+                        label={strings.request.meeting.languages}
+                        name="languages"
                       >
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
                           {languages
@@ -835,7 +874,7 @@ export default function Request() {
                 </Fieldset>
               )}
 
-              <div className="grid gap-y-10 pt-8 pb-10 max-w-md text-center mx-auto">
+              <div className="grid gap-y-10 pt-8 pb-10 max-w-xl text-center mx-auto">
                 <div className="grid gap-3">
                   <p>{strings.request.agree}</p>
                   <nav className="flex gap-x-3 justify-center">
@@ -858,16 +897,21 @@ export default function Request() {
                     </a>
                   </nav>
                 </div>
-                <div>
-                  <input
-                    className="bg-indigo-500 rounded-md px-5 py-2 text-neutral-100 text-lg dark:bg-indigo-300 dark:text-neutral-900"
-                    disabled
-                    type="submit"
-                    value={strings.request.submit}
-                  />
-                </div>
+                {editFetcher.state === "loading" ? (
+                  <div className="text-sm text-center">Sending…</div>
+                ) : editFetcher.data ? (
+                  <Alerts data={editFetcher.data} />
+                ) : (
+                  <div>
+                    <input
+                      className="bg-indigo-500 rounded-md px-5 py-2 cursor-pointer text-neutral-100 text-lg dark:bg-indigo-300 dark:text-neutral-900"
+                      type="submit"
+                      value={strings.request.submit}
+                    />
+                  </div>
+                )}
               </div>
-            </Form>
+            </ValidatedForm>
           )}
         </>
       )}
@@ -883,9 +927,15 @@ function Field({
 }: {
   children: React.ReactNode;
   label?: string;
-  name?: string;
+  name: string;
   help?: string;
 }) {
+  // getInputProps
+  const { error } = useField(name, {
+    validationBehavior: {
+      initial: "onChange",
+    },
+  });
   return (
     <div className="grid gap-y-2">
       {label && (
@@ -895,7 +945,48 @@ function Field({
       )}
       {children}
       {help && <p className={classes.help}>{help}</p>}
+      {error && <p className={classes.error}>{error}</p>}
     </div>
+  );
+}
+
+function Fields({
+  set,
+  values,
+}: {
+  set: "group-request" | "meeting-request";
+  values?: any; // todo
+}) {
+  const fieldNames = Object.keys(fields[set as keyof typeof fields]);
+  return (
+    <>
+      {fieldNames.map((name) => {
+        const { helpText, label, placeholder, type } =
+          fields[set as keyof typeof fields][name];
+        return (
+          <Field help={helpText} label={label} name={name} key={name}>
+            {type === "textarea" ? (
+              <textarea
+                className={classes.textarea}
+                defaultValue={values?.[name as keyof typeof values]}
+                id={name}
+                name={name}
+                rows={5}
+              />
+            ) : (
+              <input
+                className={classes.input}
+                defaultValue={values?.[name as keyof typeof values]}
+                id={name}
+                name={name}
+                placeholder={placeholder}
+                type={type}
+              />
+            )}
+          </Field>
+        );
+      })}
+    </>
   );
 }
 

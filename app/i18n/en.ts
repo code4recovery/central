@@ -15,12 +15,16 @@ export const strings = {
   },
   activity: {
     empty: "No activity yet",
+    approve: "Approve this change",
+    decline: "Decline this change",
     general: {
       add: "Added representative",
+      approved: "Approved",
       archive: "Archived",
       create: "Created",
       editUser: "Edited representative",
       remove: "Removed representative",
+      requestGroupUpdate: "Requested updated {properties} {approved}",
       unarchive: "Unarchived",
       update: "Updated {properties}",
     },
@@ -30,6 +34,7 @@ export const strings = {
       create: "Created group",
       editUser: "Edited group representative",
       remove: "Removed group representative",
+      requestGroupUpdate: "Requested group info update",
       unarchive: "Unarchived group",
       update: "Updated {properties}",
     },
@@ -40,6 +45,7 @@ export const strings = {
       update: "Updated {properties}",
     },
     name: "Name",
+    revert: "Revert this change",
     title: "Activity",
     what: "What",
     when: "When",
@@ -153,7 +159,7 @@ export const strings = {
       "Yes, online meetings can have approximate locations, such as Philadelphia, PA. These can be thought of as places of origin or affinity for the meeting. Specifying this will also set the meeting timezone.",
     phone_format: "What's the recommended format for Zoom phone numbers?",
     phone_format_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nec felis non quam sagittis scelerisque eu vehicula orci. Aenean ac massa sem. Donec ut purus eros. Nunc ac tortor ante. Integer et quam vel est pulvinar convallis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+      "Ideally the phone number should be in a format that can be dialed directly, such as +12125551212,,123456789#,,#,,444444# -- commas are used to add pauses, and double commas are used to add longer pauses. The commas are optional, but the # symbols are required.",
   },
   json_updated: "JSON updated",
   languages: {
@@ -233,6 +239,7 @@ export const strings = {
   },
   no: "No",
   no_updates: "Nothing was updated.",
+  pending: "Pending",
   reports: {
     archived: {
       description: "{count} meetings have been archived.",
@@ -267,6 +274,8 @@ export const strings = {
     approved: "Request approved ✅",
     approved_description: "{user} has been added to {group}.",
     directory_guidelines: "Directory Guidelines",
+    edit_request_sent:
+      "Thank you. Your request has been sent to the site administrators. You will receive an email when your request is confirmed.",
     email_sent:
       "Thanks! Now check your email. You will receive a link to confirm your identity.",
     group_info: {
@@ -276,6 +285,7 @@ export const strings = {
       email_help:
         "Optional group email address. This will be displayed publicly on the meeting listing.",
       email_placeholder: "group.name@email.com",
+      name: "Group name",
       notes: "Group notes",
       notes_help:
         "Please keep this short - it should be general information about the group and not make reference to individual meetings (that comes next).",
@@ -285,7 +295,7 @@ export const strings = {
       title: "Group info",
       website: "Group website, if any",
       website_help:
-        "Optional link to your group website. If your group does not have a website, please leave this section blank. (This should not be a zoom URL, that comes next.)",
+        "Optional link to your group website. If your group does not have a website, leave this blank. Should not be a link to a meeting, that comes next.",
     },
     group_select: {
       buttonText: "Request to be added",
@@ -295,6 +305,7 @@ export const strings = {
         "Groups are responsible for meeting listings on the website. New groups are vetted by the Policy and Admissions Committee.",
       new_group: "New Group",
       no_results: "No results",
+      search: "Get added to an existing group",
       searching: "Searching…",
       title: "Group selection",
       your_name: "Your name",
@@ -338,7 +349,8 @@ export const strings = {
         "Should represent the actual focus of the meeting. Please check a maximum of five.",
     },
     meeting_select: {
-      description: "No need to select anything when editing just the group.",
+      description:
+        "No need to select anything here if you're only editing group info.",
       new_meeting: "New Meeting",
       title: "Meeting selection",
     },
@@ -347,6 +359,11 @@ export const strings = {
       "Great! An email has been sent to the current group reps. Once they confirm, you will receive an email to continue.",
     submit: "Submit request",
     title: "New Listings • Changes • Removals",
+  },
+  requests: {
+    empty: "Inbox zero! There are no pending requests.",
+    title: "Requests",
+    title_full: "Pending requests",
   },
   search: {
     description_many: "{meetingCount} results match “{search}”",

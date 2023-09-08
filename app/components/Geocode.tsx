@@ -99,7 +99,7 @@ export function Geocode({
       >
         <Combobox.Input
           className={cx(
-            config.fieldClassNames,
+            config.classes.field,
             focusRing,
             "pr-7 relative",
             className

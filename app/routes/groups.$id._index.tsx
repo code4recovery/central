@@ -27,14 +27,15 @@ import {
 } from "~/components";
 import {
   fields,
-  formatDayTime,
-  formatDate,
-  formatValidator,
-  validObjectId,
+  formatActivity,
   formatChanges,
+  formatDate,
+  formatDayTime,
   formatMarkdown,
   formatString,
+  formatValidator,
   formatValue,
+  validObjectId,
 } from "~/helpers";
 import { strings } from "~/i18n";
 import { addGroupRep, editGroupRep, removeGroupRep } from "~/models";
@@ -88,7 +89,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   // create an activity record
   const activity = await db.activity.create({
     data: {
-      type: "update",
+      type: "update", // todo change this to "updateGroup" ?
       groupID: id,
       userID,
     },
@@ -210,6 +211,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     select: {
       id: true,
       createdAt: true,
+      approved: true,
       changes: {
         select: { field: true },
       },
@@ -326,25 +328,22 @@ export default function GroupEdit() {
           title={strings.activity.title}
           rows={activities.map(
             ({
+              approved,
               changes,
+              createdAt,
+              id,
               type,
               user,
-              createdAt,
             }: Activity & { changes: Change[]; user: User }) => ({
-              user,
               date: createdAt.toString(),
+              link: `/groups/${group.id}/activity/${id}`,
               text: formatString(
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                {
-                  properties: changes
-                    .map(({ field }) =>
-                      fields.group[field].label?.toLocaleLowerCase()
-                    )
-                    .join(", "),
-                }
+                formatActivity({ type: "group", approved, changes })
               ),
+              user,
             })
           )}
         />
