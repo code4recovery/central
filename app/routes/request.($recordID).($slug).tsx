@@ -135,7 +135,7 @@ export const action: ActionFunction = async ({ request }) => {
         )
       );
     }
-  } else if (formData.get("subaction") === "join-request") {
+  } else if (formData.get("subaction") === "group-rep-request") {
     // requested to join a group
     const recordID = formData.get("groupID")?.toString() ?? "";
     const group = await db.group.findFirstOrThrow({
@@ -493,7 +493,11 @@ export default function Request() {
                   method="post"
                   validator={formatValidator("group-rep-request")}
                 >
-                  <input type="hidden" name="subaction" value="join-request" />
+                  <input
+                    type="hidden"
+                    name="subaction"
+                    value="group-rep-request"
+                  />
                   <input type="hidden" name="groupID" value={requestID} />
                   <Field
                     help={strings.request.group_select.your_name_help}

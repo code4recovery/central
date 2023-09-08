@@ -22,14 +22,14 @@ import {
   formatActivity,
 } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith } from "~/utils";
+import { db, getIDs, jsonWith, log, publishDataToFtp } from "~/utils";
 
 export const action: ActionFunction = async ({
   params: { id: groupID, activityID },
   request,
 }) => {
   const formData = await request.formData();
-  const { id: userID } = await getIDs(request);
+  const { id: userID, currentAccountID } = await getIDs(request);
 
   if (formData.get("subaction") === "approve") {
     // get activity
@@ -56,6 +56,16 @@ export const action: ActionFunction = async ({
       },
       where: { id: activityID },
     });
+
+    // save feed
+    try {
+      await publishDataToFtp(currentAccountID);
+    } catch (e) {
+      if (e instanceof Error) {
+        log(e);
+        return json({ error: `File storage error: ${e.message}` });
+      }
+    }
 
     return json({ info: strings.request.approved });
   }

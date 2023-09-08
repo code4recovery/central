@@ -16,7 +16,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     select: {
       currentAccountID: true,
       email: true,
+      emailHash: true,
       id: true,
+      loginToken: true,
       name: true,
     },
     where: {
@@ -61,7 +63,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       strings.email.request_approved;
 
     await sendMail({
-      buttonLink: `/request/${group.recordID}`,
+      buttonLink: `/auth/${user.emailHash}/${user.loginToken}?go=/request/${group.recordID}`,
       buttonText,
       currentAccountID: user.currentAccountID,
       headline: formatString(headline, {

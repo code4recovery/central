@@ -117,22 +117,15 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     },
   },
   "group-rep-request": {
-    id: {
+    groupID: {
       type: "hidden",
       validation: required.string,
     },
-    name: {
+    your_name: {
       label: strings.users.name,
       placeholder: strings.users.name_placeholder,
-      span: 6,
       type: "text",
       validation: required.string,
-    },
-    email: {
-      label: strings.users.email,
-      span: 6,
-      type: "email",
-      validation: required.email,
     },
   },
   "group-request": {
@@ -141,7 +134,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       type: "text",
       validation: required.string,
     },
-    group_notes: {
+    notes: {
       helpText: strings.request.group_info.notes_help,
       label: strings.request.group_info.notes,
       type: "textarea",
