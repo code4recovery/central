@@ -101,6 +101,12 @@ export const strings = {
       instructions: "You can now continue your request at the link below.",
       subject: "You've been added!",
     },
+    update_applied: {
+      buttonText: "View your meetings",
+      headline: "Your group listing update has now been applied to {group}.",
+      instructions: "Tap the button below to view your group listing.",
+      subject: "Group listing update complete",
+    },
   },
   error: "Error",
   error_unknown: "An unknown error occurred.",

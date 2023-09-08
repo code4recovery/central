@@ -22,7 +22,7 @@ import {
   formatActivity,
 } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith, log, publishDataToFtp } from "~/utils";
+import { db, getIDs, jsonWith, log, publishDataToFtp, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({
   params: { id: groupID, activityID },
@@ -34,7 +34,7 @@ export const action: ActionFunction = async ({
   if (formData.get("subaction") === "approve") {
     // get activity
     const activity = await db.activity.findUniqueOrThrow({
-      include: { changes: true },
+      include: { changes: true, group: true, user: true },
       where: { id: activityID },
     });
 
@@ -66,6 +66,23 @@ export const action: ActionFunction = async ({
         return json({ error: `File storage error: ${e.message}` });
       }
     }
+
+    // notify user
+    const { buttonText, headline, instructions, subject } =
+      strings.email.update_applied;
+
+    await sendMail({
+      buttonLink: `/todo`,
+      buttonText,
+      currentAccountID: currentAccountID,
+      headline: formatString(headline, {
+        group: activity.group?.name,
+      }),
+      instructions,
+      request,
+      subject,
+      to: activity.user.email,
+    });
 
     return json({ info: strings.request.approved });
   }
