@@ -15,7 +15,7 @@ export function formatChanges(
       field,
       type: fields[field as keyof typeof fields].type,
       before: value[field as keyof typeof value],
-      after: data[field],
+      after: data[field] ?? null,
     }))
     .filter(({ type, before, after }) =>
       type === "checkboxes"
