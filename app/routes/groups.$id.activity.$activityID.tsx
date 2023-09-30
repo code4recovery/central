@@ -29,7 +29,7 @@ export const action: ActionFunction = async ({
   request,
 }) => {
   const formData = await request.formData();
-  const { id: userID, currentAccountID } = await getIDs(request);
+  const { accountID, userID } = await getIDs(request);
 
   if (formData.get("subaction") === "approve") {
     // get activity
@@ -59,7 +59,7 @@ export const action: ActionFunction = async ({
 
     // save feed
     try {
-      await publishDataToFtp(currentAccountID);
+      await publishDataToFtp(accountID);
     } catch (e) {
       if (e instanceof Error) {
         log(e);
@@ -72,9 +72,9 @@ export const action: ActionFunction = async ({
       strings.email.update_applied;
 
     await sendMail({
+      accountID,
       buttonLink: `/todo`,
       buttonText,
-      currentAccountID: currentAccountID,
       headline: formatString(headline, {
         group: activity.group?.name,
       }),

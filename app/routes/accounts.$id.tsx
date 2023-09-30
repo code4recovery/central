@@ -18,9 +18,9 @@ export const action: ActionFunction = async ({ params, request }) => {
   }
 
   // security
-  const { id } = await getIDs(request);
+  const { userID } = await getIDs(request);
   const account = db.account.findFirst({
-    where: { id: params.id, adminIDs: { has: id } },
+    where: { id: params.id, adminIDs: { has: userID } },
   });
   if (!account) {
     return redirect(config.home); // todo flash invalid id message to this page
@@ -50,9 +50,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
     return redirect(config.home); // todo flash invalid id message to this page
   }
 
-  const { id } = await getIDs(request);
+  const { userID } = await getIDs(request);
   const account = await db.account.findFirst({
-    where: { id: params.id, adminIDs: { has: id } },
+    where: { id: params.id, adminIDs: { has: userID } },
   });
   if (!account) {
     return redirect(config.home); // todo flash invalid id message to this page

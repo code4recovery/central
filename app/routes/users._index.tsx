@@ -9,7 +9,7 @@ import { strings } from "~/i18n";
 import { db, getIDs, jsonWith } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
   const users = await db.user.findMany({
     orderBy: { lastSeen: "desc" },
     select: {
@@ -19,7 +19,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       emailHash: true,
       lastSeen: true,
     },
-    where: { accountIDs: { has: currentAccountID } },
+    where: { accountIDs: { has: accountID } },
   });
   return jsonWith(request, { users });
 };

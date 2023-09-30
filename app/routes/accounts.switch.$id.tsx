@@ -3,11 +3,11 @@ import { strings } from "~/i18n";
 import { changeAccount, db, getIDs, redirectWith } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const { id } = await getIDs(request);
+  const { userID } = await getIDs(request);
   const { id: currentAccountID } = params;
 
   await db.user.update({
-    where: { id },
+    where: { id: userID },
     data: { currentAccountID },
   });
 

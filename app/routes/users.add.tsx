@@ -10,12 +10,12 @@ import { strings } from "~/i18n";
 import { db, getIDs, redirectWith, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
   const validator = formatValidator("user", {
     validator: async (data) =>
       !(await db.user.count({
-        where: { email: data.email, currentAccountID },
+        where: { email: data.email, currentAccountID: accountID },
       })),
     params: {
       message: strings.users.exists,
@@ -35,7 +35,7 @@ export const action: ActionFunction = async ({ request }) => {
     // if user exists, add them to this account
     db.user.update({
       where: { email },
-      data: { accounts: { connect: { id: currentAccountID } } },
+      data: { accounts: { connect: { id: accountID } } },
     });
   } else {
     // otherwise create
@@ -45,22 +45,22 @@ export const action: ActionFunction = async ({ request }) => {
         email,
         emailHash,
         loginToken,
-        currentAccountID,
-        accounts: { connect: { id: currentAccountID } },
+        currentAccountID: accountID,
+        accounts: { connect: { id: accountID } },
       },
     });
   }
 
   const { name: accountName, url: accountUrl } =
     await db.account.findFirstOrThrow({
-      where: { id: currentAccountID },
+      where: { id: accountID },
     });
 
   // send invitation
   await sendMail({
+    accountID,
     buttonLink: `/auth/${emailHash}/${loginToken}`,
     buttonText: strings.email.invite.buttonText,
-    currentAccountID,
     headline: formatString(strings.email.invite.headline, {
       accountUrl,
     }),

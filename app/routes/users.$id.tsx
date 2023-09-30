@@ -19,7 +19,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
   const { name, email, admin } = data;
 
@@ -29,8 +29,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       name,
       email,
       adminAccounts: admin
-        ? { connect: { id: currentAccountID } }
-        : { disconnect: { id: currentAccountID } },
+        ? { connect: { id: accountID } }
+        : { disconnect: { id: accountID } },
     },
   });
   return redirectWith("/users", request, { success: strings.users.updated });

@@ -51,7 +51,7 @@ const classes = {
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
-  const { id: userID } = await getIDs(request);
+  const { userID } = await getIDs(request);
 
   // todo get account in a better way
   const account = await db.account.findFirst({ select: { id: true } });
@@ -93,9 +93,9 @@ export const action: ActionFunction = async ({ request }) => {
     try {
       const buttonLink = `/auth/${user.emailHash}/${loginToken}?go=/request`;
       await sendMail({
+        accountID: user.currentAccountID,
         buttonLink,
         buttonText: strings.email.login.buttonText,
-        currentAccountID: user.currentAccountID,
         headline: formatString(strings.email.login.headline, { email }),
         instructions: strings.email.login.instructions,
         request,
@@ -142,7 +142,7 @@ export const action: ActionFunction = async ({ request }) => {
       where: { accountID: account.id, recordID },
       include: { users: true },
     });
-    const { id: userID } = await getIDs(request);
+    const { userID } = await getIDs(request);
 
     // update user name
     const name = formData.get("your_name")?.toString() || "";
@@ -167,10 +167,10 @@ export const action: ActionFunction = async ({ request }) => {
       const params = new URLSearchParams({ go });
       const buttonLink = `/auth/${emailHash}/${loginToken}?${params}`;
 
-      sendMail({
+      await sendMail({
+        accountID: account.id,
         buttonLink,
         buttonText: strings.email.request.buttonText,
-        currentAccountID: account.id,
         headline: formatString(strings.email.request.headline, {
           group: group.name,
           name,
@@ -233,11 +233,11 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader = async ({ params, request }: DataFunctionArgs) => {
-  const { currentAccountID, id } = await getIDs(request);
-  const user = id
+  const { accountID, userID } = await getIDs(request);
+  const user = userID
     ? await db.user.findUnique({
         select: { id: true, email: true, name: true, groups: true },
-        where: { id },
+        where: { id: userID },
       })
     : undefined;
 
@@ -253,7 +253,7 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
     : undefined;
 
   let requestedGroup;
-  if (group && !group.userIDs.includes(id)) {
+  if (group && !group.userIDs.includes(userID)) {
     requestedGroup = group;
     group = undefined;
   }
@@ -267,7 +267,7 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
 
   const meeting = meetingID ? await getMeeting(meetingID.id) : undefined;
 
-  const { languages, types } = await optionsInUse(currentAccountID);
+  const { languages, types } = await optionsInUse(accountID);
 
   return {
     group,

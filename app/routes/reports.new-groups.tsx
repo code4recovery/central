@@ -39,16 +39,16 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
-  return json(getGroups(currentAccountID, skip, where));
+  return json(getGroups(accountID, skip, where));
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
   return json({
-    loadedGroups: await getGroups(currentAccountID, 0, where),
-    groupCount: await countGroups(currentAccountID, where),
+    loadedGroups: await getGroups(accountID, 0, where),
+    groupCount: await countGroups(accountID, where),
   });
 };
 

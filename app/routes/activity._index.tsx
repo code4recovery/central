@@ -31,17 +31,17 @@ export const action: ActionFunction = async ({ request }) => {
     return validationError(error);
   }
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
-  const activity = await getActivity(currentAccountID, data.skip);
+  const activity = await getActivity(accountID, data.skip);
 
   return json(activity);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
-  const activityCount = await getActivityCount(currentAccountID);
-  const loadedActivity = await getActivity(currentAccountID);
+  const { accountID } = await getIDs(request);
+  const activityCount = await getActivityCount(accountID);
+  const loadedActivity = await getActivity(accountID);
   return jsonWith(request, { loadedActivity, activityCount });
 };
 
@@ -86,7 +86,7 @@ export default function ActivityScreen() {
           ...(activity.meeting
             ? {
                 name: activity.meeting.name,
-                link: `/meetings/${activity.meeting.id}/activity/${activity.id}`,
+                // link: `/meetings/${activity.meeting.id}/activity/${activity.id}`,
               }
             : {
                 name: activity.group?.name,

@@ -58,8 +58,8 @@ export async function createUserSession({
 export async function getIDs(request: Request) {
   const session = await getSession(request);
   return {
-    id: session.get("id"),
-    currentAccountID: session.get("currentAccountID"),
+    accountID: session.get("currentAccountID") as string,
+    userID: session.get("id") as string,
   };
 }
 
@@ -84,8 +84,8 @@ export async function getUserOrRedirect(request: Request) {
   const routeIsPublic = pathname.startsWith("/request") || routeIsLoggedOut;
 
   // get user
-  const { id } = await getIDs(request);
-  const user = id
+  const { userID } = await getIDs(request);
+  const user = userID
     ? await db.user.findFirst({
         select: {
           id: true,
@@ -102,7 +102,7 @@ export async function getUserOrRedirect(request: Request) {
             },
           },
         },
-        where: { id },
+        where: { id: userID },
       })
     : undefined;
 
@@ -119,7 +119,7 @@ export async function getUserOrRedirect(request: Request) {
 
     await db.user.update({
       data: { lastSeen: new Date() },
-      where: { id },
+      where: { id: userID },
     });
   } else if (!routeIsPublic) {
     throw unauthorized(request);

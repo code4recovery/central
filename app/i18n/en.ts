@@ -205,7 +205,7 @@ export const strings = {
     apply_changes_same_time: "all group meetings at this time",
     archive: "Archive",
     archiving: "Archiving",
-    archived: "Meeting archived",
+    archived: "Archived",
     conference_phone: "Conference phone",
     conference_phone_help: "Phone number to join the meeting",
     conference_phone_notes: "Conference phone notes",
@@ -220,7 +220,7 @@ export const strings = {
     duration: "Duration",
     edit: "Edit meeting",
     empty: "No meetings added yet",
-    empty_search: "No meetings matched “{search}”",
+    empty_search: "No meetings matched {search}",
     geocode: "Location",
     geocode_help:
       "Online meetings can have approximate locations, eg neighborhood, city, state/province",

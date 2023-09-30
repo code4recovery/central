@@ -38,10 +38,28 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
-  const meetings = await db.meeting.findMany({
+  const search = formatSearch(new URL(request.url).searchParams.get("search"));
+
+  const where = await getSearchWhere({ search, accountID });
+
+  const meetings = await getSearchResults({ where, skip });
+
+  return json(meetings);
+};
+
+async function getSearchResults({
+  where,
+  skip,
+}: {
+  where: any;
+  skip?: number;
+}) {
+  return await db.meeting.findMany({
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     select: {
+      archived: true,
       day: true,
       time: true,
       timezone: true,
@@ -51,51 +69,45 @@ export const action: ActionFunction = async ({ request }) => {
       languages: { select: { code: true } },
       types: { select: { code: true } },
     },
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
     skip,
     take: config.batchSize,
-    where: { accountID: currentAccountID, archived: false },
+    where,
   });
-  return json(meetings);
-};
+}
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const search = formatSearch(new URL(request.url).searchParams.get("search"));
-
-  const { currentAccountID } = await getIDs(request);
-
-  const where = {
-    archived: false,
+async function getSearchWhere({
+  search,
+  accountID,
+}: {
+  search: string;
+  accountID: string;
+}) {
+  return {
     OR: [
       {
         id: {
-          in: await searchMeetings(search, currentAccountID),
+          in: await searchMeetings(search, accountID),
         },
       },
       {
         groupID: {
-          in: await searchGroups(search, currentAccountID),
+          in: await searchGroups(search, accountID),
         },
       },
     ],
   };
+}
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const search = formatSearch(new URL(request.url).searchParams.get("search"));
+
+  const { accountID } = await getIDs(request);
+
+  const where = await getSearchWhere({ search, accountID });
+
+  const loadedMeetings = await getSearchResults({ where });
 
   const meetingCount = await db.meeting.count({
-    where,
-  });
-
-  const loadedMeetings = await db.meeting.findMany({
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    select: {
-      day: true,
-      time: true,
-      timezone: true,
-      name: true,
-      updatedAt: true,
-      id: true,
-      languages: { select: { code: true } },
-      types: { select: { code: true } },
-    },
     where,
   });
 
@@ -153,8 +165,18 @@ export default function Index() {
           updatedAt: { label: strings.updated, align: "right" },
         }}
         rows={meetings.map(
-          ({ name, id, updatedAt, day, languages, time, timezone, types }) => ({
+          ({
+            archived,
+            day,
+            id,
+            languages,
             name,
+            time,
+            timezone,
+            types,
+            updatedAt,
+          }) => ({
+            name: archived ? `${name} (${strings.meetings.archived})` : name,
             id,
             link: `/meetings/${id}`,
             types: [...languages, ...types].map(({ code }) => code),

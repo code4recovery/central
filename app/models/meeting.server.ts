@@ -1,6 +1,31 @@
-import { validObjectId } from "~/helpers";
+import { config, validObjectId } from "~/helpers";
 import { strings } from "~/i18n";
 import { db } from "~/utils";
+
+export async function getArchived({
+  accountID,
+  skip,
+}: {
+  accountID: string;
+  skip?: number;
+}) {
+  return await db.meeting.findMany({
+    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
+    select: {
+      day: true,
+      time: true,
+      timezone: true,
+      name: true,
+      updatedAt: true,
+      id: true,
+      languages: { select: { code: true } },
+      types: { select: { code: true } },
+    },
+    skip,
+    take: config.batchSize,
+    where: { accountID, archived: true },
+  });
+}
 
 export async function getMeeting(id?: string) {
   if (!validObjectId(id)) {

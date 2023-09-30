@@ -151,6 +151,9 @@ export async function getGroups(
         select: {
           id: true,
         },
+        where: {
+          archived: false,
+        },
       },
       users: {
         select: {

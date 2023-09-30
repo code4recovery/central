@@ -13,8 +13,9 @@ import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { Alert, LoadMore, Table, Template } from "~/components";
-import { config, formatDate, formatDayTime, formatString } from "~/helpers";
+import { formatDate, formatDayTime, formatString } from "~/helpers";
 import { strings } from "~/i18n";
+import { getArchived } from "~/models";
 import { db, getIDs } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
@@ -32,49 +33,21 @@ export const action: ActionFunction = async ({ request }) => {
 
   const { skip } = data;
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
-  const meetings = await db.meeting.findMany({
-    select: {
-      day: true,
-      time: true,
-      timezone: true,
-      name: true,
-      updatedAt: true,
-      id: true,
-      languages: { select: { code: true } },
-      types: { select: { code: true } },
-    },
-    orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
-    skip,
-    take: config.batchSize,
-    where: { accountID: currentAccountID, archived: true },
-  });
+  const meetings = await getArchived({ accountID, skip });
   return json(meetings);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
   const where = {
+    accountID,
     archived: true,
-    accountID: currentAccountID,
   };
 
-  const loadedMeetings = await db.meeting.findMany({
-    select: {
-      id: true,
-      name: true,
-      day: true,
-      time: true,
-      timezone: true,
-      updatedAt: true,
-      languages: { select: { code: true } },
-      types: { select: { code: true } },
-    },
-    take: config.batchSize,
-    where,
-  });
+  const loadedMeetings = await getArchived({ accountID });
 
   const meetingCount = await db.meeting.count({
     where,

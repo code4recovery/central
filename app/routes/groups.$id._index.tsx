@@ -49,14 +49,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   const formData = await request.formData();
   const subaction = formData.get("subaction");
 
-  const { id: userID, currentAccountID } = await getIDs(request);
+  const { accountID, userID } = await getIDs(request);
 
   if (subaction === "group-rep-add") {
-    return addGroupRep(formData, id, userID, currentAccountID);
+    return addGroupRep(formData, id, userID, accountID);
   }
 
   if (subaction === "group-rep-edit") {
-    return editGroupRep(formData, id, userID, currentAccountID);
+    return editGroupRep(formData, id, userID, accountID);
   }
 
   if (subaction === "group-rep-remove") {
@@ -126,7 +126,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await publishDataToFtp(currentAccountID);
+    await publishDataToFtp(accountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);

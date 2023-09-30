@@ -39,17 +39,17 @@ export const action: ActionFunction = async ({ request }) => {
     return validationError(error);
   }
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
-  const groups = await getGroups(currentAccountID, data.skip);
+  const groups = await getGroups(accountID, data.skip);
 
   return json(groups);
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
-  const { meetingCount, groupCount } = await getAccountCounts(currentAccountID);
-  const loadedGroups = await getGroups(currentAccountID);
+  const { accountID } = await getIDs(request);
+  const { meetingCount, groupCount } = await getAccountCounts(accountID);
+  const loadedGroups = await getGroups(accountID);
   return jsonWith(request, { loadedGroups, meetingCount, groupCount });
 };
 

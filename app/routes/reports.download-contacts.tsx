@@ -3,14 +3,14 @@ import type { LoaderFunction } from "@remix-run/node";
 import { db, getIDs } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
   const groups = await db.group.findMany({
     select: {
       name: true,
       email: true,
       users: { select: { email: true, name: true } },
     },
-    where: { accountID: currentAccountID },
+    where: { accountID },
   });
 
   const rows: { name: string; email: string }[] = [];

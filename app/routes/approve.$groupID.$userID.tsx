@@ -7,7 +7,7 @@ import { strings } from "~/i18n";
 import { db, getIDs, sendMail } from "~/utils";
 
 export const loader: LoaderFunction = async ({ params, request }) => {
-  const { id: repID } = await getIDs(request);
+  const { userID: repID } = await getIDs(request);
 
   const { groupID, userID } = params;
 
@@ -63,9 +63,9 @@ export const loader: LoaderFunction = async ({ params, request }) => {
       strings.email.request_approved;
 
     await sendMail({
+      accountID: user.currentAccountID,
       buttonLink: `/auth/${user.emailHash}/${user.loginToken}?go=/request/${group.recordID}`,
       buttonText,
-      currentAccountID: user.currentAccountID,
       headline: formatString(headline, {
         group: group.name,
       }),

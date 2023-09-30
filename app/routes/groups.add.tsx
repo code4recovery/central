@@ -9,12 +9,12 @@ import { strings } from "~/i18n";
 import { db, getIDs, log, redirectWith, publishDataToFtp } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const { id, currentAccountID } = await getIDs(request);
+  const { accountID, userID } = await getIDs(request);
 
   const validator = formatValidator("group", {
     validator: async (data) =>
       !(await db.group.count({
-        where: { recordID: data.recordID, accountID: currentAccountID },
+        where: { accountID, recordID: data.recordID },
       })),
     params: {
       message: strings.group.recordExists,
@@ -32,7 +32,7 @@ export const action: ActionFunction = async ({ request }) => {
     data: {
       ...data,
       name: data.name, // todo why
-      account: { connect: { id: currentAccountID } },
+      account: { connect: { id: accountID } },
     },
   });
 
@@ -40,13 +40,13 @@ export const action: ActionFunction = async ({ request }) => {
     data: {
       type: "create", // todo change this to "addGroup" - also change the activity type in the db
       groupID: group.id,
-      userID: id,
+      userID,
     },
   });
 
   // save feed
   try {
-    await publishDataToFtp(currentAccountID);
+    await publishDataToFtp(accountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);

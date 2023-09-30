@@ -7,18 +7,18 @@ import { strings } from "~/i18n";
 import { db } from "./db.server";
 
 export async function sendMail({
+  accountID,
   buttonLink,
   buttonText,
-  currentAccountID,
   headline,
   instructions,
   request,
   subject,
   to,
 }: {
+  accountID: string;
   buttonLink: string;
   buttonText: string;
-  currentAccountID: string;
   headline: string;
   instructions: string;
   request: Request;
@@ -37,7 +37,7 @@ export async function sendMail({
   const baseUrl = `${protocol}//${host}`;
 
   const account = await db.account.findFirst({
-    where: { id: currentAccountID },
+    where: { id: accountID },
   });
 
   const emailProps = {

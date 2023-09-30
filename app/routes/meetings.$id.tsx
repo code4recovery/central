@@ -41,7 +41,7 @@ import {
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
-  const { id: userID, currentAccountID } = await getIDs(request);
+  const { accountID, userID } = await getIDs(request);
 
   const formData = await request.formData();
 
@@ -61,7 +61,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
       },
     });
     try {
-      await publishDataToFtp(currentAccountID);
+      await publishDataToFtp(accountID);
       return json({ success: strings.meetings.archived });
     } catch (e) {
       if (e instanceof Error) {
@@ -173,7 +173,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // save feed
   try {
-    await publishDataToFtp(currentAccountID);
+    await publishDataToFtp(accountID);
   } catch (e) {
     if (e instanceof Error) {
       log(e);
@@ -186,7 +186,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
 
   const meetings = await db.meeting.findMany({
     where: { groupID: meeting.group.id, id: { not: id } },
@@ -206,7 +206,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
 
   return jsonWith(request, {
     meeting,
-    optionsInUse: await optionsInUse(currentAccountID),
+    optionsInUse: await optionsInUse(accountID),
     saveOptions,
   });
 };

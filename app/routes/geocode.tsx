@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     return json(await geocode(query));
   }
 
-  const { currentAccountID } = await getIDs(request);
+  const { accountID } = await getIDs(request);
   const addresses = await db.geocode.findMany({
     select: {
       id: true,
@@ -33,9 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     where: {
       meetings: {
         some: {
-          group: {
-            accountID: currentAccountID,
-          },
+          group: { accountID },
         },
       },
     },

@@ -52,9 +52,9 @@ export const action: ActionFunction = async ({ request }) => {
         go ? `?${new URLSearchParams({ go })}` : ""
       }`;
       await sendMail({
+        accountID: user.currentAccountID,
         buttonLink,
         buttonText: strings.email.login.buttonText,
-        currentAccountID: user.currentAccountID,
         headline: formatString(strings.email.login.headline, { email }),
         instructions: strings.email.login.instructions,
         request,
