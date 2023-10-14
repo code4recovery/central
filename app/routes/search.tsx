@@ -5,7 +5,7 @@ import type {
 } from "@remix-run/node";
 import type { Language, Meeting, Type } from "@prisma/client";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useEffect, useState } from "react";
 import { validationError } from "remix-validated-form";
@@ -82,16 +82,38 @@ async function getSearchWhere({
   search: string;
   accountID: string;
 }) {
+  const exactMatches = await db.meeting.findMany({
+    select: {
+      id: true,
+    },
+    where: {
+      name: {
+        equals: search,
+        mode: "insensitive",
+      },
+    },
+  });
+
+  if (exactMatches.length) {
+    return {
+      id: {
+        in: exactMatches.map(({ id }) => id),
+      },
+    };
+  }
+
+  const searchTerms = formatSearch(search);
+
   return {
     OR: [
       {
         id: {
-          in: await searchMeetings(search, accountID),
+          in: await searchMeetings(searchTerms, accountID),
         },
       },
       {
         groupID: {
-          in: await searchGroups(search, accountID),
+          in: await searchGroups(searchTerms, accountID),
         },
       },
     ],
@@ -99,13 +121,21 @@ async function getSearchWhere({
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const search = formatSearch(new URL(request.url).searchParams.get("search"));
+  const search = new URL(request.url).searchParams.get("search");
+
+  if (!search) {
+    throw new Error("No search query provided");
+  }
 
   const { accountID } = await getIDs(request);
 
   const where = await getSearchWhere({ search, accountID });
 
   const loadedMeetings = await getSearchResults({ where });
+
+  if (loadedMeetings.length === 1) {
+    return redirect(`/meetings/${loadedMeetings[0].id}`);
+  }
 
   const meetingCount = await db.meeting.count({
     where,
@@ -138,7 +168,7 @@ export default function Index() {
       title={strings.search.title}
       description={
         !meetingCount
-          ? formatString(strings.search.description_none, { search })
+          ? ""
           : meetingCount === 1
           ? formatString(strings.search.description_one, { search })
           : formatString(strings.search.description_many, {
@@ -151,7 +181,7 @@ export default function Index() {
         <Alert
           message={
             search
-              ? formatString(strings.meetings.empty_search, { search })
+              ? formatString(strings.search.description_none, { search })
               : strings.meetings.empty
           }
           type="info"
@@ -185,7 +215,7 @@ export default function Index() {
           })
         )}
       />
-      {!search && meetings.length < meetingCount && (
+      {meetings.length < meetingCount && (
         <LoadMore loadedCount={meetings.length} totalCount={meetingCount} />
       )}
     </Template>

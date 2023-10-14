@@ -136,7 +136,6 @@ export const strings = {
     edit: "Edit group",
     email: "Email",
     empty: "No groups added yet",
-    empty_search: "No groups matched “{search}”",
     name: "Group name",
     notes: "Group notes",
     notFound: "Could not find group.",
@@ -220,7 +219,6 @@ export const strings = {
     duration: "Duration",
     edit: "Edit meeting",
     empty: "No meetings added yet",
-    empty_search: "No meetings matched {search}",
     geocode: "Location",
     geocode_help:
       "Online meetings can have approximate locations, eg neighborhood, city, state/province",
