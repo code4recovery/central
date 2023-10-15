@@ -13,7 +13,6 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@google-cloud/storage": "^6.9.4",
     "@googlemaps/google-maps-services-js": "^3.3.28",
     "@prisma/client": "^5.2.0",
     "@react-email/components": "^0.0.7",

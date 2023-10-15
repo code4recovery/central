@@ -5,7 +5,7 @@ import type {
 } from "@remix-run/node";
 import type { Language, Meeting, Type } from "@prisma/client";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useEffect, useState } from "react";
 import { validationError } from "remix-validated-form";
@@ -21,7 +21,13 @@ import {
   formatString,
 } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, searchMeetings, searchGroups } from "~/utils";
+import {
+  db,
+  getIDs,
+  redirectWith,
+  searchMeetings,
+  searchGroups,
+} from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
@@ -134,7 +140,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   const loadedMeetings = await getSearchResults({ where });
 
   if (loadedMeetings.length === 1) {
-    return redirect(`/meetings/${loadedMeetings[0].id}`);
+    return redirectWith(`/meetings/${loadedMeetings[0].id}`, request, {
+      info: formatString(strings.search.description_one, { search }),
+    });
   }
 
   const meetingCount = await db.meeting.count({
@@ -169,15 +177,13 @@ export default function Index() {
       description={
         !meetingCount
           ? ""
-          : meetingCount === 1
-          ? formatString(strings.search.description_one, { search })
           : formatString(strings.search.description_many, {
               meetingCount,
               search,
             })
       }
     >
-      {!meetings.length && (
+      {!meetingCount && (
         <Alert
           message={
             search

@@ -370,9 +370,9 @@ export const strings = {
     title_full: "Pending requests",
   },
   search: {
-    description_many: "{meetingCount} results match “{search}”",
-    description_none: "No results match “{search}”",
-    description_one: "One result matches “{search}”",
+    description_many: "{meetingCount} meetings match “{search}”",
+    description_none: "No meetings match “{search}”",
+    description_one: "One meeting matches “{search}”",
     placeholder: "Search",
     title: "Search Results",
   },
