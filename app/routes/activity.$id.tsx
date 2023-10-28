@@ -90,51 +90,13 @@ export const action: ActionFunction = async ({
   return null;
 };
 
-export const loader: LoaderFunction = async ({
-  params: { id, activityID },
-  request,
-}) => {
+export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
     throw new Response(null, {
       status: 404,
       statusText: strings.group.notFound,
     });
   }
-
-  const group = await db.group.findUniqueOrThrow({
-    select: {
-      id: true,
-      name: true,
-    },
-    where: { id },
-  });
-
-  const activities = await db.activity.findMany({
-    orderBy: [{ createdAt: "desc" }],
-    select: {
-      id: true,
-      createdAt: true,
-      approved: true,
-      changes: {
-        select: { field: true },
-      },
-      meeting: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      type: true,
-      user: {
-        select: {
-          name: true,
-          emailHash: true,
-        },
-      },
-    },
-    take: 10,
-    where: { groupID: id },
-  });
 
   const activity = await db.activity.findUniqueOrThrow({
     select: {
@@ -165,28 +127,83 @@ export const loader: LoaderFunction = async ({
           name: true,
         },
       },
+      groupID: true,
+      meetingID: true,
     },
-    where: { id: activityID },
+    where: { id },
   });
 
-  return jsonWith(request, { activities, activity, group });
+  const where = activity.groupID
+    ? { groupID: activity.groupID }
+    : { meetingID: activity.meetingID };
+
+  const group = activity.groupID
+    ? await db.group.findUnique({ where: { id: activity.groupID } })
+    : null;
+
+  const meeting = activity.meetingID
+    ? await db.meeting.findUnique({ where: { id: activity.meetingID } })
+    : null;
+
+  const activities = await db.activity.findMany({
+    orderBy: [{ createdAt: "desc" }],
+    select: {
+      id: true,
+      createdAt: true,
+      approved: true,
+      changes: {
+        select: { field: true },
+      },
+      group: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      meeting: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      type: true,
+      user: {
+        select: {
+          name: true,
+          emailHash: true,
+        },
+      },
+    },
+    take: 10,
+    where,
+  });
+
+  return jsonWith(request, { activities, activity, group, meeting });
 };
 
 export default function GroupActivityDetail() {
-  const { activities, activity, alert, group } = useLoaderData();
+  const { activities, activity, alert, group, meeting } = useLoaderData();
   const actionData = useActionData();
   const alerts = { ...actionData, ...alert };
-  return (
-    <Template
-      breadcrumbs={[
+  const breadcrumbs = group
+    ? [
         ["/groups", strings.group.title],
         [`/groups/${group.id}`, group.name],
-      ]}
+      ]
+    : meeting
+    ? [
+        ["/meetings", strings.meetings.title],
+        [`/meetings/${meeting.id}`, meeting.name],
+      ]
+    : [];
+  return (
+    <Template
+      breadcrumbs={breadcrumbs}
       title={formatString(
         strings.activity.general[
           activity.type as keyof typeof strings.activity.general
         ],
-        formatActivity({ ...activity, type: "group" })
+        formatActivity({ ...activity, type: group ? "group" : "meeting" })
       )}
     >
       <Columns
@@ -197,13 +214,16 @@ export default function GroupActivityDetail() {
               terms={[
                 {
                   term: "Change made",
-                  definition: `${activity.user.name} ~ ${formatDate(
-                    activity.createdAt
-                  )}`,
+                  definition: [
+                    activity.user.name,
+                    formatDate(activity.createdAt),
+                  ].join(", "),
                 },
                 ...activity.changes.map(({ field, before, after }: Change) => ({
-                  term: fields.group[field].label,
-                  definition: `${before} → ${after}`,
+                  term: group
+                    ? fields.group[field]?.label
+                    : fields.meeting[field]?.label,
+                  definition: [before, after],
                 })),
                 ...(activity.type === "add"
                   ? [
@@ -219,10 +239,10 @@ export default function GroupActivityDetail() {
                         term: strings.activity.general.approved,
                         definition:
                           activity.approved === true
-                            ? strings.yes
+                            ? [strings.yes]
                             : activity.approved === false
-                            ? strings.no
-                            : strings.pending,
+                            ? [strings.no]
+                            : [strings.pending],
                       },
                     ]
                   : []),
@@ -250,12 +270,16 @@ export default function GroupActivityDetail() {
               active: id === activity.id,
               user,
               date: createdAt.toString(),
-              link: `/groups/${group.id}/activity/${id}`,
+              link: `/activity/${id}`,
               text: formatString(
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                formatActivity({ type: "group", approved, changes })
+                formatActivity({
+                  type: group ? "group" : "meeting",
+                  approved,
+                  changes,
+                })
               ),
             })
           )}

@@ -83,15 +83,8 @@ export default function ActivityScreen() {
         }}
         rows={activity.map((activity) => ({
           ...activity,
-          ...(activity.meeting
-            ? {
-                name: activity.meeting.name,
-                // link: `/meetings/${activity.meeting.id}/activity/${activity.id}`,
-              }
-            : {
-                name: activity.group?.name,
-                link: `/groups/${activity.group?.id}/activity/${activity.id}`,
-              }),
+          name: activity.meeting ? activity.meeting.name : activity.group?.name,
+          link: `/activity/${activity.id}`,
           when: formatDate(activity.createdAt.toString()),
           what: formatString(
             strings.activity[activity.meeting ? "meeting" : "group"][
