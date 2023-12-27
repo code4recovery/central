@@ -39,9 +39,8 @@ export const action: ActionFunction = async ({
     });
 
     // apply updates
-    const data = {};
+    const data: { [id: string]: string | null } = {};
     for (const change of activity.changes) {
-      // @ts-ignore todo
       data[change.field as keyof typeof data] = change.after;
     }
 
@@ -142,7 +141,10 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
     : null;
 
   const meeting = activity.meetingID
-    ? await db.meeting.findUnique({ where: { id: activity.meetingID } })
+    ? await db.meeting.findUnique({
+        include: { group: true },
+        where: { id: activity.meetingID },
+      })
     : null;
 
   const activities = await db.activity.findMany({
@@ -192,7 +194,8 @@ export default function GroupActivityDetail() {
       ]
     : meeting
     ? [
-        ["/meetings", strings.meetings.title],
+        ["/groups", strings.group.title],
+        [`/groups/${meeting.group.id}`, meeting.group.name],
         [`/meetings/${meeting.id}`, meeting.name],
       ]
     : [];
@@ -248,11 +251,14 @@ export default function GroupActivityDetail() {
                   : []),
               ]}
             />
-            <Form className="flex justify-center gap-3" method="post">
-              <input type="hidden" name="subaction" value="approve" />
-              <Button theme="primary">{strings.activity.approve}</Button>
-              <Button theme="secondary">{strings.activity.decline}</Button>
-            </Form>
+
+            {typeof activity.approved === "undefined" && (
+              <Form className="flex justify-center gap-3" method="post">
+                <input type="hidden" name="subaction" value="approve" />
+                <Button theme="primary">{strings.activity.approve}</Button>
+                <Button theme="secondary">{strings.activity.decline}</Button>
+              </Form>
+            )}
           </div>
         }
       >

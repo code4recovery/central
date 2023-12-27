@@ -15,7 +15,10 @@ export function DescriptionList({
             {typeof definition === "string" ? (
               definition
             ) : (
-              <Diff oldValue={definition[0]} newValue={definition[1]} />
+              <Diff
+                oldValue={definition[0] ?? ""}
+                newValue={definition[1] ?? ""}
+              />
             )}
           </dd>
         </div>

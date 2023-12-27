@@ -16,6 +16,7 @@ export const strings = {
   activity: {
     empty: "No activity yet",
     approve: "Approve this change",
+    change: "Change",
     decline: "Decline this change",
     general: {
       add: "Added representative",
@@ -44,10 +45,10 @@ export const strings = {
       unarchive: "Unarchived meeting",
       update: "Updated {properties}",
     },
-    name: "Name",
+    name: "Group / Meeting Name",
     revert: "Revert this change",
     title: "Activity",
-    what: "What",
+    type: "Type",
     when: "When",
     who: "Who",
   },
@@ -359,6 +360,8 @@ export const strings = {
     request_sent:
       "Great! An email has been sent to the current group reps. Once they confirm, you will receive an email to continue.",
     submit: "Submit request",
+    subtitle:
+      "This is the place to request changes to listings on the {accountName} meeting finder.",
     title: "New Listings • Changes • Removals",
   },
   requests: {
