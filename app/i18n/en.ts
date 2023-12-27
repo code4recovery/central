@@ -269,9 +269,6 @@ export const strings = {
   representatives: {
     empty: "No representatives yet",
     title: "Representatives",
-    warning: "Editing this information will edit the user's profile.",
-    warning_groups:
-      "Editing this information will edit the user's profile. This user also represents: {groups}.",
   },
   request: {
     agree: "By clicking below I agree to the Online Intergroup of A.A.:",

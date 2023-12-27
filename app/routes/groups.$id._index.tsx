@@ -31,7 +31,6 @@ import {
   formatChanges,
   formatDate,
   formatDayTime,
-  formatMarkdown,
   formatString,
   formatValidator,
   formatValue,
@@ -306,13 +305,6 @@ export default function GroupEdit() {
             edit: {
               form: "group-rep-edit",
               subaction: "group-rep-edit",
-              legend: user.groups.length
-                ? formatMarkdown(strings.representatives.warning_groups, {
-                    groups: user.groups
-                      .map(({ name, id }) => `[${name}](/groups/${id})`)
-                      .join(", "),
-                  })
-                : strings.representatives.warning,
               values: user,
             },
             remove: {
@@ -336,7 +328,7 @@ export default function GroupEdit() {
               user,
             }: Activity & { changes: Change[]; user: User }) => ({
               date: createdAt.toString(),
-              link: `/groups/${group.id}/activity/${id}`,
+              link: `/activity/${id}`,
               text: formatString(
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
