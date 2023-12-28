@@ -199,6 +199,8 @@ export default function GroupActivityDetail() {
         [`/meetings/${meeting.id}`, meeting.name],
       ]
     : [];
+  const isRequest = activity.type.startsWith("request");
+  const isPending = isRequest && typeof activity.approved === "undefined";
   return (
     <Template
       breadcrumbs={breadcrumbs}
@@ -216,7 +218,9 @@ export default function GroupActivityDetail() {
             <DescriptionList
               terms={[
                 {
-                  term: "Change made",
+                  term: isRequest
+                    ? strings.activity.changeRequested
+                    : strings.activity.changeApplied,
                   definition: [
                     activity.user.name,
                     formatDate(activity.createdAt),
@@ -236,23 +240,29 @@ export default function GroupActivityDetail() {
                       },
                     ]
                   : []),
-                ...(activity.type === "requestGroupUpdate"
+                ...(isRequest
                   ? [
                       {
-                        term: strings.activity.general.approved,
+                        term: strings.activity.status,
                         definition:
                           activity.approved === true
-                            ? [strings.yes]
+                            ? formatString(strings.activity.approvedBy, {
+                                user: activity.approver.name,
+                                date: formatDate(activity.approvedAt),
+                              })
                             : activity.approved === false
-                            ? [strings.no]
-                            : [strings.pending],
+                            ? formatString(strings.activity.declinedBy, {
+                                user: activity.approver.name,
+                                date: formatDate(activity.declinedAt),
+                              })
+                            : strings.pending,
                       },
                     ]
                   : []),
               ]}
             />
 
-            {typeof activity.approved === "undefined" && (
+            {isPending && (
               <Form className="flex justify-center gap-3" method="post">
                 <input type="hidden" name="subaction" value="approve" />
                 <Button theme="primary">{strings.activity.approve}</Button>
