@@ -29,6 +29,7 @@ import {
   formatChanges,
   formatValue,
 } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { getMeeting } from "~/models";
 import { db, getIDs, optionsInUse, sendMail } from "~/utils";
@@ -234,6 +235,12 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader = async ({ params, request }: DataFunctionArgs) => {
   const { accountID, userID } = await getIDs(request);
+
+  const account = await db.account.findUniqueOrThrow({
+    select: { name: true, url: true },
+    where: { id: accountID },
+  });
+
   const user = userID
     ? await db.user.findUnique({
         select: { id: true, email: true, name: true, groups: true },
@@ -270,6 +277,7 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
   const { languages, types } = await optionsInUse(accountID);
 
   return {
+    account,
     group,
     languages,
     meeting,
@@ -280,7 +288,7 @@ export const loader = async ({ params, request }: DataFunctionArgs) => {
 };
 
 export default function Request() {
-  const { user, group, languages, meeting, requestedGroup, types } =
+  const { account, user, group, languages, meeting, requestedGroup, types } =
     useLoaderData<ReturnType<typeof loader>>();
   const [groupExists, setGroupExists] = useState(true);
   const [groupRecordID, setGroupRecordID] = useState(
@@ -294,6 +302,9 @@ export default function Request() {
   const requestFetcher = useFetcher();
   const editFetcher = useFetcher();
   const navigate = useNavigate();
+  const {
+    theme: { text },
+  } = useUser();
 
   // update url when selections change
   useEffect(() => {
@@ -308,9 +319,28 @@ export default function Request() {
       className="p-5 max-w-5xl w-full mx-auto pb-full"
       style={{ paddingBottom: "100vh" }} /* no scroll when content changes */
     >
-      <h1 className="font-semibold text-xl sm:text-2xl block w-full text-center my-7 xl:my-10 md:text-3xl">
-        {strings.request.title}
-      </h1>
+      <div className="gap-3 grid text-center my-7 xl:my-10">
+        <h1 className="font-semibold text-xl sm:text-2xl block w-full md:text-3xl">
+          {strings.request.title}
+        </h1>
+
+        <h2>
+          {formatString(strings.request.subtitle, {
+            accountName: account.name,
+          })}
+        </h2>
+
+        <p>
+          <a
+            className={cx(text, "underline")}
+            href={account.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {account.url}
+          </a>
+        </p>
+      </div>
 
       {actionData && <Alerts data={actionData} />}
 

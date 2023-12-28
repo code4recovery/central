@@ -10,6 +10,7 @@ export function Input({
   autoFocus,
   className,
   defaultValue,
+  disabled,
   helpText,
   name,
   placeholder,
@@ -39,6 +40,7 @@ export function Input({
               !!error,
           })}
           defaultValue={defaultValue}
+          disabled={disabled}
           id={name}
           name={name}
           placeholder={placeholder}

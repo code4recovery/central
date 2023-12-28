@@ -8,6 +8,7 @@ export * from "./Chiclet";
 export * from "./Collapse";
 export * from "./Columns";
 export * from "./DescriptionList";
+export * from "./Diff";
 export * from "./Email";
 export * from "./Footer";
 export * from "./Form";

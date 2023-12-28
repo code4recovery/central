@@ -270,18 +270,20 @@ export default function EditMeeting() {
           rows={meeting.activity.map(
             ({
               changes,
+              createdAt,
+              id,
               type,
               user,
-              createdAt,
             }: Activity & { changes: Change[]; user: User }) => ({
-              user,
               date: createdAt.toString(),
+              link: `/activity/${id}`,
               text: formatString(
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
                 formatActivity({ type: "meeting", changes })
               ),
+              user,
             })
           )}
         />
