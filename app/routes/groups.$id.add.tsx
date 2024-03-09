@@ -92,7 +92,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 
   // redirect to meeting page
   return redirectWith(`/meetings/${meeting.id}`, request, {
-    success: strings.json_updated,
+    success: strings.meetings.added,
   });
 };
 
