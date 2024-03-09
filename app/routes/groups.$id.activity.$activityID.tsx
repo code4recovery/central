@@ -22,7 +22,7 @@ import {
   formatActivity,
 } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, jsonWith, log, publishDataToFtp, sendMail } from "~/utils";
+import { db, getIDs, jsonWith, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({
   params: { id: groupID, activityID },
@@ -56,16 +56,6 @@ export const action: ActionFunction = async ({
       },
       where: { id: activityID },
     });
-
-    // save feed
-    try {
-      await publishDataToFtp(accountID);
-    } catch (e) {
-      if (e instanceof Error) {
-        log(e);
-        return json({ error: `File storage error: ${e.message}` });
-      }
-    }
 
     // notify user
     const { buttonText, headline, instructions, subject } =

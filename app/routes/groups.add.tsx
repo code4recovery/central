@@ -6,7 +6,7 @@ import { validationError } from "remix-validated-form";
 import { Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import { db, getIDs, log, redirectWith, publishDataToFtp } from "~/utils";
+import { db, getIDs, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const { accountID, userID } = await getIDs(request);
@@ -43,16 +43,6 @@ export const action: ActionFunction = async ({ request }) => {
       userID,
     },
   });
-
-  // save feed
-  try {
-    await publishDataToFtp(accountID);
-  } catch (e) {
-    if (e instanceof Error) {
-      log(e);
-      return json({ error: `File storage error: ${e.message}` });
-    }
-  }
 
   // redirect to group page
   return redirectWith(`/groups/${group.id}`, request, {

@@ -166,7 +166,6 @@ export const strings = {
     phone_format_content:
       "Ideally the phone number should be in a format that can be dialed directly, such as +12125551212,,123456789#,,#,,444444# -- commas are used to add pauses, and double commas are used to add longer pauses. The commas are optional, but the # symbols are required.",
   },
-  json_updated: "JSON updated",
   languages: {
     AM: "Amharic",
     DA: "Danish",
@@ -198,6 +197,7 @@ export const strings = {
   loading: "Loading…",
   meetings: {
     add: "Add meeting",
+    added: "Meeting has been added",
     apply_changes: "Apply changes to:",
     apply_changes_all: "all group meetings",
     apply_changes_only_this: "only this meeting",
@@ -235,6 +235,7 @@ export const strings = {
     time: "Time",
     unarchive: "Unarchive",
     unarchiving: "Unarchiving",
+    updated: "Meeting has been updated",
     timezone: "Timezone",
     title: "Meetings",
     types: "Types",
