@@ -184,6 +184,8 @@ export const strings = {
     KO: "Korean",
     LT: "Lithuanian",
     ML: "Malayalam",
+    MT: "Maltese",
+    NE: "Nepali",
     PA: "Punjabi",
     PL: "Polish",
     PT: "Portuguese",
