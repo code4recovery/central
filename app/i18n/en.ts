@@ -168,6 +168,7 @@ export const strings = {
   },
   languages: {
     AM: "Amharic",
+    BG: "Bulgarian",
     DA: "Danish",
     DE: "German",
     EL: "Greek",
