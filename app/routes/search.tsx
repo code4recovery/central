@@ -1,16 +1,8 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
+import type { LoaderFunction, MetaFunction } from "@remix-run/node";
 import type { Language, Meeting, Type } from "@prisma/client";
 import { useActionData, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
+import { json, redirect } from "@remix-run/node";
 import { useEffect, useState } from "react";
-import { validationError } from "remix-validated-form";
-import { z } from "zod";
-import { zfd } from "zod-form-data";
 
 import { Alert, LoadMore, Table, Template } from "~/components";
 import {
@@ -28,32 +20,6 @@ import {
   searchMeetings,
   searchGroups,
 } from "~/utils";
-
-export const action: ActionFunction = async ({ request }) => {
-  const validator = withZod(
-    z.object({
-      skip: zfd.numeric(),
-    })
-  );
-
-  const { data, error } = await validator.validate(await request.formData());
-
-  if (error) {
-    return validationError(error);
-  }
-
-  const { skip } = data;
-
-  const { accountID } = await getIDs(request);
-
-  const search = formatSearch(new URL(request.url).searchParams.get("search"));
-
-  const where = await getSearchWhere({ search, accountID });
-
-  const meetings = await getSearchResults({ where, skip });
-
-  return json(meetings);
-};
 
 async function getSearchResults({
   where,
@@ -88,26 +54,6 @@ async function getSearchWhere({
   search: string;
   accountID: string;
 }) {
-  const exactMatches = await db.meeting.findMany({
-    select: {
-      id: true,
-    },
-    where: {
-      name: {
-        equals: search,
-        mode: "insensitive",
-      },
-    },
-  });
-
-  if (exactMatches.length) {
-    return {
-      id: {
-        in: exactMatches.map(({ id }) => id),
-      },
-    };
-  }
-
   const searchTerms = formatSearch(search);
 
   return {
@@ -130,7 +76,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const search = new URL(request.url).searchParams.get("search");
 
   if (!search) {
-    throw new Error("No search query provided");
+    return redirect("/", request);
   }
 
   const { accountID } = await getIDs(request);
