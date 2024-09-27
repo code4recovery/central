@@ -73,7 +73,9 @@ async function getSearchWhere({
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const search = new URL(request.url).searchParams.get("search");
+  const search = (
+    new URL(request.url).searchParams.get("search") ?? ""
+  ).replace(/['"]+/g, "");
 
   if (!search) {
     return redirect("/", request);
