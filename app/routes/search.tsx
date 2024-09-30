@@ -1,4 +1,8 @@
-import type { LoaderFunction, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import type { Language, Meeting, Type } from "@prisma/client";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
@@ -20,6 +24,29 @@ import {
   searchMeetings,
   searchGroups,
 } from "~/utils";
+import { withZod } from "@remix-validated-form/with-zod";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
+import { validationError } from "remix-validated-form";
+
+// load 25 more
+export const action: ActionFunction = async ({ request }) => {
+  const validator = withZod(
+    z.object({
+      skip: zfd.numeric(),
+    })
+  );
+  const { data, error } = await validator.validate(await request.formData());
+  if (error) {
+    return validationError(error);
+  }
+  const { skip } = data;
+  const { accountID } = await getIDs(request);
+  const search = formatSearch(new URL(request.url).searchParams.get("search"));
+  const where = await getSearchWhere({ search, accountID });
+  const meetings = await getSearchResults({ where, skip });
+  return json(meetings);
+};
 
 async function getSearchResults({
   where,
