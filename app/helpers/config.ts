@@ -13,6 +13,8 @@ export const config = {
     "meet.jit.si": "Jitsi",
     "meetings.dialpad.com": "Dialpad",
     "skype.com": "Skype",
+    "teams.live.com": "Microsoft Teams",
+    "teams.microsoft.com": "Microsoft Teams",
     "webex.com": "WebEx",
     "zoho.com": "Zoho",
     "zoom.us": "Zoom",
