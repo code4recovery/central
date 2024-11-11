@@ -22,7 +22,6 @@ import { strings } from "~/i18n";
 export function Form({
   cancel,
   form,
-  legend,
   optionsInUse,
   values,
   isAdmin,
@@ -35,7 +34,6 @@ export function Form({
 }: {
   cancel?: () => void;
   form: keyof typeof fields;
-  legend?: string;
   onSubmit?: () => void;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
@@ -60,9 +58,6 @@ export function Form({
       subaction={subaction ?? (form as string)}
     >
       <fieldset>
-        {legend && (
-          <legend className="px-6 pt-5 -mb-2 text-sm italic">{legend}</legend>
-        )}
         <div className="shadow sm:overflow-hidden sm:rounded-md">
           <div className="space-y-6 bg-white dark:bg-neutral-950 px-4 py-5 sm:p-6">
             <div className="grid grid-cols-12 gap-5">
@@ -73,8 +68,15 @@ export function Form({
                     !fields[form][name].streetAddressOnly || streetAddress
                 )
                 .map((name) => {
-                  const { className, label, options, required, span, type } =
-                    fields[form][name];
+                  const {
+                    className,
+                    disabled,
+                    label,
+                    options,
+                    required,
+                    span,
+                    type,
+                  } = fields[form][name];
                   return type === "hidden" ? (
                     <input
                       type="hidden"
@@ -126,6 +128,7 @@ export function Form({
                         <Input
                           {...fields[form][name]}
                           defaultValue={values?.[name]}
+                          disabled={disabled}
                           name={name}
                         />
                       )}

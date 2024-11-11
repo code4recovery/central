@@ -8,12 +8,13 @@ import {
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useEffect, useState } from "react";
+import { CalendarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { validationError } from "remix-validated-form";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
-import { formatActivity, formatDate, formatString } from "~/helpers";
+import { formatActivity, formatString } from "~/helpers";
 import { strings } from "~/i18n";
 import { getActivity, getActivityCount } from "~/models";
 import { getIDs, jsonWith } from "~/utils";
@@ -77,23 +78,25 @@ export default function ActivityScreen() {
       <Table
         columns={{
           name: { label: strings.activity.name },
+          type: { label: strings.activity.type },
           user: { label: strings.activity.who },
-          what: { label: strings.activity.what },
+          change: { label: strings.activity.change },
           when: { label: strings.activity.when, align: "right" },
         }}
         rows={activity.map((activity) => ({
           ...activity,
-          ...(activity.meeting
-            ? {
-                name: activity.meeting.name,
-                // link: `/meetings/${activity.meeting.id}/activity/${activity.id}`,
-              }
-            : {
-                name: activity.group?.name,
-                link: `/groups/${activity.group?.id}/activity/${activity.id}`,
-              }),
-          when: formatDate(activity.createdAt.toString()),
-          what: formatString(
+          name: activity.meeting ? activity.meeting.name : activity.group?.name,
+          link: `/activity/${activity.id}`,
+          type: activity.meeting ? (
+            <div className="flex gap-2 items-center">
+              <CalendarIcon className="h-6 w-6" /> Meeting
+            </div>
+          ) : (
+            <div className="flex gap-2 items-center">
+              <UserGroupIcon className="h-6 w-6" /> Group
+            </div>
+          ),
+          change: formatString(
             strings.activity[activity.meeting ? "meeting" : "group"][
               activity.type as keyof typeof strings.activity.meeting
             ],

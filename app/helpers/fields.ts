@@ -132,6 +132,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: required.string,
     },
     email: {
+      disabled: true,
       label: strings.users.email,
       span: 6,
       type: "email",
