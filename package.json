@@ -6,7 +6,7 @@
     "dev": "npm-run-all build --parallel \"dev:*\"",
     "dev:node": "cross-env NODE_ENV=development nodemon --require dotenv/config ./server.js --watch ./server.js",
     "dev:remix": "remix watch",
-    "nvm-start": ". ~/.nvm/nvm.sh && nvm install && nvm use && npm i && npm start",
+    "nvm-start": ". ~/.nvm/nvm.sh; nvm install; nvm use; cross-env NODE_ENV=production node ./server.js",
     "publish": "node --require esbuild-register prisma/publish.ts",
     "push": "npx prisma db push",
     "start": "cross-env NODE_ENV=production node ./server.js",
