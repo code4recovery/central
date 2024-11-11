@@ -7,7 +7,6 @@ module.exports = {
   },
   ignoredRouteFiles: ["**/.*"],
   tailwind: true,
-  serverModuleFormat: "esm",
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "build/index.js",

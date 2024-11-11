@@ -341,8 +341,7 @@ export const strings = {
     privacy_policy: "Privacy Policy",
     request_sent: `Great! An email has been sent to the current group reps. Once they confirm, you will receive an email to continue.`,
     submit: "Submit request",
-    subtitle:
-      "This is the place to request changes to listings on the {accountName} meeting finder.",
+    subtitle: `This is the place to request changes to listings on the {accountName} meeting finder.`,
     title: "New Listings • Changes • Removals",
   },
   requests: {
