@@ -20,7 +20,6 @@ import { useGeocode } from "~/hooks";
 import { strings } from "~/i18n";
 
 export function Form({
-  buttonTheme = "primary",
   cancel,
   form,
   legend,
@@ -31,8 +30,9 @@ export function Form({
   resetAfterSubmit,
   saveOptions,
   subaction,
+  submitLoadingText,
+  submitText,
 }: {
-  buttonTheme?: React.ComponentProps<typeof Button>["theme"];
   cancel?: () => void;
   form: keyof typeof fields;
   legend?: string;
@@ -43,6 +43,8 @@ export function Form({
   resetAfterSubmit?: boolean;
   saveOptions?: string[];
   subaction?: string;
+  submitLoadingText?: string;
+  submitText?: string;
 }) {
   const {
     geocode: { location_type },
@@ -55,7 +57,7 @@ export function Form({
       validator={formatValidator(form)}
       onSubmit={onSubmit}
       resetAfterSubmit={resetAfterSubmit}
-      subaction={subaction}
+      subaction={subaction ?? (form as string)}
     >
       <fieldset>
         {legend && (
@@ -190,35 +192,41 @@ export function Form({
                 })}
             </div>
           </div>
-          <div className="bg-neutral-50 dark:bg-neutral-950 dark:border-t dark:border-neutral-900 px-4 py-3 flex justify-end sm:px-6">
-            <div className="flex gap-3 items-center text-sm">
-              {!!saveOptions?.length && (
-                <div className="flex gap-3 items-center">
-                  {strings.meetings.apply_changes}
-                  <select
-                    className="bg-transparent rounded-md text-sm"
-                    name="save-option"
-                  >
-                    <option>{strings.meetings.apply_changes_only_this}</option>
-                    {saveOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {
-                          strings.meetings[
-                            `apply_changes_${option}` as keyof typeof strings.meetings
-                          ]
-                        }
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              {cancel && (
-                <Button onClick={cancel} theme="secondary">
-                  {strings.cancel}
-                </Button>
-              )}
-              <Submit buttonTheme={buttonTheme} />
-            </div>
+          <div
+            className={cx(
+              "bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-900 dark:border-t flex items-center px-4 py-3 sm:px-6 text-sm",
+              {
+                "gap-3 justify-end": !!(cancel || saveOptions?.length),
+                "justify-center": !(cancel || saveOptions?.length),
+              }
+            )}
+          >
+            {!!saveOptions?.length && (
+              <div className="flex gap-3 items-center">
+                {strings.meetings.apply_changes}
+                <select
+                  className="bg-transparent rounded-md text-sm"
+                  name="save-option"
+                >
+                  <option>{strings.meetings.apply_changes_only_this}</option>
+                  {saveOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {
+                        strings.meetings[
+                          `apply_changes_${option}` as keyof typeof strings.meetings
+                        ]
+                      }
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {cancel && (
+              <Button onClick={cancel} theme="secondary">
+                {strings.cancel}
+              </Button>
+            )}
+            <Submit loadingText={submitLoadingText} text={submitText} />
           </div>
         </div>
       </fieldset>
@@ -227,22 +235,22 @@ export function Form({
 }
 
 function Submit({
-  buttonTheme,
+  loadingText = strings.form.saving,
+  text = strings.form.save,
 }: {
-  buttonTheme: React.ComponentProps<typeof Button>["theme"];
+  loadingText?: string;
+  text?: string;
 }) {
   const isSubmitting = useIsSubmitting();
   return (
     <Button
-      className={
-        isSubmitting
-          ? "text-neutral-500 bg-neutral-300 dark:bg-neutral-700"
-          : undefined
-      }
+      className={cx({
+        "text-neutral-500 bg-neutral-300 dark:bg-neutral-700": isSubmitting,
+      })}
       icon={isSubmitting ? "spinner" : undefined}
-      theme={buttonTheme}
+      theme="primary"
     >
-      {isSubmitting ? strings.form.saving : strings.form.save}
+      {isSubmitting ? loadingText : text}
     </Button>
   );
 }

@@ -1,5 +1,5 @@
 export const config = {
-  aboutUrl: "https://code4recovery.org/central",
+  aboutUrl: "https://github.com/code4recovery/central",
   batchSize: 25,
   conference_providers: {
     "bluejeans.com": "Bluejeans",

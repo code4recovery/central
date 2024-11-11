@@ -85,8 +85,8 @@ export default function Index() {
         </Button>
       }
     >
-      {!groups.length && <Alert message={strings.group.empty} type="info" />}
       {alert && <Alerts data={alert} />}
+      {!groups.length && <Alert message={strings.group.empty} type="info" />}
       <Table
         columns={{
           name: { label: strings.group.name },
