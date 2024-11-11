@@ -2,10 +2,9 @@ export function formatSearch(search: FormDataEntryValue | null) {
   return (
     search
       ?.toString()
-      .split('"')
-      .join("")
+      .replace(/['"]+/g, "")
       .split(" ")
-      .filter((e) => e)
+      .filter(Boolean)
       .map((e) => `"${e}"`)
       .join(" ") ?? ""
   );

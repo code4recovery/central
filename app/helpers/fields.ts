@@ -26,6 +26,28 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: required.string,
     },
   },
+  "account-create": {
+    name: {
+      type: "text",
+      validation: required.string,
+      label: strings.request.group_select.your_name,
+    },
+    email: {
+      type: "text",
+      validation: required.string,
+      label: strings.users.email,
+    },
+    account_name: {
+      type: "text",
+      validation: required.string,
+      label: strings.account.name,
+    },
+    url: {
+      type: "url",
+      validation: required.string,
+      label: strings.account.url,
+    },
+  },
   group: {
     name: {
       className: "text-xl font-semibold py-2",
@@ -172,6 +194,7 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
     email: {
       type: "email",
       validation: required.email,
+      label: strings.users.email,
     },
     go: {
       type: "hidden",

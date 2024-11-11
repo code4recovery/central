@@ -1,5 +1,5 @@
 export const config = {
-  aboutUrl: "https://code4recovery.org/central",
+  aboutUrl: "https://github.com/code4recovery/central",
   batchSize: 25,
   conference_providers: {
     "bluejeans.com": "Bluejeans",
@@ -9,10 +9,15 @@ export const config = {
     "goto.com": "GoTo",
     "gotomeet.me": "GoTo",
     "gotomeeting.com": "GoTo",
+    "horizon.meta.com": "Meta Horizon",
+    "maps.secondlife.com": "Second Life",
     "meet.google.com": "Google Hangouts",
     "meet.jit.si": "Jitsi",
     "meetings.dialpad.com": "Dialpad",
     "skype.com": "Skype",
+    "slurl.com": "Second Life",
+    "teams.live.com": "Microsoft Teams",
+    "teams.microsoft.com": "Microsoft Teams",
     "webex.com": "WebEx",
     "zoho.com": "Zoho",
     "zoom.us": "Zoom",

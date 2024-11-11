@@ -10,14 +10,7 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
 import { formatSlug, formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
-import {
-  db,
-  getIDs,
-  log,
-  optionsInUse,
-  redirectWith,
-  publishDataToFtp,
-} from "~/utils";
+import { db, getIDs, optionsInUse, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const validator = formatValidator("meeting");
@@ -97,19 +90,9 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     },
   });
 
-  // save feed
-  try {
-    await publishDataToFtp(accountID);
-  } catch (e) {
-    if (e instanceof Error) {
-      log(e);
-      return json({ error: `File storage error: ${e.message}` });
-    }
-  }
-
   // redirect to meeting page
   return redirectWith(`/meetings/${meeting.id}`, request, {
-    success: strings.json_updated,
+    success: strings.meetings.added,
   });
 };
 

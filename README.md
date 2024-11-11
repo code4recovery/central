@@ -12,7 +12,6 @@ Central is developed on the MERN stack (MongoDB, Express, React, Node.js). It us
 
 You can set up and run Central yourself. It requires these third-party services:
 
-- Google [Cloud Run](https://cloud.google.com/run)
 - Google [Geocoding](https://developers.google.com/maps/documentation/geocoding/overview), [Sheets](https://developers.google.com/sheets/api), and [Time Zone](https://developers.google.com/maps/documentation/timezone/overview) APIs
 - [MongoDB](https://www.mongodb.com/)
 - [SendGrid](https://sendgrid.com/)
@@ -38,11 +37,6 @@ GOOGLE_API_KEY="<your.google.api.key>"
 # SendGrid (to send email)
 SENDGRID_API_KEY="<your.sendgrid.api.key>"
 SENDGRID_SENDER="<your.sender@address.com>"
-
-# Only necessary to seed OIAA data
-GOOGLE_SHEET_API_KEY="<your.google.sheets.api.key>"
-USER_NAME="<your.name>"
-USER_EMAIL="<your.email@address.com>"
 ```
 
 ### Set a base URL
@@ -55,13 +49,9 @@ You can type any string of random characters here, or use a random string genera
 
 ### Set up MongoDB
 
-1. Install MongoDB or sign up for [Atlas](https://www.mongodb.com/atlas/database)
+1. Install MongoDB (requires a replica set) or sign up for [Atlas](https://www.mongodb.com/atlas/database)
 1. Create a database
 1. Copy the connection string to your `.env`
-
-### Set up FTP
-
-1.
 
 ### Set up Google Geocoding and Time Zone APIs
 
@@ -77,12 +67,9 @@ You can type any string of random characters here, or use a random string genera
 
 ### Run locally
 
-1. Run `npm i` (you don't need to do this ever time but should do it when you pull changes)
-1. Seeding with a Meeting Guide JSON feed and setting up a blank instance are both coming soon
-1. For now you must seed a sample of OIAA data by running `npm run seed`
+1. Run `npm i` (you don't need to do this every time but should do it when you pull changes)
 1. Now run `npm run dev`. Your site should be running at [http://localhost:3000/](http://localhost:3000/)
 
-### Deploy to Cloud Run
+### Deploy
 
-1. Add this repository (or a clone of it) to Cloud Run
-1. Set your environment variables with the values in your `.env`
+We are evaluating options for the best method of deploying Central. Currently we have this working on Google [Cloud Run](https://cloud.google.com/run) and a VPS using [Laravel Forge](https://forge.laravel.com/).

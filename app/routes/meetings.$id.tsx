@@ -30,18 +30,11 @@ import {
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { getMeeting } from "~/models";
-import {
-  db,
-  getIDs,
-  jsonWith,
-  log,
-  optionsInUse,
-  publishDataToFtp,
-} from "~/utils";
+import { db, getIDs, jsonWith, optionsInUse } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
-  const { accountID, userID } = await getIDs(request);
+  const { userID } = await getIDs(request);
 
   const formData = await request.formData();
 
@@ -60,15 +53,6 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
         userID,
       },
     });
-    try {
-      await publishDataToFtp(accountID);
-      return json({ success: strings.meetings.archived });
-    } catch (e) {
-      if (e instanceof Error) {
-        log(e);
-        return json({ error: `File storage error: ${e.message}` });
-      }
-    }
   }
 
   const validator = formatValidator("meeting");
@@ -171,17 +155,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     });
   }
 
-  // save feed
-  try {
-    await publishDataToFtp(accountID);
-  } catch (e) {
-    if (e instanceof Error) {
-      log(e);
-      return json({ error: `FTP error: ${e.message}` });
-    }
-  }
-
-  return json({ success: strings.json_updated });
+  return json({ success: strings.meetings.updated });
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {

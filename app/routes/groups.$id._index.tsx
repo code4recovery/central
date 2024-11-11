@@ -38,7 +38,7 @@ import {
 } from "~/helpers";
 import { strings } from "~/i18n";
 import { addGroupRep, editGroupRep, removeGroupRep } from "~/models";
-import { db, getIDs, jsonWith, log, publishDataToFtp } from "~/utils";
+import { db, getIDs, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -119,21 +119,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     where: { id },
   });
 
-  if (!group.meetings.length) {
-    return json({ success: strings.group.updated });
-  }
-
-  // save feed
-  try {
-    await publishDataToFtp(accountID);
-  } catch (e) {
-    if (e instanceof Error) {
-      log(e);
-      return json({ error: `File storage error: ${e.message}` });
-    }
-  }
-
-  return json({ success: strings.json_updated });
+  return json({ success: strings.group.updated });
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {

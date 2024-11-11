@@ -12,6 +12,8 @@ export function formatJson(
   >,
   accountUrl: string
 ) {
+  const url = (path: string) =>
+    `${process.env.BASE_URL ?? "https://central.aa-intergroup.org"}${path}`;
   return meetings
     .map(
       ({
@@ -62,7 +64,8 @@ export function formatJson(
         venmo: group.venmo,
         paypal: group.paypal,
         square: group.square,
-        edit_url: `${process.env.BASE_URL}/request/${group.recordID}/${slug}`,
+        edit_url: url(`/meetings/${id}`),
+        // feedback_url: url(`/request/${group.recordID}/${slug}`),
         url: slug ? formatUrl(accountUrl, slug) : undefined,
         updated: updatedAt
           ?.toISOString()

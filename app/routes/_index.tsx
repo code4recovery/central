@@ -1,14 +1,20 @@
-import type { ActionFunction, MetaFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   useActionData,
-  useNavigation,
+  useLoaderData,
   useSearchParams,
 } from "@remix-run/react";
-import { validationError, ValidatedForm } from "remix-validated-form";
+import md5 from "blueimp-md5";
+import { validationError } from "remix-validated-form";
 
-import { Alerts, Button, Footer, Input, Label } from "~/components";
+import { Alerts, Footer, Form } from "~/components";
 import {
+  config,
   formatClasses as cx,
   formatString,
   formatToken,
@@ -17,15 +23,57 @@ import {
 import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
-import { db, sendMail } from "~/utils";
+import { createUserSession, db, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
-  const validator = formatValidator("login");
+  const formData = await request.formData();
+  const subaction = formData.get("subaction")?.toString();
 
-  const { data, error } = await validator.validate(await request.formData());
+  if (!subaction) {
+    return;
+  }
+
+  const validator = formatValidator(subaction);
+
+  const { data, error } = await validator.validate(formData);
 
   if (error) {
     return validationError(error);
+  }
+
+  if (subaction === "account-create") {
+    const { email, name, account_name, url } = data;
+
+    const emailHash = md5(email);
+
+    const themes = Object.keys(config.themes);
+    const theme = themes[Math.floor(Math.random() * themes.length)];
+
+    const account = await db.account.create({
+      data: {
+        name: account_name,
+        theme,
+        url,
+      },
+    });
+
+    const user = await db.user.create({
+      data: {
+        email,
+        emailHash,
+        name,
+        currentAccountID: account.id,
+        lastSeen: new Date(),
+        accounts: {
+          connect: { id: account.id },
+        },
+        adminAccounts: {
+          connect: { id: account.id },
+        },
+      },
+    });
+
+    return await createUserSession(user);
   }
 
   const { email, go } = data;
@@ -67,7 +115,13 @@ export const action: ActionFunction = async ({ request }) => {
       }
     }
   }
+
   return json({ info: strings.auth.email_sent });
+};
+
+export const loader: LoaderFunction = async () => {
+  const countAccounts = await db.account.count();
+  return json({ countAccounts });
 };
 
 export const meta: MetaFunction = () => ({
@@ -75,8 +129,7 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
-  const { state } = useNavigation();
-  const idle = state === "idle";
+  const { countAccounts } = useLoaderData();
   const {
     theme: { text },
   } = useUser();
@@ -91,29 +144,25 @@ export default function Index() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <DefaultAccountLogo className={cx("h-12 w-auto mx-auto", text)} />
           <h1 className="mt-6 text-center text-3xl font-bold tracking-tight">
-            {strings.auth.title}
+            {countAccounts ? strings.auth.title : "Welcome to Central"}
           </h1>
         </div>
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
           {actionData && <Alerts data={actionData} />}
-          <ValidatedForm
-            className="bg-white dark:bg-black py-8 px-4 shadow sm:rounded sm:px-10"
-            method="post"
-            validator={formatValidator("login")}
-          >
-            <fieldset disabled={!idle}>
-              <input
-                name="go"
-                type="hidden"
-                value={searchParams.get("go") ?? undefined}
-              />
-              <Label htmlFor="email">{strings.users.email}</Label>
-              <Input autoFocus name="email" required type="email" />
-              <Button className="mt-4 w-full" theme="primary">
-                {!idle ? strings.loading : strings.auth.submit}
-              </Button>
-            </fieldset>
-          </ValidatedForm>
+          {countAccounts ? (
+            <Form
+              form="login"
+              submitLoadingText={strings.loading}
+              submitText={strings.auth.submit}
+              values={{ go: searchParams.get("go") ?? "" }}
+            />
+          ) : (
+            <Form
+              form="account-create"
+              submitLoadingText={strings.loading}
+              submitText={strings.auth.get_started}
+            />
+          )}
         </div>
       </div>
       <Footer />
