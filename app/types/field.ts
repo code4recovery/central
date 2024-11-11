@@ -6,6 +6,7 @@ import type { Option } from "./option";
 export type Field = {
   adminOnly?: boolean;
   className?: string;
+  defaultValue?: number | string | string[];
   disabled?: boolean;
   helpText?: string;
   label?: string;

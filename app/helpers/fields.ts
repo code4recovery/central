@@ -286,12 +286,14 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: optional.string,
     },
     duration: {
+      defaultValue: config.defaultDuration,
       label: strings.meetings.duration,
       span: 4,
       type: "number",
       validation: optional.number,
     },
     languages: {
+      defaultValue: config.defaultLanguages,
       label: strings.meetings.languages,
       options: Object.keys(strings.languages)
         .sort((a, b) =>

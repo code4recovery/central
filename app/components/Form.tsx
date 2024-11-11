@@ -70,6 +70,7 @@ export function Form({
                 .map((name) => {
                   const {
                     className,
+                    defaultValue,
                     disabled,
                     label,
                     options,
@@ -114,7 +115,7 @@ export function Form({
                           {...fields[form][name]}
                           name={name}
                           optionsInUse={optionsInUse?.[name]}
-                          values={values?.[name]}
+                          values={values?.[name] ?? defaultValue}
                         />
                       )}
                       {[
@@ -127,7 +128,7 @@ export function Form({
                       ].includes(type) && (
                         <Input
                           {...fields[form][name]}
-                          defaultValue={values?.[name]}
+                          defaultValue={values?.[name] ?? defaultValue}
                           disabled={disabled}
                           name={name}
                         />
@@ -177,7 +178,9 @@ export function Form({
                       {type === "select" && (
                         <Select
                           className={className}
-                          defaultValue={values?.[name] as string | number}
+                          defaultValue={
+                            (values?.[name] ?? defaultValue) as string | number
+                          }
                           name={name}
                           options={options}
                           required={required}
@@ -208,7 +211,7 @@ export function Form({
               <div className="flex gap-3 items-center">
                 {strings.meetings.apply_changes}
                 <select
-                  className="bg-transparent rounded-md text-sm"
+                  className="bg-neutral-50 dark:bg-neutral-950 rounded-md text-sm"
                   name="save-option"
                 >
                   <option>{strings.meetings.apply_changes_only_this}</option>

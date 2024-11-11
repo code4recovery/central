@@ -4,7 +4,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useActionData, useLoaderData } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
@@ -114,6 +114,7 @@ export const meta: MetaFunction = () => ({
 export default function CreateMeeting() {
   const actionData = useActionData();
   const { group, optionsInUse } = useLoaderData();
+  const navigate = useNavigate();
   return (
     <Template
       title={strings.meetings.add}
@@ -126,7 +127,11 @@ export default function CreateMeeting() {
         primary={
           <>
             {actionData && <Alerts data={actionData} />}
-            <Form form="meeting" optionsInUse={optionsInUse} />
+            <Form
+              cancel={() => navigate(`/groups/${group.id}`)}
+              form="meeting"
+              optionsInUse={optionsInUse}
+            />
           </>
         }
       >

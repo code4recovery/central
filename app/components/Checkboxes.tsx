@@ -13,7 +13,7 @@ export function Checkboxes({
 }: {
   name: string;
   options?: Option[];
-  values?: string | string[];
+  values?: number | string | string[];
   optionsInUse?: string[];
   className?: string;
 }) {
@@ -27,7 +27,10 @@ export function Checkboxes({
     <>
       <div className="items-start gap-x-5 gap-y-3 grid grid-cols-3 lg:grid-cols-4">
         {options
-          .filter(({ value }) => showAll || optionsInUse?.includes(value))
+          .filter(
+            ({ value }) =>
+              showAll || !optionsInUse?.length || optionsInUse?.includes(value)
+          )
           .map(({ value: optionValue, label }) => (
             <div className="flex items-top gap-2 m-0" key={optionValue}>
               <input
@@ -55,7 +58,7 @@ export function Checkboxes({
             </div>
           ))}
       </div>
-      {optionsInUse && optionsInUse.length !== options.length && (
+      {!!optionsInUse?.length && optionsInUse.length !== options.length && (
         <div className="flex justify-end mt-3">
           <button
             className="text-sm bg-neutral-200 text-neutral-500 hover:bg-neutral-300 dark:hover:bg-neutral-800 hover:text-neutral-800 dark:hover:text-neutral-200 dark:bg-neutral-900 rounded px-2 py-1"

@@ -18,7 +18,7 @@ export function Input({
   type,
 }: Partial<Field> & {
   autoFocus?: boolean;
-  defaultValue?: string | string[];
+  defaultValue?: string | string[] | number;
   name: string;
 }) {
   const {
@@ -39,6 +39,7 @@ export function Input({
             "ring-1 ring-inset ring-red-300 dark:ring-red-700 placeholder:text-red-300 dark:placeholder:text-red-700 focus:ring-2 focus:ring-inset focus:ring-red-500":
               !!error,
           })}
+          data-1p-ignore={true}
           defaultValue={defaultValue}
           disabled={disabled}
           id={name}
