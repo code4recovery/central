@@ -1,5 +1,5 @@
 import { render } from "@react-email/render";
-import sendgrid from "@sendgrid/mail";
+import { Resend } from "resend";
 
 import { Email } from "~/components";
 import { config, formatString } from "~/helpers";
@@ -25,13 +25,13 @@ export async function sendMail({
   subject: string;
   to: string;
 }) {
-  const { SENDGRID_API_KEY, SENDGRID_SENDER } = process.env;
+  const { RESEND_API_KEY, RESEND_SENDER } = process.env;
 
-  if (!SENDGRID_API_KEY || !SENDGRID_SENDER) {
-    throw new Error("Missing SendGrid API key or sender");
+  if (!RESEND_API_KEY || !RESEND_SENDER) {
+    throw new Error("Missing Resend API key or sender");
   }
 
-  sendgrid.setApiKey(SENDGRID_API_KEY);
+  const resend = new Resend(RESEND_API_KEY);
 
   const { protocol, host } = new URL(request.url);
   const baseUrl = `${protocol}//${host}`;
@@ -58,10 +58,17 @@ export async function sendMail({
     subject,
   };
 
-  sendgrid.send({
-    from: SENDGRID_SENDER,
-    html: render(<Email {...emailProps} />),
+  const { data, error } = await resend.emails.send({
+    from: RESEND_SENDER,
+    to: [to],
     subject,
-    to,
+    html: render(<Email {...emailProps} />),
   });
+
+  if (error) {
+    console.error('Resend error:', error);
+    throw new Error(`Failed to send email: ${JSON.stringify(error)}`);
+  }
+
+  return data;
 }
