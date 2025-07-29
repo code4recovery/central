@@ -1,4 +1,5 @@
-FROM node:17-slim
+FROM node:18.18.2-slim
+
 
 WORKDIR /usr/app
 COPY ./ /usr/app
