@@ -66,9 +66,16 @@ export async function sendMail({
   });
 
   if (error) {
-    console.error('Resend error:', error);
-    throw new Error(`Failed to send email: ${JSON.stringify(error)}`);
+    throw new Error(
+      `Failed to send email: ${
+        isValidationError(error) ? error.error : JSON.stringify(error)
+      }`
+    );
   }
 
   return data;
 }
+
+const isValidationError = (error: unknown): error is { error: string } => {
+  return typeof error === "object" && error !== null && "error" in error;
+};

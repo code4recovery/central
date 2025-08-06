@@ -14,8 +14,7 @@ You can set up and run Central yourself. It requires these third-party services:
 
 - Google [Geocoding](https://developers.google.com/maps/documentation/geocoding/overview), [Sheets](https://developers.google.com/sheets/api), and [Time Zone](https://developers.google.com/maps/documentation/timezone/overview) APIs
 - [MongoDB](https://www.mongodb.com/)
-- [SendGrid](https://sendgrid.com/)
-- Sentry (coming soon)
+- [Resend](https://resend.com/)
 
 ## Run locally
 
@@ -34,9 +33,9 @@ DATABASE_URL="mongodb+srv://<user>:<password>@cluster0.<cluster>.mongodb.net/<da
 # Google Geocoding, Sheets, and Time Zone APIs
 GOOGLE_API_KEY="<your.google.api.key>"
 
-# SendGrid (to send email)
-SENDGRID_API_KEY="<your.sendgrid.api.key>"
-SENDGRID_SENDER="<your.sender@address.com>"
+# Resend (to send email)
+RESEND_API_KEY="<your.resend.api.key>"
+RESEND_SENDER="<your.sender@address.com>"
 ```
 
 ### Set a base URL
@@ -60,9 +59,9 @@ You can type any string of random characters here, or use a random string genera
 1. Restrict to these two APIs (if you can figure out how to restrict it to the proper IP addresses for Cloud Run, let us know!)
 1. Copy the API key and add it to your `.env`
 
-### Set up SendGrid
+### Set up Resend
 
-1. Set up an account at SendGrid
+1. Set up an account at Resend
 1. Get API key and sender email, add them to `.env`
 
 ### Run locally
