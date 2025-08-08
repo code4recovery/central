@@ -95,7 +95,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
           userID,
         },
       });
-    })
+    }),
   );
 
   // redirect to group page

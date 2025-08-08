@@ -30,7 +30,7 @@ export type Field = {
     | ZodUnion<
         [
           ZodEffects<ZodLiteral<string>, boolean, string>,
-          ZodEffects<ZodLiteral<undefined>, boolean, undefined>
+          ZodEffects<ZodLiteral<undefined>, boolean, undefined>,
         ]
       >;
 };

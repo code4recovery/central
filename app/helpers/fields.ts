@@ -101,8 +101,8 @@ const meeting: { [key: string]: Field } = {
     options: Object.keys(strings.languages)
       .sort((a, b) =>
         strings.languages[a as keyof typeof strings.languages].localeCompare(
-          strings.languages[b as keyof typeof strings.languages]
-        )
+          strings.languages[b as keyof typeof strings.languages],
+        ),
       )
       .map((type) => ({
         value: type,
@@ -116,8 +116,8 @@ const meeting: { [key: string]: Field } = {
     options: Object.keys(strings.types)
       .sort((a, b) =>
         strings.types[a as keyof typeof strings.types].localeCompare(
-          strings.types[b as keyof typeof strings.types]
-        )
+          strings.types[b as keyof typeof strings.types],
+        ),
       )
       .map((type) => ({
         value: type,

@@ -31,7 +31,7 @@ export const SelectMultiple = ({
           className={cx(
             config.classes.field,
             focusRing,
-            "focus:outline-none relative  h-9"
+            "relative h-9 focus:outline-none",
           )}
         >
           <span className="block truncate text-left">
@@ -51,7 +51,7 @@ export const SelectMultiple = ({
             />
           </span>
         </Listbox.Button>
-        <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-neutral-100 dark:bg-neutral-900 py-1 text-lg shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
+        <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-neutral-100 py-1 text-lg shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-neutral-900 sm:text-sm">
           {options?.map((option) => (
             <Listbox.Option
               key={option.value}
