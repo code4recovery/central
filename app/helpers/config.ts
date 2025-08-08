@@ -28,7 +28,7 @@ export const config = {
     checkbox:
       "h-4 w-4 rounded border-neutral-500 m-0 mt-0.5 focus:ring-offset-transparent focus:ring-2",
     field:
-      "bg-white dark:bg-black block border-0 leading-6 py-1.5 rounded-md ring-1 ring-neutral-300 dark:ring-neutral-700 ring-inset shadow-sm w-full placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:ring-2 focus:ring-inset disabled:opacity-50",
+      "bg-white dark:bg-black block border-0 leading-6 px-3 py-1.5 rounded-md ring-1 ring-neutral-300 dark:ring-neutral-700 ring-inset shadow-sm w-full placeholder:text-neutral-400 dark:placeholder:text-neutral-600 focus:ring-2 focus:ring-inset disabled:opacity-50",
     panel:
       "bg-white dark:bg-black rounded-md shadow overflow-hidden divide-y divide-neutral-300 dark:divide-neutral-800",
   },

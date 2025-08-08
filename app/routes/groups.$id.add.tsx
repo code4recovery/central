@@ -8,12 +8,12 @@ import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
-import { formatSlug, formatValidator } from "~/helpers";
+import { formatSlug, formatString, formatValidator } from "~/helpers";
 import { strings } from "~/i18n";
 import { db, getIDs, optionsInUse, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
-  const validator = formatValidator("meeting");
+  const validator = formatValidator("meeting-create");
   const formData = await request.formData();
   const geocodeID = formData.get("geocodeID[id]")?.toString(); // todo handle programatically
   const { data, error } = await validator.validate(formData);
@@ -45,54 +45,67 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     })
   ).map(({ slug }) => slug);
 
-  const slug = formatSlug(name, slugs);
+  const days: (number | null)[] =
+    day?.length > 0 ? day.map((d: string) => parseInt(d)) : [null];
 
-  // update meeting
-  const meeting = await db.meeting.create({
-    data: {
-      name,
-      slug,
-      day,
-      time,
-      timezone,
-      duration,
-      conference_url,
-      conference_url_notes,
-      conference_phone,
-      conference_phone_notes,
-      notes,
-      geocode: { connect: geocodeID ? { id: geocodeID } : undefined },
-      group: {
-        connect: { id },
-      },
-      languages: {
-        connectOrCreate: languages.map((code: string) => ({
-          where: { code },
-          create: { code },
-        })),
-      },
-      types: {
-        connectOrCreate: types.map((code: string) => ({
-          where: { code },
-          create: { code },
-        })),
-      },
-      account: { connect: { id: accountID } },
-    },
-  });
+  // create meeting for each day selected
+  await Promise.all(
+    days.map(async (day) => {
+      const slug = formatSlug(name, slugs);
+      slugs.push(slug);
 
-  // create an activity record
-  await db.activity.create({
-    data: {
-      type: "create", // todo change this to "createMeeting"
-      meetingID: meeting.id,
-      userID,
-    },
-  });
+      const meeting = await db.meeting.create({
+        data: {
+          name,
+          slug,
+          day,
+          time,
+          timezone,
+          duration,
+          conference_url,
+          conference_url_notes,
+          conference_phone,
+          conference_phone_notes,
+          notes,
+          geocode: { connect: geocodeID ? { id: geocodeID } : undefined },
+          group: {
+            connect: { id },
+          },
+          languages: {
+            connectOrCreate: languages.map((code: string) => ({
+              where: { code },
+              create: { code },
+            })),
+          },
+          types: {
+            connectOrCreate: types.map((code: string) => ({
+              where: { code },
+              create: { code },
+            })),
+          },
+          account: { connect: { id: accountID } },
+        },
+      });
 
-  // redirect to meeting page
-  return redirectWith(`/meetings/${meeting.id}`, request, {
-    success: strings.meetings.added,
+      // create an activity record
+      await db.activity.create({
+        data: {
+          type: "create", // todo change this to "createMeeting"
+          meetingID: meeting.id,
+          userID,
+        },
+      });
+    })
+  );
+
+  // redirect to group page
+  return redirectWith(`/groups/${id}`, request, {
+    success:
+      days.length === 1
+        ? strings.meetings.added
+        : formatString(strings.meetings.added_multiple, {
+            meetingCount: days.length,
+          }),
   });
 };
 
@@ -129,7 +142,7 @@ export default function CreateMeeting() {
             {actionData && <Alerts data={actionData} />}
             <Form
               cancel={() => navigate(`/groups/${group.id}`)}
-              form="meeting"
+              form="meeting-create"
               optionsInUse={optionsInUse}
             />
           </>

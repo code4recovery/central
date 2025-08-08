@@ -196,6 +196,7 @@ export const strings = {
   meetings: {
     add: "Add meeting",
     added: "Meeting has been added",
+    added_multiple: "{meetingCount} meetings have been added",
     apply_changes: "Apply changes to:",
     apply_changes_all: "all group meetings",
     apply_changes_only_this: "only this meeting",

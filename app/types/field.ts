@@ -1,4 +1,4 @@
-import type { ZodEffects, ZodUnion, ZodLiteral } from "zod";
+import type { ZodEffects, ZodLiteral, ZodUnion } from "zod";
 
 import type { InputType } from "./input-type";
 import type { Option } from "./option";
@@ -19,10 +19,10 @@ export type Field = {
     | "checkbox"
     | "checkboxes"
     | "colors"
-    | "combobox"
     | "geocode"
     | "hidden"
     | "select"
+    | "select-multiple"
     | "textarea"
     | InputType;
   validation?:

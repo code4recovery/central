@@ -8,12 +8,13 @@ import {
   Input,
   Label,
   Select,
+  SelectMultiple,
   Textarea,
 } from "~/components";
 import {
   config,
-  fields,
   formatClasses as cx,
+  fields,
   formatValidator,
 } from "~/helpers";
 import { useGeocode } from "~/hooks";
@@ -185,6 +186,9 @@ export function Form({
                           options={options}
                           required={required}
                         />
+                      )}
+                      {type === "select-multiple" && (
+                        <SelectMultiple name={name} options={options} />
                       )}
                       {type === "textarea" && (
                         <Textarea
