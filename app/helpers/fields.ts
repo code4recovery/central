@@ -2,7 +2,137 @@ import { strings } from "~/i18n";
 import type { Field } from "~/types";
 
 import { config } from "./config";
-import { required, optional } from "./validators";
+import { optional, required } from "./validators";
+
+const meeting: { [key: string]: Field } = {
+  name: {
+    className: "text-xl font-semibold px-4 py-2",
+    label: strings.meetings.name,
+    type: "text",
+    validation: required.string,
+  },
+  conference_url: {
+    label: strings.meetings.conference_url,
+    type: "url",
+    span: 6,
+    validation: optional.conference_url,
+    helpText: strings.meetings.conference_url_help,
+  },
+  conference_url_notes: {
+    label: strings.meetings.conference_url_notes,
+    type: "text",
+    span: 6,
+    validation: optional.string,
+    helpText: strings.meetings.conference_url_notes_help,
+  },
+  conference_phone: {
+    label: strings.meetings.conference_phone,
+    type: "tel",
+    span: 6,
+    validation: optional.phone,
+    helpText: strings.meetings.conference_phone_help,
+  },
+  conference_phone_notes: {
+    label: strings.meetings.conference_phone_notes,
+    type: "text",
+    span: 6,
+    validation: optional.string,
+    helpText: strings.meetings.conference_phone_notes_help,
+  },
+  geocodeID: {
+    label: strings.meetings.geocode,
+    type: "geocode",
+    span: 9,
+    helpText: strings.meetings.geocode_help,
+  },
+  timezone: {
+    label: strings.meetings.timezone,
+    options: config.timezones.map((value) => {
+      const [group, ...rest] = value.split("/");
+      const label = rest.join(" • ").split("_").join(" ");
+      return { value, label, group };
+    }),
+    span: 3,
+    type: "select",
+    validation: optional.string,
+  },
+  location: {
+    label: strings.meetings.location,
+    type: "text",
+    span: 6,
+    validation: optional.string,
+    helpText: strings.meetings.location_help,
+    streetAddressOnly: true,
+  },
+  location_notes: {
+    label: strings.meetings.location_notes,
+    type: "text",
+    span: 6,
+    validation: optional.string,
+    helpText: strings.meetings.location_notes_help,
+    streetAddressOnly: true,
+  },
+  day: {
+    label: strings.meetings.day,
+    options: config.days.map((day, index) => ({
+      value: `${index}`,
+      label: strings.days[day as keyof typeof strings.days],
+    })),
+    span: 4,
+    type: "select",
+    validation: optional.number,
+  },
+  time: {
+    label: strings.meetings.time,
+    span: 4,
+    type: "time",
+    validation: optional.string,
+  },
+  duration: {
+    defaultValue: config.defaultDuration,
+    label: strings.meetings.duration,
+    span: 4,
+    type: "number",
+    validation: optional.number,
+  },
+  languages: {
+    defaultValue: config.defaultLanguages,
+    label: strings.meetings.languages,
+    options: Object.keys(strings.languages)
+      .sort((a, b) =>
+        strings.languages[a as keyof typeof strings.languages].localeCompare(
+          strings.languages[b as keyof typeof strings.languages],
+        ),
+      )
+      .map((type) => ({
+        value: type,
+        label: strings.languages[type as keyof typeof strings.languages],
+      })),
+    type: "checkboxes",
+    validation: required.array,
+  },
+  types: {
+    label: strings.meetings.types,
+    options: Object.keys(strings.types)
+      .sort((a, b) =>
+        strings.types[a as keyof typeof strings.types].localeCompare(
+          strings.types[b as keyof typeof strings.types],
+        ),
+      )
+      .map((type) => ({
+        value: type,
+        label: strings.types[type as keyof typeof strings.types],
+      })),
+    type: "checkboxes",
+    validation: optional.array,
+  },
+  notes: {
+    helpText: strings.meetings.notes_notes,
+    label: strings.meetings.notes,
+    type: "textarea",
+    validation: optional.string,
+  },
+};
 
 export const fields: { [index: string]: { [index: string]: Field } } = {
   account: {
@@ -201,133 +331,13 @@ export const fields: { [index: string]: { [index: string]: Field } } = {
       validation: optional.string,
     },
   },
-  meeting: {
-    name: {
-      className: "text-xl font-semibold py-2",
-      label: strings.meetings.name,
-      type: "text",
-      validation: required.string,
-    },
-    conference_url: {
-      label: strings.meetings.conference_url,
-      type: "url",
-      span: 6,
-      validation: optional.conference_url,
-      helpText: strings.meetings.conference_url_help,
-    },
-    conference_url_notes: {
-      label: strings.meetings.conference_url_notes,
-      type: "text",
-      span: 6,
-      validation: optional.string,
-      helpText: strings.meetings.conference_url_notes_help,
-    },
-    conference_phone: {
-      label: strings.meetings.conference_phone,
-      type: "tel",
-      span: 6,
-      validation: optional.phone,
-      helpText: strings.meetings.conference_phone_help,
-    },
-    conference_phone_notes: {
-      label: strings.meetings.conference_phone_notes,
-      type: "text",
-      span: 6,
-      validation: optional.string,
-      helpText: strings.meetings.conference_phone_notes_help,
-    },
-    geocodeID: {
-      label: strings.meetings.geocode,
-      type: "geocode",
-      span: 9,
-      helpText: strings.meetings.geocode_help,
-    },
-    timezone: {
-      label: strings.meetings.timezone,
-      options: config.timezones.map((value) => {
-        const [group, ...rest] = value.split("/");
-        const label = rest.join(" • ").split("_").join(" ");
-        return { value, label, group };
-      }),
-      span: 3,
-      type: "select",
-      validation: optional.string,
-    },
-    location: {
-      label: strings.meetings.location,
-      type: "text",
-      span: 6,
-      validation: optional.string,
-      helpText: strings.meetings.location_help,
-      streetAddressOnly: true,
-    },
-    location_notes: {
-      label: strings.meetings.location_notes,
-      type: "text",
-      span: 6,
-      validation: optional.string,
-      helpText: strings.meetings.location_notes_help,
-      streetAddressOnly: true,
-    },
+  meeting,
+  "meeting-create": {
+    ...meeting,
     day: {
-      label: strings.meetings.day,
-      options: config.days.map((day, index) => ({
-        value: `${index}`,
-        label: strings.days[day as keyof typeof strings.days],
-      })),
-      span: 4,
-      type: "select",
-      validation: optional.number,
-    },
-    time: {
-      label: strings.meetings.time,
-      span: 4,
-      type: "time",
-      validation: optional.string,
-    },
-    duration: {
-      defaultValue: config.defaultDuration,
-      label: strings.meetings.duration,
-      span: 4,
-      type: "number",
-      validation: optional.number,
-    },
-    languages: {
-      defaultValue: config.defaultLanguages,
-      label: strings.meetings.languages,
-      options: Object.keys(strings.languages)
-        .sort((a, b) =>
-          strings.languages[a as keyof typeof strings.languages].localeCompare(
-            strings.languages[b as keyof typeof strings.languages]
-          )
-        )
-        .map((type) => ({
-          value: type,
-          label: strings.languages[type as keyof typeof strings.languages],
-        })),
-      type: "checkboxes",
-      validation: required.array,
-    },
-    types: {
-      label: strings.meetings.types,
-      options: Object.keys(strings.types)
-        .sort((a, b) =>
-          strings.types[a as keyof typeof strings.types].localeCompare(
-            strings.types[b as keyof typeof strings.types]
-          )
-        )
-        .map((type) => ({
-          value: type,
-          label: strings.types[type as keyof typeof strings.types],
-        })),
-      type: "checkboxes",
+      ...meeting.day,
+      type: "select-multiple",
       validation: optional.array,
-    },
-    notes: {
-      helpText: strings.meetings.notes_notes,
-      label: strings.meetings.notes,
-      type: "textarea",
-      validation: optional.string,
     },
   },
   user: {

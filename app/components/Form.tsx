@@ -8,12 +8,13 @@ import {
   Input,
   Label,
   Select,
+  SelectMultiple,
   Textarea,
 } from "~/components";
 import {
   config,
-  fields,
   formatClasses as cx,
+  fields,
   formatValidator,
 } from "~/helpers";
 import { useGeocode } from "~/hooks";
@@ -59,13 +60,13 @@ export function Form({
     >
       <fieldset>
         <div className="shadow sm:overflow-hidden sm:rounded-md">
-          <div className="space-y-6 bg-white dark:bg-neutral-950 px-4 py-5 sm:p-6">
+          <div className="space-y-6 bg-white px-4 py-5 dark:bg-neutral-950 sm:p-6">
             <div className="grid grid-cols-12 gap-5">
               {Object.keys(fields[form])
                 .filter((name) => !fields[form][name].adminOnly || isAdmin)
                 .filter(
                   (name) =>
-                    !fields[form][name].streetAddressOnly || streetAddress
+                    !fields[form][name].streetAddressOnly || streetAddress,
                 )
                 .map((name) => {
                   const {
@@ -134,7 +135,7 @@ export function Form({
                         />
                       )}
                       {type === "colors" && (
-                        <div className="grid grid-cols-5 gap-2 items-top">
+                        <div className="items-top grid grid-cols-5 gap-2">
                           {Object.keys(config.themes).map((color) => {
                             const {
                               background,
@@ -155,12 +156,12 @@ export function Form({
                                 title={color}
                                 defaultChecked={color === values?.[name]}
                                 className={cx(
-                                  "relative h-10 flex cursor-pointer justify-center rounded w-full border-0 checked:ring-2 checked:ring-offset-1",
+                                  "relative flex h-10 w-full cursor-pointer justify-center rounded border-0 checked:ring-2 checked:ring-offset-1",
                                   background,
                                   backgroundHover,
                                   className,
                                   focusRing,
-                                  text
+                                  text,
                                 )}
                                 aria-label={label}
                               />
@@ -186,6 +187,9 @@ export function Form({
                           required={required}
                         />
                       )}
+                      {type === "select-multiple" && (
+                        <SelectMultiple name={name} options={options} />
+                      )}
                       {type === "textarea" && (
                         <Textarea
                           {...fields[form][name]}
@@ -200,18 +204,18 @@ export function Form({
           </div>
           <div
             className={cx(
-              "bg-neutral-50 dark:bg-neutral-950 dark:border-neutral-900 dark:border-t flex items-center px-4 py-3 sm:px-6 text-sm",
+              "flex items-center bg-neutral-50 px-4 py-3 text-sm dark:border-t dark:border-neutral-900 dark:bg-neutral-950 sm:px-6",
               {
-                "gap-3 justify-end": !!(cancel || saveOptions?.length),
+                "justify-end gap-3": !!(cancel || saveOptions?.length),
                 "justify-center": !(cancel || saveOptions?.length),
-              }
+              },
             )}
           >
             {!!saveOptions?.length && (
-              <div className="flex gap-3 items-center">
+              <div className="flex items-center gap-3">
                 {strings.meetings.apply_changes}
                 <select
-                  className="bg-neutral-50 dark:bg-neutral-950 rounded-md text-sm"
+                  className="rounded-md bg-neutral-50 text-sm dark:bg-neutral-950"
                   name="save-option"
                 >
                   <option>{strings.meetings.apply_changes_only_this}</option>
@@ -251,7 +255,7 @@ function Submit({
   return (
     <Button
       className={cx({
-        "text-neutral-500 bg-neutral-300 dark:bg-neutral-700": isSubmitting,
+        "bg-neutral-300 text-neutral-500 dark:bg-neutral-700": isSubmitting,
       })}
       icon={isSubmitting ? "spinner" : undefined}
       theme="primary"
