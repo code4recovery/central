@@ -77,7 +77,7 @@ export const strings = {
     wednesday: "Wednesday",
   },
   email: {
-    footer: `This email was sent by {app} on behalf of {accountName}. If you didn’t request it, there’s nothing to worry about — you can safely ignore it.`,
+    footer: `This email was sent at {time} on behalf of {accountName}. If you didn’t request it, there’s nothing to worry about — you can safely ignore it.`,
     invite: {
       buttonText: "Accept invitation",
       headline: `You have been invited to help administer the listings on our website at {accountUrl}.`,

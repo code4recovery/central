@@ -46,8 +46,8 @@ export async function sendMail({
     buttonLink: `${baseUrl}${buttonLink}`,
     buttonText,
     footer: formatString(strings.email.footer, {
-      app: strings.app_name,
-      accountName: account?.name,
+      accountName: account?.name ?? "??",
+      time: new Date().toLocaleTimeString(),
     }),
     headline,
     imageHeight: 48,
@@ -69,7 +69,7 @@ export async function sendMail({
     throw new Error(
       `Failed to send email: ${
         isValidationError(error) ? error.error : JSON.stringify(error)
-      }`
+      }`,
     );
   }
 
