@@ -47,12 +47,13 @@ export const config = {
   home: "/groups",
   languageSubstitutions: {
     ES: "S",
-    RU: "RUS",
     IT: "ITA",
     KO: "KOR",
+    PA: "PUN",
     PL: "POL",
     PT: "POR",
-    PA: "PUN",
+    RU: "RUS",
+    TR: "TUR",
   },
   themes: {
     slate: {
