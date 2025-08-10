@@ -1,40 +1,43 @@
+import type { Group, Language, Meeting, Type } from "@prisma/client";
 import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import type { Language, Meeting, Type } from "@prisma/client";
-import { useActionData, useLoaderData } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
+import { Link, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useState } from "react";
 
+import { ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import { withZod } from "@remix-validated-form/with-zod";
+import { validationError } from "remix-validated-form";
+import { z } from "zod";
+import { zfd } from "zod-form-data";
 import { Alert, LoadMore, Table, Template } from "~/components";
 import {
   config,
+  formatClasses as cx,
   formatDate,
   formatDayTime,
   formatSearch,
   formatString,
 } from "~/helpers";
+import { useUser } from "~/hooks";
 import { strings } from "~/i18n";
 import {
   db,
   getIDs,
   redirectWith,
-  searchMeetings,
   searchGroups,
+  searchMeetings,
 } from "~/utils";
-import { withZod } from "@remix-validated-form/with-zod";
-import { z } from "zod";
-import { zfd } from "zod-form-data";
-import { validationError } from "remix-validated-form";
 
 // load 25 more
 export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
     z.object({
       skip: zfd.numeric(),
-    })
+    }),
   );
   const { data, error } = await validator.validate(await request.formData());
   if (error) {
@@ -65,6 +68,7 @@ async function getSearchResults({
       name: true,
       updatedAt: true,
       id: true,
+      group: { select: { id: true, name: true, recordID: true } },
       languages: { select: { code: true } },
       types: { select: { code: true } },
     },
@@ -132,12 +136,20 @@ export const meta: MetaFunction = () => ({
 });
 
 export default function Index() {
+  const {
+    theme: { text },
+  } = useUser();
   const { loadedMeetings, search, meetingCount } =
     useLoaderData<typeof loader>();
-  const [meetings, setMeetings] =
-    useState<Array<Meeting & { types: Type[]; languages: Language[] }>>(
-      loadedMeetings
-    );
+  const [meetings, setMeetings] = useState<
+    Array<
+      Meeting & {
+        types: Type[];
+        languages: Language[];
+        group: Partial<Group>;
+      }
+    >
+  >(loadedMeetings);
   const actionData = useActionData();
 
   useEffect(() => {
@@ -172,7 +184,7 @@ export default function Index() {
         columns={{
           name: { label: strings.meetings.name },
           when: { label: strings.meetings.when },
-          types: { label: strings.meetings.types },
+          group: { label: strings.group.name },
           updatedAt: { label: strings.updated, align: "right" },
         }}
         rows={meetings.map(
@@ -180,20 +192,43 @@ export default function Index() {
             archived,
             day,
             id,
-            languages,
             name,
             time,
             timezone,
-            types,
             updatedAt,
+            group: { id: groupID, recordID, name: groupName },
           }) => ({
-            name: archived ? `${name} (${strings.meetings.archived})` : name,
+            name: (
+              <Link
+                to={`/meetings/${id}`}
+                className={cx(text, "font-semibold", {
+                  underline: !archived,
+                  "line-through opacity-75": archived,
+                })}
+              >
+                {archived && (
+                  <ArchiveBoxIcon className="mr-1 inline-block h-4 w-4" />
+                )}
+                {name}
+              </Link>
+            ),
             id,
-            link: `/meetings/${id}`,
-            types: [...languages, ...types].map(({ code }) => code),
+            group: (
+              <div className="flex items-center gap-3">
+                <span className="min-w-[80px] rounded border border-neutral-400 px-3 py-1 text-center font-mono text-sm dark:border-neutral-700">
+                  #{recordID}
+                </span>
+                <Link
+                  to={`/groups/${groupID}`}
+                  className={cx(text, "font-semibold underline")}
+                >
+                  {groupName}
+                </Link>
+              </div>
+            ),
             updatedAt: formatDate(updatedAt.toString()),
             when: formatDayTime(day, time, timezone),
-          })
+          }),
         )}
       />
       {meetings.length < meetingCount && (
