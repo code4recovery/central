@@ -15,33 +15,38 @@ const getData = async () => {
   const accounts = await db.account.findMany({ select: { id: true } });
   const accountIds = accounts.map(({ id }) => id);
 
-  const validGroups = await db.group.findMany({
-    select: { id: true },
-    where: { account: { id: { in: accountIds } } },
-  });
+  const [validGroups, validMeetings] = await Promise.all([
+    db.group.findMany({
+      select: { id: true },
+      where: { account: { id: { in: accountIds } } },
+    }),
+    db.meeting.findMany({
+      select: { id: true },
+      where: { account: { id: { in: accountIds } } },
+    }),
+  ]);
   const validGroupIds = validGroups.map(({ id }) => id);
+  const validMeetingIds = validMeetings.map(({ id }) => id);
 
   const validUsers = await db.user.findMany({
     select: { id: true },
-    where: { accounts: { some: { id: { in: accountIds } } } },
+    where: {
+      OR: [
+        { accounts: { some: { id: { in: accountIds } } } },
+        { groups: { some: { id: { in: validGroupIds } } } },
+      ],
+    },
   });
   const validUserIds = validUsers.map(({ id }) => id);
-
-  const validMeetings = await db.meeting.findMany({
-    select: { id: true },
-    where: { account: { id: { in: accountIds } } },
-  });
-  const validMeetingIds = validMeetings.map(({ id }) => id);
 
   const validActivity = await db.activity.findMany({
     select: { id: true },
     where: {
-      user: { id: { in: validUserIds } },
-      // todo figure out
-      // OR: {
-      //   group: { id: { in: validGroupIds } },
-      //   meeting: { id: { in: validMeetingIds } },
-      // },
+      AND: [{ user: { id: { in: validUserIds } } }],
+      OR: [
+        { group: { id: { in: validGroupIds } } },
+        { meeting: { id: { in: validMeetingIds } } },
+      ],
     },
   });
   const validActivityIds = validActivity.map(({ id }) => id);
@@ -52,17 +57,18 @@ const getData = async () => {
   });
   const validChangeIds = validChanges.map(({ id }) => id);
 
-  const languages = await db.language.findMany({
-    select: { id: true, code: true },
-    where: { meetings: { some: { id: { in: validMeetingIds } } } },
-  });
+  const [languages, types] = await Promise.all([
+    db.language.findMany({
+      select: { id: true, code: true },
+      where: { meetings: { some: { id: { in: validMeetingIds } } } },
+    }),
+    db.type.findMany({
+      select: { id: true, code: true },
+      where: { meetings: { some: { id: { in: validMeetingIds } } } },
+    }),
+  ]);
   const validLanguageIds = languages.map(({ id }) => id);
-
-  const validTypes = await db.type.findMany({
-    select: { id: true, code: true },
-    where: { meetings: { some: { id: { in: validMeetingIds } } } },
-  });
-  const validTypeIds = validTypes.map(({ id }) => id);
+  const validTypeIds = types.map(({ id }) => id);
 
   return {
     validGroupIds,
@@ -226,7 +232,7 @@ export default function Cleanup() {
   return (
     <Template
       title="Cleanup"
-      description="Clean up disconnected data in the database"
+      description="Remove disconnected data from the database"
     >
       {actionData && state === "idle" && <Alerts data={actionData} />}
       <div className="grid items-start gap-5 px-4 sm:grid-cols-2 sm:px-0 md:grid-cols-3">
