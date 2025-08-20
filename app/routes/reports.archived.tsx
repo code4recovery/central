@@ -14,7 +14,8 @@ import { zfd } from "zod-form-data";
 
 import { Alert, LoadMore, Table, Template } from "~/components";
 import { formatDate, formatDayTime, formatString } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 import { getArchived } from "~/models";
 import { db, getIDs } from "~/utils";
 
@@ -22,7 +23,7 @@ export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
     z.object({
       skip: zfd.numeric(),
-    })
+    }),
   );
 
   const { data, error } = await validator.validate(await request.formData());
@@ -57,17 +58,18 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.reports.title,
+  title: en.reports.title,
 });
 
 export default function ArchivedMeetings() {
   const { loadedMeetings, meetingCount } = useLoaderData<typeof loader>();
   const [meetings, setMeetings] =
     useState<Array<Meeting & { types: Type[]; languages: Language[] }>>(
-      loadedMeetings
+      loadedMeetings,
     );
 
   const actionData = useActionData();
+  const strings = useTranslation();
 
   useEffect(() => {
     if (actionData) {
@@ -101,7 +103,7 @@ export default function ArchivedMeetings() {
             types: [...languages, ...types].map(({ code }) => code),
             updatedAt: formatDate(updatedAt.toString()),
             when: formatDayTime(day, time, timezone),
-          })
+          }),
         )}
       />
       {meetings.length < meetingCount && (

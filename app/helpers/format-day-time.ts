@@ -1,12 +1,13 @@
 import { DateTime } from "luxon";
-
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
 
 export function formatDayTime(
   day: number | null,
   time: string | null,
-  timezone: string | null
+  timezone: string | null,
 ) {
+  const strings = useTranslation();
+
   if (day === null || !time || !timezone) {
     return strings.meetings.ongoing;
   }
@@ -19,7 +20,7 @@ export function formatDayTime(
 
   const start = DateTime.fromObject(
     { weekday, hour, minute },
-    { zone: timezone }
+    { zone: timezone, locale: `${strings.language}-us` },
   );
 
   return start.toLocaleString({

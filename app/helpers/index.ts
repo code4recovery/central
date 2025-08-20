@@ -1,5 +1,4 @@
 export * from "./config";
-export * from "./fields";
 export * from "./format-activity";
 export * from "./format-changes";
 export * from "./format-classes";
@@ -15,5 +14,6 @@ export * from "./format-url";
 export * from "./format-valid";
 export * from "./format-validator";
 export * from "./format-value";
+export * from "./get-fields";
 export * from "./get-google-sheet";
 export * from "./validators";

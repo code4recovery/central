@@ -5,12 +5,12 @@ import { validationError } from "remix-validated-form";
 
 import { Columns, Form, HelpTopic, Template } from "~/components";
 import { formatValidator } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getIDs, redirectWith } from "~/utils";
+import { useTranslation } from "~/hooks";
+import { db, getIDs, getStrings, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const { accountID, userID } = await getIDs(request);
-
+  const strings = await getStrings(request);
   const validator = formatValidator("group", {
     validator: async (data) =>
       !(await db.group.count({
@@ -59,6 +59,7 @@ export const loader: LoaderFunction = async () => {
 
 export default function AddGroup() {
   const loaderData = useLoaderData();
+  const strings = useTranslation();
   return (
     <Template>
       <Columns

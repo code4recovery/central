@@ -3,8 +3,8 @@ import { Resend } from "resend";
 
 import { Email } from "~/components";
 import { config, formatString } from "~/helpers";
-import { strings } from "~/i18n";
 import { db } from "./db.server";
+import { getStrings } from "./session.server";
 
 export async function sendMail({
   accountID,
@@ -26,6 +26,7 @@ export async function sendMail({
   to: string;
 }) {
   const { RESEND_API_KEY, RESEND_SENDER } = process.env;
+  const strings = await getStrings(request);
 
   if (!RESEND_API_KEY || !RESEND_SENDER) {
     throw new Error("Missing Resend API key or sender");

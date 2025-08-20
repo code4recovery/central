@@ -1,12 +1,11 @@
-import { json, redirect } from "@remix-run/node";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Button, Columns, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
 import { db, getIDs, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
@@ -14,6 +13,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return redirect("/users"); // todo flash invalid id message to this page
   }
   const validator = formatValidator("user");
+  const strings = useTranslation();
   const { data, error } = await validator.validate(await request.formData());
   if (error) {
     return validationError(error);
@@ -50,6 +50,7 @@ export default function User() {
   const actionData = useActionData();
   const submitting = state !== "idle";
   const { currentAccountID, isAdmin } = useUser();
+  const strings = useTranslation();
   return (
     <Template
       title={isAdmin ? strings.users.edit : strings.users.edit_profile}
@@ -74,7 +75,7 @@ export default function User() {
         <p>
           <Button
             url="https://gravatar.com/"
-            className="inline-flex mt-3"
+            className="mt-3 inline-flex"
             theme="primary"
           >
             Gravatar

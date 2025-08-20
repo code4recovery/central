@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import type { Group } from "@prisma/client";
 import {
   type ActionFunction,
   type DataFunctionArgs,
   json,
 } from "@remix-run/node";
-import { DateTime } from "luxon";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import {
   useActionData,
   useFetcher,
@@ -14,25 +12,27 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import md5 from "blueimp-md5";
-import { validationError, ValidatedForm, useField } from "remix-validated-form";
+import { DateTime } from "luxon";
+import { useEffect, useState } from "react";
+import { useField, ValidatedForm, validationError } from "remix-validated-form";
 
 import { Alerts, Button, Select } from "~/components";
 import {
   config,
-  fields,
   formatClasses as cx,
+  formatChanges,
   formatDayTime,
   formatSearch,
   formatString,
   formatToken,
   formatValidator,
-  formatChanges,
   formatValue,
+  getFields,
+  Model,
 } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
 import { getMeeting } from "~/models";
-import { db, getIDs, optionsInUse, sendMail } from "~/utils";
+import { db, getIDs, getStrings, optionsInUse, sendMail } from "~/utils";
 
 const classes = {
   help: "text-sm text-neutral-500",
@@ -40,7 +40,7 @@ const classes = {
   input: cx(
     config.classes.field,
     config.themes.indigo.focusRing,
-    "h-10 leading-7"
+    "h-10 leading-7",
   ),
   label: "block text-sm font-medium leading-6",
   labelButton:
@@ -51,6 +51,7 @@ const classes = {
 };
 
 export const action: ActionFunction = async ({ request }) => {
+  const strings = await getStrings(request);
   const formData = await request.formData();
   const { userID } = await getIDs(request);
 
@@ -132,8 +133,10 @@ export const action: ActionFunction = async ({ request }) => {
       return json(
         result.filter(
           (group) =>
-            !group.userIDs.some(({ $oid }: { $oid: string }) => $oid === userID)
-        )
+            !group.userIDs.some(
+              ({ $oid }: { $oid: string }) => $oid === userID,
+            ),
+        ),
       );
     }
   } else if (formData.get("subaction") === "group-rep-request") {
@@ -199,7 +202,8 @@ export const action: ActionFunction = async ({ request }) => {
       where: { accountID: account.id, recordID },
     });
 
-    const changes = formatChanges(fields["group-request"], group, data);
+    const fields = getFields("group-request", strings);
+    const changes = formatChanges(fields, group, data);
 
     // exit if no changes
     if (!changes.length) {
@@ -225,7 +229,7 @@ export const action: ActionFunction = async ({ request }) => {
             after: formatValue(after),
             field,
           },
-        })
+        }),
     );
 
     return json({ info: strings.request.edit_request_sent });
@@ -292,7 +296,7 @@ export default function Request() {
     useLoaderData<ReturnType<typeof loader>>();
   const [groupExists, setGroupExists] = useState(true);
   const [groupRecordID, setGroupRecordID] = useState(
-    group?.recordID ?? requestedGroup?.recordID ?? user?.groups[0]?.recordID
+    group?.recordID ?? requestedGroup?.recordID ?? user?.groups[0]?.recordID,
   );
   const [meetingSlug, setMeetingSlug] = useState(meeting?.slug);
   const [requestID, setRequestID] = useState(requestedGroup?.recordID);
@@ -302,6 +306,7 @@ export default function Request() {
   const requestFetcher = useFetcher();
   const editFetcher = useFetcher();
   const navigate = useNavigate();
+  const strings = useTranslation();
   const {
     theme: { text },
   } = useUser();
@@ -316,11 +321,11 @@ export default function Request() {
 
   return (
     <div
-      className="p-5 max-w-5xl w-full mx-auto pb-full"
+      className="pb-full mx-auto w-full max-w-5xl p-5"
       style={{ paddingBottom: "100vh" }} /* no scroll when content changes */
     >
-      <div className="gap-3 grid text-center my-7 xl:my-10">
-        <h1 className="font-semibold text-xl sm:text-2xl block w-full md:text-3xl">
+      <div className="my-7 grid gap-3 text-center xl:my-10">
+        <h1 className="block w-full text-xl font-semibold sm:text-2xl md:text-3xl">
           {strings.request.title}
         </h1>
 
@@ -364,7 +369,7 @@ export default function Request() {
               />
               {!!user && (
                 <Button
-                  className="absolute px-2 text-sm top-1 right-1 bottom-1 rounded bg-pink"
+                  className="bg-pink absolute bottom-1 right-1 top-1 rounded px-2 text-sm"
                   theme="primary"
                   url="/auth/out?go=/request"
                 >
@@ -410,7 +415,7 @@ export default function Request() {
               </label>
             ))}
 
-            <label className="grid gap-2 cursor-pointer">
+            <label className="grid cursor-pointer gap-2">
               <p
                 className={
                   !groupExists ? classes.labelButtonActive : classes.labelButton
@@ -449,7 +454,7 @@ export default function Request() {
                     id="search"
                     name="search"
                     type="search"
-                    className="absolute bg-transparent border-0 ring-0 top-0 right-0 left-7 bottom-0 focus:ring-0"
+                    className="absolute bottom-0 left-7 right-0 top-0 border-0 bg-transparent ring-0 focus:ring-0"
                   />
                 </div>
               </Field>
@@ -600,7 +605,7 @@ export default function Request() {
                           setMeetingSlug(
                             meetingSlug === meeting.slug
                               ? undefined
-                              : meeting.slug
+                              : meeting.slug,
                           )
                         }
                         readOnly
@@ -612,7 +617,7 @@ export default function Request() {
                         {formatDayTime(
                           meeting.day,
                           meeting.time,
-                          meeting.timezone
+                          meeting.timezone,
                         )}
                       </span>
                     </label>
@@ -649,7 +654,7 @@ export default function Request() {
                         value={meetingActive}
                         onChange={(e) =>
                           setMeetingActive(
-                            e.target.value as typeof meetingActive
+                            e.target.value as typeof meetingActive,
                           )
                         }
                         className={classes.input}
@@ -724,11 +729,11 @@ export default function Request() {
                             />
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-5 mb-3">
+                        <div className="mb-3 mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
                           {config.days.map((day, i) => (
                             <label
                               key={i}
-                              className="flex gap-2 items-center cursor-pointer text-sm"
+                              className="flex cursor-pointer items-center gap-2 text-sm"
                             >
                               <input
                                 className="rounded"
@@ -747,7 +752,7 @@ export default function Request() {
                         help={strings.request.meeting.conference_url_help}
                       >
                         <div className="grid grid-cols-3 gap-3">
-                          <div className="grid gap-2 col-span-2">
+                          <div className="col-span-2 grid gap-2">
                             <label className={classes.label}>
                               {strings.request.meeting.conference_url}
                             </label>
@@ -787,7 +792,7 @@ export default function Request() {
                         help={strings.request.meeting.conference_phone_help}
                       >
                         <div className="grid grid-cols-3 gap-3">
-                          <div className="grid gap-2 col-span-2">
+                          <div className="col-span-2 grid gap-2">
                             <label className={classes.label}>
                               {strings.request.meeting.conference_phone}
                             </label>
@@ -823,19 +828,19 @@ export default function Request() {
                         label={strings.request.meeting.types}
                         name="types"
                       >
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+                        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
                           {types
                             .sort((a, b) =>
                               strings.types[
                                 a as keyof typeof strings.types
                               ].localeCompare(
-                                strings.types[b as keyof typeof strings.types]
-                              )
+                                strings.types[b as keyof typeof strings.types],
+                              ),
                             )
                             .map((type, i) => (
                               <label
                                 key={i}
-                                className="flex gap-2 items-center cursor-pointer text-sm"
+                                className="flex cursor-pointer items-center gap-2 text-sm"
                               >
                                 <input
                                   className="rounded"
@@ -857,7 +862,7 @@ export default function Request() {
                         label={strings.request.meeting.languages}
                         name="languages"
                       >
-                        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
+                        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
                           {languages
                             .sort((a, b) =>
                               strings.languages[
@@ -865,18 +870,18 @@ export default function Request() {
                               ].localeCompare(
                                 strings.languages[
                                   b as keyof typeof strings.languages
-                                ]
-                              )
+                                ],
+                              ),
                             )
                             .map((language, i) => (
                               <label
                                 key={i}
-                                className="flex gap-2 items-center cursor-pointer text-sm"
+                                className="flex cursor-pointer items-center gap-2 text-sm"
                               >
                                 <input
                                   className="rounded"
                                   defaultChecked={meeting?.languages.includes(
-                                    language
+                                    language,
                                   )}
                                   type="checkbox"
                                   value={i}
@@ -908,12 +913,12 @@ export default function Request() {
                 </Fieldset>
               )}
 
-              <div className="grid gap-y-10 pt-8 pb-10 max-w-xl text-center mx-auto">
+              <div className="mx-auto grid max-w-xl gap-y-10 pb-10 pt-8 text-center">
                 <div className="grid gap-3">
                   <p>{strings.request.agree}</p>
-                  <nav className="flex gap-x-3 justify-center">
+                  <nav className="flex justify-center gap-x-3">
                     <a
-                      className="text-indigo-500 dark:text-indigo-400 underline"
+                      className="text-indigo-500 underline dark:text-indigo-400"
                       href="https://aa-intergroup.org/privacy-policy"
                       rel="noreferrer"
                       target="_blank"
@@ -922,7 +927,7 @@ export default function Request() {
                     </a>
                     <span>~</span>
                     <a
-                      className="text-indigo-500 dark:text-indigo-400 underline"
+                      className="text-indigo-500 underline dark:text-indigo-400"
                       href="https://aa-intergroup.org/directory-guidelines"
                       rel="noreferrer"
                       target="_blank"
@@ -932,13 +937,13 @@ export default function Request() {
                   </nav>
                 </div>
                 {editFetcher.state === "loading" ? (
-                  <div className="text-sm text-center">Sending…</div>
+                  <div className="text-center text-sm">Sending…</div>
                 ) : editFetcher.data ? (
                   <Alerts data={editFetcher.data} />
                 ) : (
                   <div>
                     <input
-                      className="bg-indigo-500 rounded-md px-5 py-2 cursor-pointer text-neutral-100 text-lg dark:bg-indigo-300 dark:text-neutral-900"
+                      className="cursor-pointer rounded-md bg-indigo-500 px-5 py-2 text-lg text-neutral-100 dark:bg-indigo-300 dark:text-neutral-900"
                       type="submit"
                       value={strings.request.submit}
                     />
@@ -991,12 +996,13 @@ function Fields({
   set: "group-request" | "meeting-request";
   values?: any; // todo
 }) {
-  const fieldNames = Object.keys(fields[set as keyof typeof fields]);
+  const strings = useTranslation();
+  const fields = getFields(set as Model, strings);
+  const fieldNames = Object.keys(fields);
   return (
     <>
       {fieldNames.map((name) => {
-        const { helpText, label, placeholder, type } =
-          fields[set as keyof typeof fields][name];
+        const { helpText, label, placeholder, type } = fields[name];
         return (
           <Field help={helpText} label={label} name={name} key={name}>
             {type === "textarea" ? (
@@ -1034,12 +1040,12 @@ function Fieldset({
   title: string;
 }) {
   return (
-    <fieldset className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-neutral-300 dark:border-neutral-800 py-12 md:grid-cols-6">
-      <div className=" md:col-span-2">
-        <h2 className="text-xl font-semibold mb-2">{title}</h2>
+    <fieldset className="grid grid-cols-1 gap-x-8 gap-y-10 border-b border-neutral-300 py-12 dark:border-neutral-800 md:grid-cols-6">
+      <div className="md:col-span-2">
+        <h2 className="mb-2 text-xl font-semibold">{title}</h2>
         {description && <p className={classes.help}>{description}</p>}
       </div>
-      <div className="grid gap-x-6 gap-y-8 md:col-span-4 items-start">
+      <div className="grid items-start gap-x-6 gap-y-8 md:col-span-4">
         {children}
       </div>
     </fieldset>

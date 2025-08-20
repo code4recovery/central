@@ -3,12 +3,12 @@ import { useLoaderData } from "@remix-run/react";
 
 import { Message } from "~/components";
 import { formatString } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getIDs, sendMail } from "~/utils";
+import { useTranslation } from "~/hooks";
+import { db, getIDs, getStrings, sendMail } from "~/utils";
 
 export const loader: LoaderFunction = async ({ params, request }) => {
   const { userID: repID } = await getIDs(request);
-
+  const strings = await getStrings(request);
   const { groupID, userID } = params;
 
   // confirm requesting user exists
@@ -81,6 +81,7 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 
 export default function Approve() {
   const { group, user } = useLoaderData();
+  const strings = useTranslation();
   return (
     <Message
       heading={strings.request.approved}

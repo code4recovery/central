@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import {
   ArrowLeftOnRectangleIcon,
@@ -11,14 +10,15 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Link, NavLink, useSearchParams } from "@remix-run/react";
+import { Fragment } from "react";
 
 import { config, formatClasses as cx } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
 import { DefaultAccountLogo as Logo } from "~/icons";
 import { Avatar } from "./Avatar";
 
 export function Header() {
+  const strings = useTranslation();
   const {
     accounts,
     currentAccountID,
@@ -49,7 +49,6 @@ export function Header() {
         label: strings.activity.title,
       },
       { url: "/reports", label: strings.reports.title },
-      { url: "/requests", label: strings.requests.title },
     ],
     secondary: [
       isAdmin
@@ -92,7 +91,7 @@ export function Header() {
 
   return (
     <header>
-      <Disclosure as="nav" className="bg-white dark:bg-neutral-950 shadow">
+      <Disclosure as="nav" className="bg-white shadow dark:bg-neutral-950">
         {({ open }) => (
           <>
             <div className="px-2 sm:px-6 xl:px-12">
@@ -102,8 +101,8 @@ export function Header() {
                     <Link
                       to={config.home}
                       className={cx(
-                        "focus-visible:ring-2 outline-none w-auto",
-                        focusRing
+                        "w-auto outline-none focus-visible:ring-2",
+                        focusRing,
                       )}
                     >
                       <Logo className={cx("h-9 w-auto", text)} />
@@ -122,8 +121,8 @@ export function Header() {
                               "border-transparent hover:border-neutral-300 dark:hover:border-neutral-800":
                                 !isActive,
                             },
-                            "border-b-2 focus-visible:ring-2 font-medium inline-flex items-center outline-none pt-1 px-1 text-sm",
-                            focusRing
+                            "inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium outline-none focus-visible:ring-2",
+                            focusRing,
                           )
                         }
                       >
@@ -132,7 +131,7 @@ export function Header() {
                     ))}
                   </div>
                 </div>
-                <div className="flex flex-1 items-center justify-center px-2 lg:px-0 lg:ml-6 lg:justify-end">
+                <div className="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end lg:px-0">
                   <form
                     action="/search"
                     className="w-full max-w-lg lg:max-w-xs"
@@ -151,8 +150,8 @@ export function Header() {
                         autoComplete="off"
                         className={cx(
                           "block w-full rounded-md border-0 py-1.5 pl-10 pr-3 ring-1 ring-inset focus:ring-inset sm:text-sm sm:leading-6",
-                          "bg-transparent ring-neutral-300 dark:ring-neutral-700 placeholder:text-neutral-400 dark:placeholder:text-neutral-600 dark:hover:bg-black",
-                          focusRing
+                          "bg-transparent ring-neutral-300 placeholder:text-neutral-400 dark:ring-neutral-700 dark:placeholder:text-neutral-600 dark:hover:bg-black",
+                          focusRing,
                         )}
                         defaultValue={search}
                         name="search"
@@ -167,8 +166,8 @@ export function Header() {
                   <Disclosure.Button
                     className={cx(
                       "inline-flex items-center justify-center rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-inset",
-                      "text-neutral-400 dark:text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-500",
-                      focusRing
+                      "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-500 dark:text-neutral-600 dark:hover:bg-neutral-900",
+                      focusRing,
                     )}
                   >
                     <span className="sr-only">Open main menu</span>
@@ -184,7 +183,7 @@ export function Header() {
                     <Menu.Button
                       className={cx(
                         "flex rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
-                        focusRing
+                        focusRing,
                       )}
                     >
                       <Avatar emailHash={emailHash} name={name} size="md" />
@@ -198,7 +197,7 @@ export function Header() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white dark:bg-black py-1 shadow-lg focus:outline-none divide-neutral-200 dark:divide-neutral-800 divide-y">
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-64 origin-top-right divide-y divide-neutral-200 rounded-md bg-white py-1 shadow-lg focus:outline-none dark:divide-neutral-800 dark:bg-black">
                         {navItems.secondary
                           .filter((e) => e.length)
                           .map((group, index) => (
@@ -212,7 +211,7 @@ export function Header() {
                                           "bg-neutral-100 dark:bg-neutral-900":
                                             active,
                                         },
-                                        "px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 flex gap-2 items-center"
+                                        "flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300",
                                       )}
                                       reloadDocument={reload}
                                       to={url}
@@ -233,7 +232,7 @@ export function Header() {
             </div>
 
             <Disclosure.Panel className="lg:hidden">
-              <div className="space-y-1 pt-2 pb-3">
+              <div className="space-y-1 pb-3 pt-2">
                 {navItems.primary.map(({ url, label }) => (
                   <NavLink
                     key={url}
@@ -242,11 +241,11 @@ export function Header() {
                       cx(
                         {
                           [border]: isActive,
-                          "border-transparent text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-950 hover:border-neutral-300 dark:hover:border-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200":
+                          "border-transparent text-neutral-600 hover:border-neutral-300 hover:bg-neutral-50 hover:text-neutral-800 dark:text-neutral-400 dark:hover:border-neutral-700 dark:hover:bg-neutral-950 dark:hover:text-neutral-200":
                             !isActive,
                         },
                         "block border-l-4 py-2 pl-3 pr-4 text-base font-medium",
-                        text
+                        text,
                       )
                     }
                   >
@@ -254,7 +253,7 @@ export function Header() {
                   </NavLink>
                 ))}
               </div>
-              <div className="border-t border-neutral-200 dark:border-neutral-200 pt-4 pb-3">
+              <div className="border-t border-neutral-200 pb-3 pt-4 dark:border-neutral-200">
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
                     <Avatar emailHash={emailHash} name={name} size="lg" />
@@ -265,14 +264,14 @@ export function Header() {
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 space-y-1 divide-neutral-200 dark:divide-neutral-800 divide-y">
+                <div className="mt-3 space-y-1 divide-y divide-neutral-200 dark:divide-neutral-800">
                   {navItems.secondary
                     .filter((e) => e.length)
                     .map((group, index) => (
                       <div key={index} className="py-1">
                         {group.map(({ url, label, icon, reload }) => (
                           <NavLink
-                            className="flex gap-2 items-center px-4 py-2 text-base font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 hover:text-neutral-800 dark:hover:text-neutral-200"
+                            className="flex items-center gap-2 px-4 py-2 text-base font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800 dark:hover:bg-neutral-900 dark:hover:text-neutral-200"
                             key={url}
                             reloadDocument={reload}
                             to={url}

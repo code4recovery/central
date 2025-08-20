@@ -1,4 +1,4 @@
-export const strings = {
+export const en = {
   about: "About this software",
   account: {
     description: "Settings apply to all account users.",
@@ -53,6 +53,7 @@ export const strings = {
     status: "Status",
     title: "Activity",
     type: "Type",
+    what: "What",
     when: "When",
     who: "Who",
   },
@@ -132,7 +133,6 @@ export const strings = {
     add: "Add group",
     added: "Group has been added",
     description: `There are {groupCount} groups and {meetingCount} meetings in your account.`,
-    edit: "Edit group",
     email: "Email",
     empty: "No groups added yet",
     name: "Group name",
@@ -161,6 +161,7 @@ export const strings = {
     record_id: "What is a record ID?",
     record_id_content: `Record IDs are used to identify groups in Central. They can be any string of letters, numbers, or symbols, but they must be unique within your account. The Record ID suggested here is one number higher than the current max.`,
   },
+  language: "en",
   languages: {
     AF: "Afrikaans",
     AM: "Amharic",
@@ -230,6 +231,7 @@ export const strings = {
     empty: "No meetings added yet",
     geocode: "Location",
     geocode_help: `Online meetings can have approximate locations, eg neighborhood, city, state/province`,
+    hide_not_in_use: "Hide not in use",
     languages: "Languages",
     location: "Location name",
     location_help: "Building name (optional)",
@@ -240,6 +242,7 @@ export const strings = {
     notes_notes: "Avoid adding information here that could go in other fields",
     notFound: "Could not find meeting.",
     ongoing: "Ongoing",
+    show_all: "Show all",
     time: "Time",
     timezone: "Timezone",
     title: "Meetings",

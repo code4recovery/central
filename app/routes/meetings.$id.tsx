@@ -19,22 +19,23 @@ import {
 } from "~/components";
 import { ArchiveForm } from "~/components/ArchiveForm";
 import {
-  fields,
   formatActivity,
   formatChanges,
   formatString,
   formatUrl,
   formatValidator,
   formatValue,
+  getFields,
 } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
+import { en } from "~/i18n";
 import { getMeeting } from "~/models";
-import { db, getIDs, jsonWith, optionsInUse } from "~/utils";
+import { db, getIDs, getStrings, jsonWith, optionsInUse } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const meeting = await getMeeting(id);
   const { userID } = await getIDs(request);
+  const strings = await getStrings(request);
 
   const formData = await request.formData();
 
@@ -61,15 +62,17 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
+  const fields = getFields("meeting", strings);
+
   // patch geocode data
-  Object.keys(fields.meeting)
-    .filter((field) => fields.meeting[field].type === "geocode")
+  Object.keys(fields)
+    .filter((field) => fields[field].type === "geocode")
     .forEach((field) => {
       const value = formData.get(`${field}[id]`)?.toString();
       data[field] = value;
     });
 
-  const changes = formatChanges(fields.meeting, meeting, data);
+  const changes = formatChanges(fields, meeting, data);
 
   // exit if no changes
   if (!changes.length) {
@@ -86,13 +89,13 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
           })
         ).map(({ id }) => id)
       : formData.get("save-option") === "same_time"
-      ? (
-          await db.meeting.findMany({
-            select: { id: true },
-            where: { groupID: meeting.groupID, time: meeting.time },
-          })
-        ).map(({ id }) => id)
-      : [id];
+        ? (
+            await db.meeting.findMany({
+              select: { id: true },
+              where: { groupID: meeting.groupID, time: meeting.time },
+            })
+          ).map(({ id }) => id)
+        : [id];
 
   // prepare checkbox updates
   const changedCheckboxFields: {
@@ -139,14 +142,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
             after: formatValue(after),
             field,
           },
-        })
+        }),
     );
 
     // update meeting
     const changed = Object.fromEntries(
       changes
         .filter(({ type }) => type !== "checkboxes")
-        .map(({ field, after }) => [field, after])
+        .map(({ field, after }) => [field, after]),
     );
 
     await db.meeting.update({
@@ -186,7 +189,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings.edit,
+  title: en.meetings.edit,
 });
 
 export default function EditMeeting() {
@@ -195,6 +198,7 @@ export default function EditMeeting() {
   const navigate = useNavigate();
   const { accountUrl } = useUser();
   const alerts = { ...alert, ...actionData };
+  const strings = useTranslation();
 
   return (
     <Template
@@ -218,7 +222,7 @@ export default function EditMeeting() {
           </>
         }
       >
-        <div className="flex gap-5 flex-wrap">
+        <div className="flex flex-wrap gap-5">
           <Button
             icon="external"
             theme="secondary"
@@ -257,10 +261,10 @@ export default function EditMeeting() {
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                formatActivity({ type: "meeting", changes })
+                formatActivity({ type: "meeting", changes }),
               ),
               user,
-            })
+            }),
           )}
         />
       </Columns>

@@ -1,10 +1,10 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { strings } from "~/i18n";
-import { changeAccount, db, getIDs, redirectWith } from "~/utils";
+import { changeAccount, db, getIDs, getStrings, redirectWith } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const { userID } = await getIDs(request);
   const { id: currentAccountID } = params;
+  const strings = await getStrings(request);
 
   await db.user.update({
     where: { id: userID },

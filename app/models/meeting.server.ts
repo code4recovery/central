@@ -1,5 +1,5 @@
 import { config, validObjectId } from "~/helpers";
-import { strings } from "~/i18n";
+import { en as strings } from "~/i18n";
 import { db } from "~/utils";
 
 export async function getArchived({

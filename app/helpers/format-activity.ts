@@ -1,6 +1,7 @@
 import type { Change } from "@prisma/client";
 
-import { fields } from "./fields";
+import { useTranslation } from "~/hooks";
+import { getFields } from "./get-fields";
 
 export function formatActivity({
   approved,
@@ -11,9 +12,11 @@ export function formatActivity({
   changes: Change[];
   type: "group" | "meeting";
 }) {
+  const strings = useTranslation();
+  const fields = getFields(type, strings);
   return {
     properties: changes
-      .map(({ field }) => fields[type][field].label?.toLocaleLowerCase())
+      .map(({ field }) => fields[field].label?.toLocaleLowerCase())
       .join(", "),
     approved: approved === true ? "✅" : approved === false ? "❌" : "⏳",
   };

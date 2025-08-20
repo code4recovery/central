@@ -1,20 +1,22 @@
-import { Link } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/node";
 import {
   ArchiveBoxIcon,
   ArrowDownOnSquareStackIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
+import type { MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 
 import { Template } from "~/components";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 
 export const meta: MetaFunction = () => ({
-  title: strings.reports.title,
+  title: en.reports.title,
 });
 
 export default function Reports() {
   const iconClass = "h-10 w-10 mx-auto";
+  const strings = useTranslation();
   const reports = {
     "new-groups": {
       icon: <SparklesIcon className={iconClass} />,
@@ -36,10 +38,10 @@ export default function Reports() {
 
   return (
     <Template title={strings.reports.title}>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 px-4 md:px-0">
+      <div className="grid grid-cols-2 gap-4 px-4 md:grid-cols-3 md:gap-8 md:px-0">
         {Object.keys(reports).map((report) => (
           <Link
-            className="bg-white dark:bg-black hover:bg-neutral-100 dark:hover:bg-neutral-950 shadow rounded text-center px-5 py-10 space-y-2"
+            className="space-y-2 rounded bg-white px-5 py-10 text-center shadow hover:bg-neutral-100 dark:bg-black dark:hover:bg-neutral-950"
             key={report}
             reloadDocument={report.startsWith("download-")}
             to={`/reports/${report}`}

@@ -1,32 +1,34 @@
 import { withZod } from "@remix-validated-form/with-zod";
-import { z } from "zod";
 import type { ZodAny, ZodEffects } from "zod";
+import { z } from "zod";
 
-import { fields } from "./fields";
+import { en as strings } from "~/i18n";
+import { getFields, type Model } from "./get-fields";
 
 export const formatValidator = (
-  model: keyof typeof fields,
+  model: Model,
   serverValidation?: {
     validator: (data: { [id: string]: any }) => Promise<boolean>;
     params: {
       message: string;
       path: string[];
     };
-  }
+  },
 ) => {
+  const fields = getFields(model, strings);
   const schema = z.object(
     Object.fromEntries(
-      Object.keys(fields[model])
-        .filter((name) => fields[model][name].validation)
+      Object.keys(fields)
+        .filter((name) => fields[name].validation)
         .map((name) => [
           name,
-          fields[model][name].validation as ZodEffects<ZodAny, any, any>,
-        ])
-    )
+          fields[name].validation as ZodEffects<ZodAny, any, any>,
+        ]),
+    ),
   );
   return serverValidation
     ? withZod(
-        schema.refine(serverValidation.validator, serverValidation.params)
+        schema.refine(serverValidation.validator, serverValidation.params),
       )
     : withZod(schema);
 };

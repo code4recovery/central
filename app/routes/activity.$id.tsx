@@ -15,14 +15,14 @@ import {
   Template,
 } from "~/components";
 import {
-  fields,
-  formatDate,
-  validObjectId,
-  formatString,
   formatActivity,
+  formatDate,
+  formatString,
+  getFields,
+  validObjectId,
 } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getIDs, jsonWith, sendMail } from "~/utils";
+import { useTranslation } from "~/hooks";
+import { db, getIDs, getStrings, jsonWith, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({
   params: { id: groupID, activityID },
@@ -30,7 +30,7 @@ export const action: ActionFunction = async ({
 }) => {
   const formData = await request.formData();
   const { accountID, userID } = await getIDs(request);
-
+  const strings = await getStrings(request);
   if (formData.get("subaction") === "approve") {
     // get activity
     const activity = await db.activity.findUniqueOrThrow({
@@ -80,6 +80,7 @@ export const action: ActionFunction = async ({
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
+  const strings = await getStrings(request);
   if (!validObjectId(id)) {
     throw new Response(null, {
       status: 404,
@@ -177,18 +178,19 @@ export default function GroupActivityDetail() {
   const { activities, activity, alert, group, meeting } = useLoaderData();
   const actionData = useActionData();
   const alerts = { ...actionData, ...alert };
+  const strings = useTranslation();
   const breadcrumbs = group
     ? [
         ["/groups", strings.group.title],
         [`/groups/${group.id}`, group.name],
       ]
     : meeting
-    ? [
-        ["/groups", strings.group.title],
-        [`/groups/${meeting.group.id}`, meeting.group.name],
-        [`/meetings/${meeting.id}`, meeting.name],
-      ]
-    : [];
+      ? [
+          ["/groups", strings.group.title],
+          [`/groups/${meeting.group.id}`, meeting.group.name],
+          [`/meetings/${meeting.id}`, meeting.name],
+        ]
+      : [];
   const isRequest = activity.type.startsWith("request");
   const isPending = isRequest && typeof activity.approved === "undefined";
   return (
@@ -198,12 +200,12 @@ export default function GroupActivityDetail() {
         strings.activity.general[
           activity.type as keyof typeof strings.activity.general
         ],
-        formatActivity({ ...activity, type: group ? "group" : "meeting" })
+        formatActivity({ ...activity, type: group ? "group" : "meeting" }),
       )}
     >
       <Columns
         primary={
-          <div className="px-4 sm:px-0 grid gap-y-4">
+          <div className="grid gap-y-4 px-4 sm:px-0">
             {alerts && <Alerts data={alerts} />}
             <DescriptionList
               terms={[
@@ -216,12 +218,16 @@ export default function GroupActivityDetail() {
                     formatDate(activity.createdAt),
                   ].join(", "),
                 },
-                ...activity.changes.map(({ field, before, after }: Change) => ({
-                  term: group
-                    ? fields.group[field]?.label
-                    : fields.meeting[field]?.label,
-                  definition: [before, after],
-                })),
+                ...activity.changes.map(({ field, before, after }: Change) => {
+                  const fields = getFields(
+                    group ? "group" : "meeting",
+                    strings,
+                  );
+                  return {
+                    term: fields[field]?.label,
+                    definition: [before, after],
+                  };
+                }),
                 ...(activity.type === "add"
                   ? [
                       {
@@ -241,11 +247,11 @@ export default function GroupActivityDetail() {
                                 date: formatDate(activity.approvedAt),
                               })
                             : activity.approved === false
-                            ? formatString(strings.activity.declinedBy, {
-                                user: activity.approver.name,
-                                date: formatDate(activity.declinedAt),
-                              })
-                            : strings.pending,
+                              ? formatString(strings.activity.declinedBy, {
+                                  user: activity.approver.name,
+                                  date: formatDate(activity.declinedAt),
+                                })
+                              : strings.pending,
                       },
                     ]
                   : []),
@@ -285,9 +291,9 @@ export default function GroupActivityDetail() {
                   type: group ? "group" : "meeting",
                   approved,
                   changes,
-                })
+                }),
               ),
-            })
+            }),
           )}
           title={strings.activity.title}
         />

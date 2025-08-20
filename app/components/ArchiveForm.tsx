@@ -1,9 +1,9 @@
-import { ValidatedForm, useIsSubmitting } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm, useIsSubmitting } from "remix-validated-form";
 import { z } from "zod";
 
+import { useTranslation } from "~/hooks";
 import { Button } from "./Button";
-import { strings } from "~/i18n";
 
 export function ArchiveForm({ archived }: { archived: boolean }) {
   return (
@@ -18,6 +18,7 @@ export function ArchiveForm({ archived }: { archived: boolean }) {
 }
 
 function Submit({ archived }: { archived: boolean }) {
+  const strings = useTranslation();
   return useIsSubmitting() ? (
     <Button icon="spinner" theme="secondary">
       {archived ? strings.meetings.unarchiving : strings.meetings.archiving}

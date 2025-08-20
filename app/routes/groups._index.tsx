@@ -1,16 +1,16 @@
+import type { Group, Meeting, User } from "@prisma/client";
 import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
-import type { Group, Meeting, User } from "@prisma/client";
-import { useEffect, useState } from "react";
-import { useActionData, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/node";
+import { useActionData, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
+import { useEffect, useState } from "react";
+import { validationError } from "remix-validated-form";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
-import { validationError } from "remix-validated-form";
 
 import {
   Alert,
@@ -21,8 +21,9 @@ import {
   Table,
   Template,
 } from "~/components";
-import { formatString, formatDate } from "~/helpers";
-import { strings } from "~/i18n";
+import { formatDate, formatString } from "~/helpers";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 import { getAccountCounts, getGroups } from "~/models";
 import { getIDs, jsonWith } from "~/utils";
 
@@ -30,7 +31,7 @@ export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
     z.object({
       skip: zfd.numeric(),
-    })
+    }),
   );
 
   const { data, error } = await validator.validate(await request.formData());
@@ -54,7 +55,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.group.title,
+  title: en.group.title,
 });
 
 export default function Index() {
@@ -62,10 +63,10 @@ export default function Index() {
     useLoaderData<typeof loader>();
   const [groups, setGroups] =
     useState<Array<Group & { meetings: Meeting[]; users: User[] }>>(
-      loadedGroups
+      loadedGroups,
     );
   const actionData = useActionData();
-
+  const strings = useTranslation();
   useEffect(() => {
     if (actionData) {
       setGroups((groups) => [...groups, ...actionData]);
@@ -100,7 +101,7 @@ export default function Index() {
           meetings: meetings.length,
           name,
           reps: (
-            <div className="pl-2 flex">
+            <div className="flex pl-2">
               {users.map(({ id, emailHash, name }) => (
                 <Avatar
                   key={id}

@@ -1,16 +1,16 @@
-import md5 from "blueimp-md5";
 import type { ActionFunction } from "@remix-run/node";
 import { useActionData } from "@remix-run/react";
+import md5 from "blueimp-md5";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, Template } from "~/components";
 import { formatString, formatToken, formatValidator } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
-import { db, getIDs, redirectWith, sendMail } from "~/utils";
+import { useTranslation, useUser } from "~/hooks";
+import { db, getIDs, getStrings, redirectWith, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const { accountID } = await getIDs(request);
+  const strings = await getStrings(request);
 
   const validator = formatValidator("user", {
     validator: async (data) =>
@@ -80,6 +80,7 @@ export const action: ActionFunction = async ({ request }) => {
 export default function User() {
   const { currentAccountID, isAdmin } = useUser();
   const actionData = useActionData();
+  const strings = useTranslation();
   return (
     <Template
       title={strings.users.add}

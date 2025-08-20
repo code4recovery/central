@@ -19,21 +19,23 @@ import {
   formatString,
   formatToken,
   formatValidator,
+  Model,
 } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
+import { en } from "~/i18n";
 import { DefaultAccountLogo } from "~/icons";
-import { createUserSession, db, sendMail } from "~/utils";
+import { createUserSession, db, getStrings, sendMail } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const subaction = formData.get("subaction")?.toString();
+  const strings = await getStrings(request);
 
   if (!subaction) {
     return;
   }
 
-  const validator = formatValidator(subaction);
+  const validator = formatValidator(subaction as Model);
 
   const { data, error } = await validator.validate(formData);
 
@@ -125,11 +127,12 @@ export const loader: LoaderFunction = async () => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.auth.title,
+  title: en.auth.title,
 });
 
 export default function Index() {
   const { countAccounts } = useLoaderData();
+  const strings = useTranslation();
   const {
     theme: { text },
   } = useUser();
@@ -142,12 +145,12 @@ export default function Index() {
     <>
       <div className="flex flex-grow flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <DefaultAccountLogo className={cx("h-12 w-auto mx-auto", text)} />
+          <DefaultAccountLogo className={cx("mx-auto h-12 w-auto", text)} />
           <h1 className="mt-6 text-center text-3xl font-bold tracking-tight">
             {countAccounts ? strings.auth.title : "Welcome to Central"}
           </h1>
         </div>
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md space-y-5">
+        <div className="mt-8 space-y-5 sm:mx-auto sm:w-full sm:max-w-md">
           {actionData && <Alerts data={actionData} />}
           {countAccounts ? (
             <Form
