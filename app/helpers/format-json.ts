@@ -1,13 +1,13 @@
 import type { Geocode, Group, Meeting } from "@prisma/client";
 
-import { config, formatUrl } from "~/helpers";
+import { config } from "~/helpers";
 
 export function formatJson(
   meetings: Array<
     Partial<Meeting> & {
       languages: { code: string }[];
       types: { code: string }[];
-      geocode?: Partial<Geocode>;
+      geocode: Partial<Geocode> | null;
       group: Partial<Group>;
     }
   >,
@@ -15,6 +15,13 @@ export function formatJson(
 ) {
   const url = (path: string) =>
     `${process.env.BASE_URL ?? "https://central.aa-intergroup.org"}${path}`;
+
+  const websiteBaseUrl = accountUrl.includes("redirectTo=")
+    ? decodeURIComponent(
+        accountUrl.substring(accountUrl.indexOf("redirectTo=") + 11),
+      )
+    : accountUrl;
+
   return meetings
     .map(
       ({
@@ -71,7 +78,7 @@ export function formatJson(
         square: group.square,
         edit_url: url(`/meetings/${id}`),
         // feedback_url: url(`/request/${group.recordID}/${slug}`),
-        url: slug ? formatUrl(accountUrl, slug) : undefined,
+        url: slug ? `${websiteBaseUrl}${slug}` : undefined,
         updated: updatedAt
           ?.toISOString()
           .split("T")

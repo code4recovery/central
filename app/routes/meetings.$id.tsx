@@ -22,7 +22,6 @@ import {
   formatActivity,
   formatChanges,
   formatString,
-  formatUrl,
   formatValidator,
   formatValue,
   getFields,
@@ -226,7 +225,7 @@ export default function EditMeeting() {
           <Button
             icon="external"
             theme="secondary"
-            url={formatUrl(accountUrl, meeting.slug)}
+            url={`${accountUrl}${meeting.slug}`}
           >
             {strings.meetings.view}
           </Button>
