@@ -109,6 +109,19 @@ export async function getAllMeetingsForJson(accountID: string) {
       conference_phone: true,
       conference_phone_notes: true,
       updatedAt: true,
+      location: true,
+      geocode: {
+        select: {
+          formatted_address: true,
+          latitude: true,
+          longitude: true,
+          timezone: true,
+          neighborhood: true,
+          city: true,
+          state: true,
+          country: true,
+        },
+      },
       group: {
         select: {
           name: true,

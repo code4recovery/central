@@ -1,4 +1,4 @@
-import type { Group, Meeting } from "@prisma/client";
+import type { Geocode, Group, Meeting } from "@prisma/client";
 
 import { config, formatUrl } from "~/helpers";
 
@@ -7,10 +7,11 @@ export function formatJson(
     Partial<Meeting> & {
       languages: { code: string }[];
       types: { code: string }[];
+      geocode?: Partial<Geocode>;
       group: Partial<Group>;
     }
   >,
-  accountUrl: string
+  accountUrl: string,
 ) {
   const url = (path: string) =>
     `${process.env.BASE_URL ?? "https://central.aa-intergroup.org"}${path}`;
@@ -31,6 +32,7 @@ export function formatJson(
         conference_phone,
         conference_phone_notes,
         updatedAt,
+        geocode,
         group,
       }) => ({
         slug,
@@ -45,7 +47,7 @@ export function formatJson(
                 ? config.languageSubstitutions[
                     code as keyof typeof config.languageSubstitutions
                   ]
-                : code
+                : code,
             ),
           ...types.map(({ code }) => code),
         ],
@@ -55,6 +57,9 @@ export function formatJson(
         conference_url_notes,
         conference_phone,
         conference_phone_notes,
+        formatted_address: geocode?.formatted_address,
+        latitude: geocode?.latitude,
+        longitude: geocode?.longitude,
         group: group.name,
         group_id: group.recordID,
         group_notes: group.notes,
@@ -73,11 +78,11 @@ export function formatJson(
           .join(" ")
           .split("Z")
           .join(""), // todo use group/meeting created/updated whichever is latest
-      })
+      }),
     )
     .map((entry) =>
       Object.entries(entry)
         .filter(([_, v]) => v !== null && v !== "") // remove null / empty values
-        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {})
+        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {}),
     );
 }
