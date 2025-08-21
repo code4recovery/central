@@ -1,7 +1,8 @@
 import { formatClasses as cx } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
 
 export function Spinner({ className }: { className?: string }) {
+  const strings = useTranslation();
   return (
     <svg
       aria-label={strings.loading}

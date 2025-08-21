@@ -9,13 +9,16 @@ import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, Template } from "~/components";
 import { config, formatValidator, validObjectId } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getIDs } from "~/utils";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
+import { db, getIDs, getStrings } from "~/utils";
 
 export const action: ActionFunction = async ({ params, request }) => {
   if (!validObjectId(params.id)) {
     return redirect(config.home); // todo flash invalid id message to this page
   }
+
+  const translation = await getStrings(request);
 
   // security
   const { userID } = await getIDs(request);
@@ -42,7 +45,7 @@ export const action: ActionFunction = async ({ params, request }) => {
     where: { id: params.id },
   });
 
-  return json({ success: strings.account.updated });
+  return json({ success: translation.account.updated });
 };
 
 export const loader: LoaderFunction = async ({ params, request }) => {
@@ -62,13 +65,14 @@ export const loader: LoaderFunction = async ({ params, request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.account.title,
+  title: en.account.title,
 });
 
 export default function Settings() {
   const loaderData = useLoaderData();
   const actionData = useActionData();
   const { state } = useNavigation();
+  const strings = useTranslation();
   return (
     <Template title={strings.account.title}>
       <Columns

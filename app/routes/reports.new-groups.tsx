@@ -15,7 +15,8 @@ import { zfd } from "zod-form-data";
 
 import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { formatDate, formatString } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 import { countGroups, getGroups } from "~/models";
 import { getIDs } from "~/utils";
 
@@ -28,7 +29,7 @@ export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
     z.object({
       skip: zfd.numeric(),
-    })
+    }),
   );
 
   const { data, error } = await validator.validate(await request.formData());
@@ -53,7 +54,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.reports.title,
+  title: en.reports.title,
 });
 
 export default function NewGroups() {
@@ -66,7 +67,7 @@ export default function NewGroups() {
       }
     >
   >(loadedGroups);
-
+  const strings = useTranslation();
   const actionData = useActionData();
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export default function NewGroups() {
           meetings: meetings.length,
           name,
           user: !!activity.length && (
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <Avatar
                 emailHash={activity[0].user.emailHash}
                 name={activity[0].user.name}

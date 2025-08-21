@@ -4,8 +4,8 @@ import { useLoaderData } from "@remix-run/react";
 
 import { Alerts, Avatar, Button, Chiclet, Table, Template } from "~/components";
 import { formatDate } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
+import { en } from "~/i18n";
 import { db, getIDs, jsonWith } from "~/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -25,12 +25,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.users.title,
+  title: en.users.title,
 });
 
 export default function Users() {
   const { alert, users } = useLoaderData();
   const { currentAccountID, isAdmin } = useUser();
+  const strings = useTranslation();
 
   return (
     <Template
@@ -53,7 +54,7 @@ export default function Users() {
         rows={users.map((user: User) => ({
           ...user,
           name: (
-            <div className="flex gap-3 items-center">
+            <div className="flex items-center gap-3">
               <Avatar emailHash={user.emailHash} name={user.name} size="md" />
               {user.name}
             </div>

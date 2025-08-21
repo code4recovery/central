@@ -5,12 +5,14 @@ import type {
 } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData, useNavigate } from "@remix-run/react";
+import { useMemo } from "react";
 import { validationError } from "remix-validated-form";
 
 import { Alerts, Columns, Form, HelpTopic, Template } from "~/components";
 import { formatSlug, formatString, formatValidator } from "~/helpers";
-import { strings } from "~/i18n";
-import { db, getIDs, optionsInUse, redirectWith } from "~/utils";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
+import { db, getIDs, getStrings, optionsInUse, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   const validator = formatValidator("meeting-create");
@@ -20,6 +22,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (error) {
     return validationError(error);
   }
+
+  const strings = await getStrings(request);
 
   const {
     name,
@@ -113,7 +117,7 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
   const { accountID } = await getIDs(request);
 
   const group = await db.group.findUnique({
-    select: { id: true, name: true },
+    include: { meetings: true },
     where: { id },
   });
 
@@ -121,12 +125,40 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.meetings.title,
+  title: en.meetings.title,
 });
 
 export default function CreateMeeting() {
+  const strings = useTranslation();
   const actionData = useActionData();
   const { group, optionsInUse } = useLoaderData();
+
+  // get main address
+  const mainAddress = useMemo(() => {
+    const counts = new Map();
+
+    for (const meeting of group.meetings) {
+      const value = meeting.geocodeID;
+      counts.set(value, (counts.get(value) || 0) + 1);
+    }
+
+    let maxFrequency = 0;
+    for (const count of counts.values()) {
+      if (count > maxFrequency) {
+        maxFrequency = count;
+      }
+    }
+
+    let mostFrequentValue;
+    for (const [value, count] of counts.entries()) {
+      if (count === maxFrequency) {
+        mostFrequentValue = value;
+      }
+    }
+
+    return mostFrequentValue;
+  }, [group.meetings]);
+
   const navigate = useNavigate();
   return (
     <Template
@@ -144,6 +176,10 @@ export default function CreateMeeting() {
               cancel={() => navigate(`/groups/${group.id}`)}
               form="meeting-create"
               optionsInUse={optionsInUse}
+              values={{
+                name: group.name,
+                geocodeID: mainAddress,
+              }}
             />
           </>
         }

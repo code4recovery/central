@@ -1,10 +1,13 @@
-import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
 import type { Account } from "@prisma/client";
+import { createCookieSessionStorage, json, redirect } from "@remix-run/node";
+
+import parser from "accept-language-parser";
 
 import { config, formatString } from "~/helpers";
-import { strings } from "~/i18n";
-import type { Alert as AlertType } from "~/types";
+import { type Alert as AlertType, isLanguage } from "~/types";
 import { db } from "./db.server";
+
+import * as translations from "../i18n";
 
 if (!process.env.SESSION_SECRET) {
   throw new Error("SESSION_SECRET must be set");
@@ -24,10 +27,11 @@ const storage = createCookieSessionStorage({
 
 export async function changeAccount(request: Request, account: Account) {
   const session = await getSession(request);
+  const strings = await getStrings(request);
   session.set("currentAccountID", account.id);
   session.flash(
     "success",
-    formatString(strings.account.switched, { name: account.name })
+    formatString(strings.account.switched, { name: account.name }),
   );
   return redirect("/", {
     headers: {
@@ -65,6 +69,13 @@ export async function getIDs(request: Request) {
 
 export async function getSession(request: Request) {
   return await storage.getSession(request.headers.get("Cookie"));
+}
+
+export async function getStrings(request: Request) {
+  const language =
+    parser.pick(["en", "es"], request.headers.get("accept-language") ?? "") ??
+    "";
+  return isLanguage(language) ? translations[language] : translations.en;
 }
 
 export async function getUserOrRedirect(request: Request) {
@@ -108,7 +119,7 @@ export async function getUserOrRedirect(request: Request) {
 
   if (user) {
     const canLogIn = user.accounts.some(
-      (account) => account.id === user.currentAccountID
+      (account) => account.id === user.currentAccountID,
     );
 
     if (routeIsLoggedOut) {
@@ -162,7 +173,7 @@ export async function jsonWith(request: Request, payload: object) {
       headers: {
         "Set-Cookie": await storage.commitSession(session),
       },
-    }
+    },
   );
 }
 
@@ -180,7 +191,7 @@ export async function redirectWith(
   request: Request,
   payload: {
     [Property in keyof AlertType]: string;
-  }
+  },
 ) {
   const session = await getSession(request);
   session.flash(Object.keys(payload)[0], Object.values(payload)[0]);

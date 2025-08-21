@@ -1,5 +1,5 @@
 import { config, validObjectId } from "~/helpers";
-import { strings } from "~/i18n";
+import { en as strings } from "~/i18n";
 import { db } from "~/utils";
 
 export async function getArchived({
@@ -109,6 +109,19 @@ export async function getAllMeetingsForJson(accountID: string) {
       conference_phone: true,
       conference_phone_notes: true,
       updatedAt: true,
+      location: true,
+      geocode: {
+        select: {
+          formatted_address: true,
+          latitude: true,
+          longitude: true,
+          timezone: true,
+          neighborhood: true,
+          city: true,
+          state: true,
+          country: true,
+        },
+      },
       group: {
         select: {
           name: true,

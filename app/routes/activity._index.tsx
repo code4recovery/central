@@ -1,3 +1,4 @@
+import { CalendarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import type { Activity, Change, Meeting, User } from "@prisma/client";
 import {
   json,
@@ -8,14 +9,14 @@ import {
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useEffect, useState } from "react";
-import { CalendarIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { validationError } from "remix-validated-form";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
 import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { formatActivity, formatString } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 import { getActivity, getActivityCount } from "~/models";
 import { getIDs, jsonWith } from "~/utils";
 
@@ -23,7 +24,7 @@ export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
     z.object({
       skip: zfd.numeric(),
-    })
+    }),
   );
 
   const { data, error } = await validator.validate(await request.formData());
@@ -47,7 +48,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.activity.title,
+  title: en.activity.title,
 });
 
 export default function ActivityScreen() {
@@ -63,6 +64,7 @@ export default function ActivityScreen() {
       }
     >
   >(loadedActivity);
+  const strings = useTranslation();
 
   useEffect(() => {
     if (actionData) {
@@ -88,12 +90,12 @@ export default function ActivityScreen() {
           name: activity.meeting ? activity.meeting.name : activity.group?.name,
           link: `/activity/${activity.id}`,
           type: activity.meeting ? (
-            <div className="flex gap-2 items-center">
-              <CalendarIcon className="h-6 w-6" /> Meeting
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="h-6 w-6" /> {strings.meetings.title}
             </div>
           ) : (
-            <div className="flex gap-2 items-center">
-              <UserGroupIcon className="h-6 w-6" /> Group
+            <div className="flex items-center gap-2">
+              <UserGroupIcon className="h-6 w-6" /> {strings.group.title}
             </div>
           ),
           change: formatString(
@@ -103,10 +105,10 @@ export default function ActivityScreen() {
             formatActivity({
               ...activity,
               type: activity.meeting ? "meeting" : "group",
-            })
+            }),
           ),
           user: (
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <Avatar
                 emailHash={activity.user.emailHash}
                 name={activity.user.name}

@@ -22,11 +22,12 @@ import {
   formatSearch,
   formatString,
 } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
+import { en } from "~/i18n";
 import {
   db,
   getIDs,
+  getStrings,
   redirectWith,
   searchGroups,
   searchMeetings,
@@ -108,6 +109,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     new URL(request.url).searchParams.get("search") ?? ""
   ).replace(/['"]+/g, "");
 
+  const strings = await getStrings(request);
+
   if (!search) {
     return redirect("/", request);
   }
@@ -132,10 +135,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.search.title,
+  title: en.search.title,
 });
 
 export default function Index() {
+  const strings = useTranslation();
   const {
     theme: { text },
   } = useUser();

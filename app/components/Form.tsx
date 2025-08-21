@@ -14,11 +14,11 @@ import {
 import {
   config,
   formatClasses as cx,
-  fields,
   formatValidator,
+  getFields,
+  Model,
 } from "~/helpers";
-import { useGeocode } from "~/hooks";
-import { strings } from "~/i18n";
+import { useGeocode, useTranslation } from "~/hooks";
 
 export function Form({
   cancel,
@@ -34,7 +34,7 @@ export function Form({
   submitText,
 }: {
   cancel?: () => void;
-  form: keyof typeof fields;
+  form: Model;
   onSubmit?: () => void;
   optionsInUse?: { [key: string]: string[] };
   values?: { [key: string]: string | string[] };
@@ -49,6 +49,8 @@ export function Form({
     geocode: { location_type },
   } = useGeocode();
   const streetAddress = location_type && location_type !== "APPROXIMATE";
+  const strings = useTranslation();
+  const fields = getFields(form, strings);
   return (
     <ValidatedForm
       autoComplete="off"
@@ -62,11 +64,10 @@ export function Form({
         <div className="shadow sm:overflow-hidden sm:rounded-md">
           <div className="space-y-6 bg-white px-4 py-5 dark:bg-neutral-950 sm:p-6">
             <div className="grid grid-cols-12 gap-5">
-              {Object.keys(fields[form])
-                .filter((name) => !fields[form][name].adminOnly || isAdmin)
+              {Object.keys(fields)
+                .filter((name) => !fields[name].adminOnly || isAdmin)
                 .filter(
-                  (name) =>
-                    !fields[form][name].streetAddressOnly || streetAddress,
+                  (name) => !fields[name].streetAddressOnly || streetAddress,
                 )
                 .map((name) => {
                   const {
@@ -78,7 +79,7 @@ export function Form({
                     required,
                     span,
                     type,
-                  } = fields[form][name];
+                  } = fields[name];
                   return type === "hidden" ? (
                     <input
                       type="hidden"
@@ -106,14 +107,14 @@ export function Form({
                       <Label htmlFor={name}>{label}</Label>
                       {type === "checkbox" && (
                         <Checkbox
-                          {...fields[form][name]}
+                          {...fields[name]}
                           name={name}
                           defaultChecked={values?.[name]}
                         />
                       )}
                       {type === "checkboxes" && (
                         <Checkboxes
-                          {...fields[form][name]}
+                          {...fields[name]}
                           name={name}
                           optionsInUse={optionsInUse?.[name]}
                           values={values?.[name] ?? defaultValue}
@@ -128,7 +129,7 @@ export function Form({
                         "url",
                       ].includes(type) && (
                         <Input
-                          {...fields[form][name]}
+                          {...fields[name]}
                           defaultValue={values?.[name] ?? defaultValue}
                           disabled={disabled}
                           name={name}
@@ -171,7 +172,7 @@ export function Form({
                       )}
                       {type === "geocode" && (
                         <Geocode
-                          {...fields[form][name]}
+                          {...fields[name]}
                           defaultValue={values?.[name] as string}
                           name={name}
                         />
@@ -192,7 +193,7 @@ export function Form({
                       )}
                       {type === "textarea" && (
                         <Textarea
-                          {...fields[form][name]}
+                          {...fields[name]}
                           defaultValue={values?.[name]}
                           name={name}
                         />
@@ -245,12 +246,13 @@ export function Form({
 }
 
 function Submit({
-  loadingText = strings.form.saving,
-  text = strings.form.save,
+  loadingText,
+  text,
 }: {
   loadingText?: string;
   text?: string;
 }) {
+  const strings = useTranslation();
   const isSubmitting = useIsSubmitting();
   return (
     <Button
@@ -260,7 +262,9 @@ function Submit({
       icon={isSubmitting ? "spinner" : undefined}
       theme="primary"
     >
-      {isSubmitting ? loadingText : text}
+      {isSubmitting
+        ? loadingText || strings.form.saving
+        : text || strings.form.save}
     </Button>
   );
 }

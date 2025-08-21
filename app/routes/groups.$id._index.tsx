@@ -13,8 +13,8 @@ import {
   type ActionFunction,
   type LoaderFunction,
 } from "@remix-run/node";
-import { validationError } from "remix-validated-form";
 import { useActionData, useLoaderData } from "@remix-run/react";
+import { validationError } from "remix-validated-form";
 
 import {
   Alerts,
@@ -26,7 +26,6 @@ import {
   Template,
 } from "~/components";
 import {
-  fields,
   formatActivity,
   formatChanges,
   formatDate,
@@ -34,11 +33,12 @@ import {
   formatString,
   formatValidator,
   formatValue,
+  getFields,
   validObjectId,
 } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
 import { addGroupRep, editGroupRep, removeGroupRep } from "~/models";
-import { db, getIDs, jsonWith } from "~/utils";
+import { db, getIDs, getStrings, jsonWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
@@ -55,7 +55,7 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
   }
 
   if (subaction === "group-rep-edit") {
-    return editGroupRep(formData, id, userID, accountID);
+    return editGroupRep(formData, id, userID);
   }
 
   if (subaction === "group-rep-remove") {
@@ -78,7 +78,11 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
     return validationError(error);
   }
 
-  const changes = formatChanges(fields.group, group, data);
+  const strings = await getStrings(request);
+
+  const fields = getFields("group", strings);
+
+  const changes = formatChanges(fields, group, data);
 
   // exit if no changes
   if (!changes.length) {
@@ -104,14 +108,14 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
           after: formatValue(after),
           field,
         },
-      })
+      }),
   );
 
   // update group
   const changed = Object.fromEntries(
     changes
       .filter(({ type }) => type !== "checkboxes")
-      .map(({ field, after }) => [field, after])
+      .map(({ field, after }) => [field, after]),
   );
 
   await db.group.update({
@@ -123,6 +127,8 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
 };
 
 export const loader: LoaderFunction = async ({ params: { id }, request }) => {
+  const strings = await getStrings(request);
+
   if (!validObjectId(id)) {
     throw new Response(null, {
       status: 404,
@@ -223,12 +229,13 @@ export const loader: LoaderFunction = async ({ params: { id }, request }) => {
 
 export default function GroupEdit() {
   const { activities, alert, group, users } = useLoaderData();
+  const strings = useTranslation();
   const actionData = useActionData();
   const alerts = { ...actionData, ...alert };
   return (
     <Template
       breadcrumbs={[["/groups", strings.group.title]]}
-      title={strings.group.edit}
+      title={group.name}
     >
       <Columns
         primary={
@@ -269,7 +276,7 @@ export default function GroupEdit() {
                   types: [...languages, ...types].map(({ code }) => code),
                   updatedAt: formatDate(updatedAt.toString()),
                   when: formatDayTime(day, time, timezone),
-                })
+                }),
               )}
             />
             <div className="flex justify-center pt-4">
@@ -319,10 +326,10 @@ export default function GroupEdit() {
                 strings.activity.general[
                   type as keyof typeof strings.activity.general
                 ],
-                formatActivity({ type: "group", approved, changes })
+                formatActivity({ type: "group", approved, changes }),
               ),
               user,
-            })
+            }),
           )}
         />
       </Columns>

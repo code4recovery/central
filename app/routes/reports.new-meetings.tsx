@@ -15,7 +15,8 @@ import { zfd } from "zod-form-data";
 
 import { Alert, LoadMore, Table, Template } from "~/components";
 import { config, formatDate, formatDayTime, formatString } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 import { db, getIDs } from "~/utils";
 
 // shared where condition
@@ -28,7 +29,7 @@ export const action: ActionFunction = async ({ request }) => {
   const validator = withZod(
     z.object({
       skip: zfd.numeric(),
-    })
+    }),
   );
 
   const { data, error } = await validator.validate(await request.formData());
@@ -86,16 +87,16 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export const meta: MetaFunction = () => ({
-  title: strings.reports.title,
+  title: en.reports.title,
 });
 
 export default function NewMeetings() {
   const { loadedMeetings, meetingCount } = useLoaderData<typeof loader>();
   const [meetings, setMeetings] =
     useState<Array<Meeting & { types: Type[]; languages: Language[] }>>(
-      loadedMeetings
+      loadedMeetings,
     );
-
+  const strings = useTranslation();
   const actionData = useActionData();
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export default function NewMeetings() {
             types: [...languages, ...types].map(({ code }) => code),
             createdAt: formatDate(createdAt.toString()),
             when: formatDayTime(day, time, timezone),
-          })
+          }),
         )}
       />
       {meetings.length < meetingCount && (

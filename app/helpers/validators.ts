@@ -8,7 +8,7 @@ import {
   validPhone,
 } from "./format-valid";
 
-import { strings } from "~/i18n";
+import { en as strings } from "~/i18n";
 
 export const optional = {
   array: zfd.repeatable(),
@@ -29,10 +29,10 @@ export const optional = {
             message: strings.form.invalidConferenceUrl,
           });
       })
-      .optional()
+      .optional(),
   ),
   email: zfd.text(
-    z.string().email({ message: strings.form.invalidEmail }).optional()
+    z.string().email({ message: strings.form.invalidEmail }).optional(),
   ),
   number: zfd.numeric(z.number().optional()),
   paypal: zfd.text(
@@ -41,7 +41,7 @@ export const optional = {
       .refine((val) => validPayPal(val), {
         message: strings.form.invalidPayPal,
       })
-      .optional()
+      .optional(),
   ),
   phone: zfd.text(
     z
@@ -49,14 +49,14 @@ export const optional = {
       .refine((val) => validPhone(val), {
         message: strings.form.invalidPhone,
       })
-      .optional()
+      .optional(),
   ),
   square: zfd.text(
-    z.string().startsWith("$", strings.form.invalidSquare).optional()
+    z.string().startsWith("$", strings.form.invalidSquare).optional(),
   ),
   string: zfd.text(z.string().optional()),
   venmo: zfd.text(
-    z.string().startsWith("@", strings.form.invalidVenmo).optional()
+    z.string().startsWith("@", strings.form.invalidVenmo).optional(),
   ),
   url: zfd.text(z.string().url().optional()),
 };
@@ -66,7 +66,7 @@ export const required = {
   email: zfd.text(
     z
       .string({ required_error: strings.form.required })
-      .email({ message: strings.form.invalidEmail })
+      .email({ message: strings.form.invalidEmail }),
   ),
   string: zfd.text(),
   url: zfd.text(z.string().url()),

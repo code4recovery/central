@@ -1,10 +1,11 @@
 import { config } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
 
 export function Footer() {
+  const strings = useTranslation();
   return (
     <footer>
-      <div className="mx-auto max-w-7xl pb-16 px-6 lg:px-8 text-center">
+      <div className="mx-auto max-w-7xl px-6 pb-16 text-center lg:px-8">
         <a
           className="text-sm leading-5 text-neutral-500 underline"
           href={config.aboutUrl}

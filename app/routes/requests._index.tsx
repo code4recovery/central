@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 
 import { Alert, Avatar, LoadMore, Table, Template } from "~/components";
 import { formatActivity, formatDate, formatString } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { en } from "~/i18n";
 import { db } from "~/utils";
 
 export const meta: MetaFunction = () => ({
-  title: strings.requests.title,
+  title: en.requests.title,
 });
 
 export const loader: LoaderFunction = async () => {
@@ -28,6 +29,7 @@ export const loader: LoaderFunction = async () => {
 export default function RequestsScreen() {
   const { loadedActivity, activityCount } = useLoaderData();
   const actionData = useActionData();
+  const strings = useTranslation();
   const [activity, setActivity] = useState<
     Array<
       Activity & {
@@ -76,10 +78,10 @@ export default function RequestsScreen() {
             formatActivity({
               ...activity,
               type: activity.meeting ? "meeting" : "group",
-            })
+            }),
           ),
           user: (
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <Avatar
                 emailHash={activity.user.emailHash}
                 name={activity.user.name}

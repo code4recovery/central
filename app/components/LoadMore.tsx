@@ -1,8 +1,8 @@
 import { Form, useNavigation } from "@remix-run/react";
 
-import { Button } from "./Button";
 import { config, formatString } from "~/helpers";
-import { strings } from "~/i18n";
+import { useTranslation } from "~/hooks";
+import { Button } from "./Button";
 
 export function LoadMore({
   loadedCount,
@@ -13,6 +13,7 @@ export function LoadMore({
 }) {
   const { state } = useNavigation();
   const idle = state === "idle";
+  const strings = useTranslation();
 
   return (
     <Form method="post" className="flex justify-center">

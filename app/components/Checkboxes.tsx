@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { config, formatClasses as cx } from "~/helpers";
-import { useUser } from "~/hooks";
+import { useTranslation, useUser } from "~/hooks";
 import type { Option } from "~/types";
 
 export function Checkboxes({
@@ -21,24 +21,25 @@ export function Checkboxes({
     theme: { focusRing, text },
   } = useUser();
   const [showAll, setShowAll] = useState(false);
+  const strings = useTranslation();
 
   if (!options) return null;
   return (
     <>
-      <div className="items-start gap-x-5 gap-y-3 grid grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-3 items-start gap-x-5 gap-y-3 lg:grid-cols-4">
         {options
           .filter(
             ({ value }) =>
-              showAll || !optionsInUse?.length || optionsInUse?.includes(value)
+              showAll || !optionsInUse?.length || optionsInUse?.includes(value),
           )
           .map(({ value: optionValue, label }) => (
-            <div className="flex items-top gap-2 m-0" key={optionValue}>
+            <div className="items-top m-0 flex gap-2" key={optionValue}>
               <input
                 className={cx(
                   config.classes.checkbox,
                   focusRing,
                   text,
-                  className
+                  className,
                 )}
                 defaultChecked={
                   Array.isArray(values) && values?.includes(optionValue)
@@ -49,7 +50,7 @@ export function Checkboxes({
                 value={optionValue}
               />
               <label
-                className="text-sm truncate"
+                className="truncate text-sm"
                 htmlFor={optionValue}
                 title={label}
               >
@@ -59,13 +60,15 @@ export function Checkboxes({
           ))}
       </div>
       {!!optionsInUse?.length && optionsInUse.length !== options.length && (
-        <div className="flex justify-end mt-3">
+        <div className="mt-3 flex justify-end">
           <button
-            className="text-sm bg-neutral-200 text-neutral-500 hover:bg-neutral-300 dark:hover:bg-neutral-800 hover:text-neutral-800 dark:hover:text-neutral-200 dark:bg-neutral-900 rounded px-2 py-1"
+            className="rounded bg-neutral-200 px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-300 hover:text-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-200"
             onClick={() => setShowAll(!showAll)}
             type="button"
           >
-            {showAll ? "Hide not in use" : "Show all"}
+            {showAll
+              ? strings.meetings.hide_not_in_use
+              : strings.meetings.show_all}
           </button>
         </div>
       )}

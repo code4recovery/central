@@ -1,9 +1,8 @@
-import { Fragment } from "react";
 import { useNavigate } from "@remix-run/react";
+import { Fragment } from "react";
 
 import { formatClasses as cx } from "~/helpers";
-import { useUser } from "~/hooks";
-import { strings } from "~/i18n";
+import { useTranslation, useUser } from "~/hooks";
 
 import { Chiclet } from "./Chiclet";
 
@@ -34,12 +33,13 @@ export function Table({
   const {
     theme: { text },
   } = useUser();
+  const strings = useTranslation();
 
   if (!rows.length) return null;
 
   const showValue = (value: Value) =>
     Array.isArray(value) ? (
-      <div className="flex gap-1 flex-wrap">
+      <div className="flex flex-wrap gap-1">
         {value.map((type) => (
           <Chiclet key={type}>
             {strings.types[type as keyof typeof strings.types] ??
@@ -54,8 +54,8 @@ export function Table({
   return (
     <table
       className={cx(
-        "min-w-full divide-y divide-neutral-500 text-left text-sm table-fixed",
-        className
+        "min-w-full table-fixed divide-y divide-neutral-500 text-left text-sm",
+        className,
       )}
     >
       <thead>
@@ -76,7 +76,7 @@ export function Table({
           ))}
         </tr>
       </thead>
-      <tbody className="divide-y divide-neutral-300 dark:divide-neutral-700 text-neutral-700 dark:text-neutral-300">
+      <tbody className="divide-y divide-neutral-300 text-neutral-700 dark:divide-neutral-700 dark:text-neutral-300">
         {rows.map((row) => {
           const stack = (
             <dl className="font-normal lg:hidden">
@@ -93,7 +93,7 @@ export function Table({
                         {showValue(row[key] as Value)}
                       </dd>
                     </Fragment>
-                  )
+                  ),
               )}
             </dl>
           );
@@ -109,7 +109,7 @@ export function Table({
 
           return (
             <tr key={row.id} {...rowProps}>
-              <td className="w-2/5 max-w-0 font-medium sm:w-auto sm:max-w-none p-3">
+              <td className="w-2/5 max-w-0 p-3 font-medium sm:w-auto sm:max-w-none">
                 <div className={row.link ? cx(text, "underline") : undefined}>
                   {showValue(row[keys[0]] as Value)}
                 </div>
@@ -119,8 +119,8 @@ export function Table({
                 <td
                   key={key}
                   className={cx("p-3", {
-                    "hidden lg:table-cell w-1/5": index === 0,
-                    "hidden sm:table-cell w-1/4": index === 1,
+                    "hidden w-1/5 lg:table-cell": index === 0,
+                    "hidden w-1/4 sm:table-cell": index === 1,
                     "w-1/5": index === 2,
                     "text-center": columns[key].align === "center",
                     "text-right": columns[key].align === "right",

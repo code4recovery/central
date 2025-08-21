@@ -1,17 +1,17 @@
-import { validationError } from "remix-validated-form";
-import md5 from "blueimp-md5";
-import { json } from "@remix-run/node";
 import type { Prisma } from "@prisma/client";
+import { json } from "@remix-run/node";
+import md5 from "blueimp-md5";
+import { validationError } from "remix-validated-form";
 
 import { config, formatValidator } from "~/helpers";
+import { en as strings } from "~/i18n";
 import { db } from "../utils/db.server";
-import { strings } from "~/i18n";
 
 export async function addGroupRep(
   formData: FormData,
   groupID: string,
   userID: string,
-  currentAccountID: string
+  currentAccountID: string,
 ) {
   const validator = formatValidator("group-rep-add");
   const { data, error } = await validator.validate(formData);
@@ -64,7 +64,6 @@ export async function editGroupRep(
   formData: FormData,
   groupID: string,
   userID: string,
-  currentAccountID: string
 ) {
   const validator = formatValidator("group-rep-edit");
   const { data, error } = await validator.validate(formData);
@@ -128,7 +127,7 @@ export async function editGroupRep(
 
 export async function countGroups(
   accountID: string,
-  where?: Prisma.GroupWhereInput
+  where?: Prisma.GroupWhereInput,
 ) {
   return await db.group.count({
     where: { ...where, accountID },
@@ -138,7 +137,7 @@ export async function countGroups(
 export async function getGroups(
   accountID: string,
   skip?: number,
-  where?: Prisma.GroupWhereInput
+  where?: Prisma.GroupWhereInput,
 ) {
   return await db.group.findMany({
     orderBy: [{ updatedAt: "desc" }, { id: "asc" }],
@@ -186,7 +185,7 @@ export async function getGroups(
 export async function removeGroupRep(
   formData: FormData,
   id: string,
-  userID: string
+  userID: string,
 ) {
   const targetID = formData.get("targetID") as string;
   if (targetID) {
