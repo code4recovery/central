@@ -118,6 +118,7 @@ export async function getAllMeetingsForJson(accountID: string) {
           timezone: true,
           neighborhood: true,
           city: true,
+          county: true,
           state: true,
           country: true,
         },

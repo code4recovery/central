@@ -23,7 +23,7 @@ type Translation = typeof en;
 export const getFields = (form: Model, strings: Translation) => {
   const meeting: { [key: string]: Field } = {
     name: {
-      className: "text-xl font-semibold px-4 py-2",
+      className: "text-xl font-semibold py-2",
       label: strings.meetings.name,
       type: "text",
       validation: required.string,
@@ -154,18 +154,38 @@ export const getFields = (form: Model, strings: Translation) => {
   const fields: { [index: string]: { [index: string]: Field } } = {
     account: {
       name: {
+        className: "text-xl font-semibold py-2",
         helpText: strings.account.name_description,
         label: strings.account.name,
         type: "text",
         validation: required.string,
       },
       url: {
+        className: "font-mono text-sm",
         helpText: strings.account.url_description,
         label: strings.account.url,
         placeholder: strings.account.url_placeholder,
-        span: 8,
         type: "url",
         validation: required.url,
+      },
+      language: {
+        label: strings.account.language,
+        helpText: strings.account.language_description,
+        type: "select",
+        options: Object.keys(strings.languages)
+          .sort((a, b) =>
+            strings.languages[
+              a as keyof typeof strings.languages
+            ].localeCompare(
+              strings.languages[b as keyof typeof strings.languages],
+            ),
+          )
+          .map((type) => ({
+            value: type,
+            label: strings.languages[type as keyof typeof strings.languages],
+          })),
+        defaultValue: "EN",
+        validation: required.string,
       },
       theme: {
         label: strings.account.theme,

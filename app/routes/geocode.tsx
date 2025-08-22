@@ -4,6 +4,7 @@ import { db, geocode, getIDs } from "~/utils";
 
 export const action: ActionFunction = async ({ request }) => {
   const data = await request.formData();
+  const { accountID } = await getIDs(request);
 
   const query = data.get("query")?.toString() ?? "";
 
@@ -11,18 +12,19 @@ export const action: ActionFunction = async ({ request }) => {
     throw new Error("empty geocoding request");
   }
 
-  return json(await geocode(query));
+  return json(await geocode(query, accountID));
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
   // secret geocode mode
   const url = new URL(request.url);
   const query = url.searchParams.get("query");
+  const { accountID } = await getIDs(request);
+
   if (query) {
-    return json(await geocode(query));
+    return json(await geocode(query, accountID));
   }
 
-  const { accountID } = await getIDs(request);
   const addresses = await db.geocode.findMany({
     select: {
       id: true,

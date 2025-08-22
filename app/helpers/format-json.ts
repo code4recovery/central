@@ -67,6 +67,13 @@ export function formatJson(
         formatted_address: geocode?.formatted_address,
         latitude: geocode?.latitude,
         longitude: geocode?.longitude,
+        regions: [
+          geocode?.country,
+          geocode?.state,
+          geocode?.county,
+          geocode?.city,
+          geocode?.neighborhood,
+        ].filter(Boolean),
         group: group.name,
         group_id: group.recordID,
         group_notes: group.notes,

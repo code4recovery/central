@@ -2,6 +2,8 @@ export const en = {
   about: "About this software",
   account: {
     description: "Settings apply to all account users.",
+    language: "Language",
+    language_description: "Used when geocoding addresses",
     name: "Service entity name",
     name_description: "Used in emails",
     notFound: "Could not find account.",

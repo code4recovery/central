@@ -1,7 +1,7 @@
 import { AddressType, Client } from "@googlemaps/google-maps-services-js";
 import { db } from "./db.server";
 
-export async function geocode(query: string) {
+export async function geocode(query: string, accountID: string) {
   const result = await db.geoquery.findUnique({
     select: {
       geocode: {
@@ -20,6 +20,13 @@ export async function geocode(query: string) {
     },
   });
 
+  const account = await db.account.findUnique({
+    where: { id: accountID },
+    select: { language: true },
+  });
+
+  const language = account?.language ?? "EN";
+
   if (result) {
     return { ...result.geocode, status: "cache" };
   }
@@ -31,7 +38,9 @@ export async function geocode(query: string) {
   let geocode;
 
   try {
-    const response = await client.geocode({ params: { address: query, key } });
+    const response = await client.geocode({
+      params: { address: query, key, language },
+    });
 
     if (!response.data.results.length) {
       return { status: "no_results" };
@@ -46,8 +55,13 @@ export async function geocode(query: string) {
       types,
     } = response.data.results[0];
 
+    const neighborhoodTypes = [
+      AddressType.neighborhood,
+      AddressType.sublocality,
+    ];
+
     const neighborhood = address_components.filter(({ types }) =>
-      types.includes(AddressType.neighborhood)
+      neighborhoodTypes.some((type) => types.includes(type)),
     )[0]?.short_name;
 
     const cityTypes = [
@@ -56,15 +70,19 @@ export async function geocode(query: string) {
       AddressType.administrative_area_level_3,
     ];
     const city = address_components.filter(({ types }) =>
-      cityTypes.some((type) => types.includes(type))
+      cityTypes.some((type) => types.includes(type)),
     )[0]?.long_name;
 
     const state = address_components.filter(({ types }) =>
-      types.includes(AddressType.administrative_area_level_1)
+      types.includes(AddressType.administrative_area_level_1),
+    )[0]?.long_name;
+
+    const county = address_components.filter(({ types }) =>
+      types.includes(AddressType.administrative_area_level_2),
     )[0]?.long_name;
 
     const country = address_components.filter(({ types }) =>
-      types.includes(AddressType.administrative_area_level_1)
+      types.includes(AddressType.country),
     )[0]?.long_name;
 
     const timestamp = new Date();
@@ -76,6 +94,7 @@ export async function geocode(query: string) {
     geocode = {
       neighborhood,
       city,
+      county,
       state,
       country,
       formatted_address,

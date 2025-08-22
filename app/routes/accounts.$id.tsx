@@ -34,10 +34,11 @@ export const action: ActionFunction = async ({ params, request }) => {
   if (error) {
     return validationError(error);
   }
-  const { name, url, theme } = data;
+  const { name, url, language, theme } = data;
 
   await db.account.update({
     data: {
+      language,
       name,
       url,
       theme,

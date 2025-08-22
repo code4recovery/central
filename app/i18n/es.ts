@@ -4,6 +4,8 @@ export const es: typeof en = {
   about: "Acerca de este software",
   account: {
     description: `La configuración se aplica a todas las usuarios de la cuenta.`,
+    language: "Lenguaje",
+    language_description: "Se utiliza al geocodificar direcciones",
     name: "Nombre de la entidad de servicio",
     name_description: "Utilizado en correos electrónicos",
     notFound: "No se pudo encontrar la cuenta.",

@@ -18,6 +18,7 @@ model Account {
   name       String
   url        String
   theme      String
+  language   String?
   meetingIDs String[]  @db.ObjectId
   meetings   Meeting[]
   groupIDs   String[]  @db.ObjectId
@@ -63,6 +64,7 @@ model Geocode {
   searches          Geoquery[]
   neighborhood      String?
   city              String?
+  county            String?
   state             String?
   country           String?
   formatted_address String     @unique

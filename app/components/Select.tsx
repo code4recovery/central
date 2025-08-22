@@ -1,6 +1,7 @@
 import { config, formatClasses as cx } from "~/helpers";
 import { useGeocode, useUser } from "~/hooks";
-import type { Option } from "~/types";
+import type { Field, Option } from "~/types";
+import { HelpText } from "./HelpText";
 
 export function Select({
   className,
@@ -8,12 +9,9 @@ export function Select({
   name,
   options = [],
   required,
-}: {
-  className?: string;
-  defaultValue?: string | number;
+  helpText,
+}: Partial<Field> & {
   name: string;
-  options?: Option[];
-  required?: boolean;
 }) {
   const {
     theme: { focusRing },
@@ -52,6 +50,7 @@ export function Select({
           );
         })}
       </select>
+      <HelpText helpText={helpText} />
     </>
   );
 }

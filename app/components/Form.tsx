@@ -179,13 +179,12 @@ export function Form({
                       )}
                       {type === "select" && (
                         <Select
+                          {...fields[name]}
                           className={className}
                           defaultValue={
                             (values?.[name] ?? defaultValue) as string | number
                           }
                           name={name}
-                          options={options}
-                          required={required}
                         />
                       )}
                       {type === "select-multiple" && (
