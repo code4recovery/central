@@ -7,7 +7,7 @@ const arrayEquals = (array1: string[], array2: string[]) =>
 export function formatChanges(
   fields: { [index: string]: Field },
   value: { [key: string]: any },
-  data: { [key: string]: any }
+  data: { [key: string]: any },
 ) {
   // get changed fields
   return Object.keys(fields)
@@ -20,7 +20,7 @@ export function formatChanges(
     .filter(({ type, before, after }) =>
       type === "checkboxes"
         ? !arrayEquals(before as string[], after as string[])
-        : before !== after
+        : before !== after,
     )
-    .filter(({ before, after }) => before || after);
+    .filter(({ before, after }) => before !== null || after !== null);
 }

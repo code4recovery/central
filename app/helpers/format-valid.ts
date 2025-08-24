@@ -5,7 +5,7 @@ export function validConferenceProvider(url: string): url is string {
   try {
     const { host } = new URL(url);
     return Object.keys(config.conference_providers).some((domain) =>
-      host.endsWith(domain)
+      host.endsWith(domain),
     );
   } catch {
     return false;
@@ -32,7 +32,7 @@ export function validPayPal(handle: string): handle is string {
 }
 
 export function validPhone(phone: string): phone is string {
-  return !!phone.match(/^[0-9-+(),#]*$/);
+  return !!phone.match(/^[0-9-+(),# ]*$/);
 }
 
 export function validUrl(url: string): url is string {
