@@ -51,10 +51,12 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async () => {
-  const {
-    _max: { recordID },
-  } = await db.group.aggregate({ _max: { recordID: true } });
-  return json({ recordID: parseInt(recordID || "0") + 1 });
+  const meetings = await db.group.findMany({ select: { recordID: true } });
+  return json({
+    recordID:
+      Math.max(...meetings.map(({ recordID }) => parseInt(recordID ?? "")), 0) +
+      1,
+  });
 };
 
 export default function AddGroup() {
