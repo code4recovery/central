@@ -212,10 +212,10 @@ export function Form({
             )}
           >
             {!!saveOptions?.length && (
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {strings.meetings.apply_changes}
                 <select
-                  className="rounded-md bg-neutral-50 text-sm dark:bg-neutral-950"
+                  className="max-w-[300px] rounded-md bg-neutral-50 text-sm dark:bg-neutral-950"
                   name="save-option"
                 >
                   <option>{strings.meetings.apply_changes_only_this}</option>
