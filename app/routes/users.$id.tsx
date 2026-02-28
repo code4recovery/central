@@ -6,14 +6,14 @@ import { validationError } from "remix-validated-form";
 import { Alerts, Button, Columns, Form, Template } from "~/components";
 import { formatValidator, validObjectId } from "~/helpers";
 import { useTranslation, useUser } from "~/hooks";
-import { db, getIDs, redirectWith } from "~/utils";
+import { db, getIDs, getStrings, redirectWith } from "~/utils";
 
 export const action: ActionFunction = async ({ params: { id }, request }) => {
   if (!validObjectId(id)) {
     return redirect("/users"); // todo flash invalid id message to this page
   }
   const validator = formatValidator("user");
-  const strings = useTranslation();
+  const strings = await getStrings(request);
   const { data, error } = await validator.validate(await request.formData());
   if (error) {
     return validationError(error);
@@ -33,7 +33,9 @@ export const action: ActionFunction = async ({ params: { id }, request }) => {
         : { disconnect: { id: accountID } },
     },
   });
-  return redirectWith("/users", request, { success: strings.users.updated });
+  return redirectWith("/users", request, {
+    success: strings.users.updated,
+  });
 };
 
 export const loader: LoaderFunction = async ({ params: { id } }) => {

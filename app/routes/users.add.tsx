@@ -27,7 +27,7 @@ export const action: ActionFunction = async ({ request }) => {
     return validationError(error);
   }
 
-  const { name, email } = data;
+  const { name, email, admin } = data;
   const emailHash = md5(email);
   const loginToken = formatToken();
 
@@ -35,7 +35,12 @@ export const action: ActionFunction = async ({ request }) => {
     // if user exists, add them to this account
     db.user.update({
       where: { email },
-      data: { accounts: { connect: { id: accountID } } },
+      data: {
+        accounts: { connect: { id: accountID } },
+        adminAccounts: admin
+          ? { connect: { id: accountID } }
+          : { disconnect: { id: accountID } },
+      },
     });
   } else {
     // otherwise create
@@ -47,6 +52,7 @@ export const action: ActionFunction = async ({ request }) => {
         loginToken,
         currentAccountID: accountID,
         accounts: { connect: { id: accountID } },
+        adminAccounts: admin ? { connect: { id: accountID } } : {},
       },
     });
   }
